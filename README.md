@@ -136,9 +136,11 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 
 # Instructions for Use
 - How to use in command line
+
 Rscript MicroSEC.R [working/output directory] [sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [progress bar Y/N] [sample type: Human or Mouse]
 
 - Example
+
 Rscript MicroSEC.R /mnt/HDD8TB/FFPE SL_0002_L_FFPE_11-B /mnt/HDD8TB/FFPE/source/SL_mutation_somatic_200909.xlsx /mnt/HDD8TB/FFPE/source/SL_0002_L_FFPE_11_TDv4.realigned.bam /mnt/HDD8TB/FFPE/source/SL_mut_call_FFPE 150 AGATCGGAAGAGC Y Human
 
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
