@@ -1,2 +1,9 @@
 ^MicroSEC\.Rproj$
 ^\.Rproj\.user$
+^\.RData$
+^\.Rhistory$
+^NEWS\.md$
+^MicroSEC\.R$
+^MicroSEC\.Rmd$
+^source$
+^output$

@@ -1,0 +1,75 @@
+#' Repeat check package.
+#'
+#' This attempts to check the repetitive sequence around the mutation.
+#'
+#' @template devtools
+#' @param quiet if `TRUE` suppresses output from this function.
+#' @seealso [load_all()] to load a package for interactive development.
+#' @examples
+#' \dontrun{
+#' # Reload package that is in current directory
+#' reload(".")
+#'
+#' # Reload package that is in ./ggplot2/
+#' reload("ggplot2/")
+#'
+#' # Can use inst() to find the package path
+#' # This will reload the installed ggplot2 package
+#' reload(pkgload::inst("ggplot2"))
+#' }
+#' @export
+#' @keywords internal
+"_PACKAGE"
+fun_repeat_check = function(Rep_A, Rep_B, Del){
+  Rep_B = Rep_B[2:nchar(Rep_B)]
+  homo_tmp_1 = 0
+  homo_tmp_2 = 0
+  for(q in 1:nchar(Rep_B)){
+    Rep_seq = Rep_B[q:nchar(Rep_B)]
+    check_rep = TRUE
+    Post_rep_status_tmp = 0
+    for(r in (1 + Del * nchar(Rep_B)):(Width - 1)){
+      if(check_rep &  Ref_seq[Width + r + 1] == Rep_seq[((r - 1) %% nchar(Rep_seq) + 1)]){
+        Post_rep_status_tmp = Post_rep_status_tmp + 1
+      }
+      else{
+        check_rep = FALSE
+      }
+    }
+    if(Post_rep_status_tmp > 0){
+      Post_rep_status <<- max(Post_rep_status, Post_rep_status_tmp)
+      if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
+        homo_tmp_1 = Post_rep_status_tmp + nchar(Rep_seq)
+      }
+    }
+  }
+  for(q in 1:nchar(Rep_B)){
+    Rep_seq = Rep_B[1:q]
+    check_rep = TRUE
+    Pre_rep_status_tmp = 0
+    for(r in 1:(Width + 1)){
+      if(check_rep &  Ref_seq[Width + 2 - r] == Rep_seq[((nchar(Rep_seq) - r) %% nchar(Rep_seq) + 1)]){
+        Pre_rep_status_tmp = Pre_rep_status_tmp + 1
+      }
+      else{
+        check_rep = FALSE
+      }
+    }
+    if(Pre_rep_status_tmp > 0){
+      Pre_rep_status <<- max(Pre_rep_status, Pre_rep_status_tmp)
+      if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
+        homo_tmp_2 = Pre_rep_status_tmp + nchar(Rep_seq)
+      }
+    }
+  }
+  Homopolymer_status <<- max(homo_tmp_1, homo_tmp_2)
+  if((Post_rep_status + Post_rep_status) > 0 & gsub(as.character(Rep_B[1]), "", as.character(Rep_B)) == ""){
+    Homopolymer_status <<- homo_tmp_1 + homo_tmp_2 - nchar(Rep_B)
+  }
+}
+
+# The following block is used by usethis to automatically manage
+# roxygen namespace tags. Modify with care!
+## usethis namespace: start
+## usethis namespace: end
+NULL
