@@ -140,7 +140,6 @@ Rscript MicroSEC.R /mnt/HDD8TB/FFPE SL_0002_L_FFPE_11-B /mnt/HDD8TB/FFPE/source/
 - Confirm the read length in the plathome
 - Confirm the adaptor sequence; Todai Onco Panel ("AGATCGGAAGAGC")
 - If you want to know the progress visually, [progress bar Y/N] should be Y.
-- If you want to use the Filter 6, [GGGenome search Y/N] should be Y (requiring the internet access).
 
 # Reproducibility
 
