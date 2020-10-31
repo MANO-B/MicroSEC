@@ -9,7 +9,6 @@ This repository contains all the code and data to regenerate results from our pa
 ## Contents
 
 - [Overview](#overview)
-- [Repo Contents](#repo-contents)
 - [System Requirements](#system-requirements)
 - [Instructions for Use](#instructions-for-use)
 
@@ -60,12 +59,6 @@ Results are saved in a excel file.
 The explatation of the results is written in detail in the second sheet of the excel file.  
 
 github url: https://github.com/MANO-B/MicroSEC
-
-# Repo Contents
-
-- [summary](./summary): summary pdf file including figures and `R` markdown code.
-- [source](./source): data sources for reproducing the figures.
-- [output](./output): output raw data tables.
 
 # System Requirements
 
