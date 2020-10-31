@@ -1028,6 +1028,15 @@ CCLE = CCLE %>% dplyr::select(Sample, Gene, HGVS.p, Mut_type, `Total_QV>=20`, `%
 write.xlsx(as.data.frame(as.matrix(CCLE)), paste(wd, "/source/CCLE.xlsx", sep=""))
 ```
 
+```{r}
+library(devtools)
+library(roxygen2)
+library(usethis)
+
+
+```
+
+
 ## Information about the current R session
 ```{r, eval=FALSE}
 sessionInfo()

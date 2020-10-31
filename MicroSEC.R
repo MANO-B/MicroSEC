@@ -57,8 +57,8 @@ Version_info = "v1_0_3"
 # Rscript MicroSEC.R /mnt/HDD8TB/FFPE SL_1010-N6-B /mnt/HDD8TB/FFPE/source/SL_mutation_somatic_200907.xlsx /mnt/HDD8TB/FFPE/source/SL_1010-N6_TDv4tw.realigned.bam /mnt/HDD8TB/FFPE/source/SL_1010-N6-B 124 AGATCGGAAGAGC Y Human
 # Rscript MicroSEC.R /mnt/HDD8TB/FFPE PC9 /mnt/HDD8TB/FFPE/source/CCLE.xlsx /mnt/HDD8TB/FFPE/source/Cell_line/PC9_FEPE_Ag_TDv4.realigned.bam /mnt/HDD8TB/FFPE/source/PC9_FEPE 127 AGATCGGAAGAGC Y Human
 #
-
-
+#
+#
 # Sample name is set to the sample of interest in the Sample column of the mutation information file.
 # Confirm the read length in the plathome
 # Confirm the adaptor sequence; Todai Onco Panel ("AGATCGGAAGAGC")
