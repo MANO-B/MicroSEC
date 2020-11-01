@@ -22,8 +22,8 @@ Four files are nessesary for the analysis: mutation information file, BAM file, 
   
 - File 1: mutation information file  
 This excel file should contain at least these contents:  
-       Sample     Gene HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition
- SL_1010-N6-B SLC25A24      _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t
+       Sample     Gene HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition  
+ SL_1010-N6-B SLC25A24      _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t  
   
     Total_QV>=20: The read number with total Q-value >=20.  
     SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
