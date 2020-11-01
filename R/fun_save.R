@@ -2,7 +2,7 @@
 #'
 #' This function attempts to save the filtering results.
 #'
-#' @param MicroSEC Mutation filtering information.
+#' @param MSEC Mutation filtering information.
 #' @param wd The directory to save.
 #' @importFrom openxlsx createWorkbook
 #' @importFrom openxlsx addWorksheet
@@ -11,9 +11,9 @@
 #' @importFrom openxlsx setColWidths
 #' @importFrom openxlsx saveWorkbook
 #' @export
-fun_save = function(MicroSEC, wd){
+fun_save = function(MSEC, wd){
   # explanation
-  MicroSEC_explain = data.frame(
+  MSEC_explain = data.frame(
     Alt_length  = "The length of altered sequence",
     Total_read = "The number of reads supporting the mutation: [Total_read >= 10] filtering is strongly recommended",
     mut_type = "Type of the mutation",
@@ -53,28 +53,28 @@ fun_save = function(MicroSEC, wd){
     Filter_6_simple_repeat = "Mutations locating at simple repeat sequences",
     Filter_7_C_to_G_artifact = "C>T_g false positive calls in FFPE samples",
     Filter_8_mutation_at_homopolymer =  "Indel mutations located inside a >=15 homopolymer",
-    MicroSEC_filter_1234 = "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",
-    MicroSEC_filter_12345 = "One or more filters of Fitler 1, 2, 3, 4, or 5 are TRUE",
-    MicroSEC_filter_all= "One or more filters are TRUE"
+    MSEC_filter_1234 = "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",
+    MSEC_filter_12345 = "One or more filters of Fitler 1, 2, 3, 4, or 5 are TRUE",
+    MSEC_filter_all= "One or more filters are TRUE"
   )
-  MicroSEC_explain = data.frame(t(MicroSEC_explain))
-  colnames(MicroSEC_explain) = c("Explanation")
-  MicroSEC_explain_Name = data.frame(rownames(MicroSEC_explain))
-  colnames(MicroSEC_explain_Name) = c("Name")
-  MicroSEC_explain = cbind(MicroSEC_explain_Name, MicroSEC_explain)
-  colnames(MicroSEC_explain) = c("Name", "Explanation")
+  MSEC_explain = data.frame(t(MSEC_explain))
+  colnames(MSEC_explain) = c("Explanation")
+  MSEC_explain_Name = data.frame(rownames(MSEC_explain))
+  colnames(MSEC_explain_Name) = c("Name")
+  MSEC_explain = cbind(MSEC_explain_Name, MSEC_explain)
+  colnames(MSEC_explain) = c("Name", "Explanation")
   
   # save the results
   NewWb = createWorkbook()
   addWorksheet(wb = NewWb, sheetName = "MicroSEC_results", gridLines = TRUE)
   addWorksheet(wb = NewWb, sheetName = "MicroSEC_explanation", gridLines = TRUE)
-  writeData(wb = NewWb, sheet = "MicroSEC_results", x = MicroSEC,
+  writeData(wb = NewWb, sheet = "MicroSEC_results", x = MSEC,
             xy = c(1,1), borders = "all", withFilter=TRUE)
-  writeData(wb = NewWb, sheet = "MicroSEC_explanation", x = MicroSEC_explain,
+  writeData(wb = NewWb, sheet = "MicroSEC_explanation", x = MSEC_explain,
             xy = c(1,1), borders = "all")
   freezePane(wb = NewWb, sheet = "MicroSEC_results", firstActiveRow = 2)
-  setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MicroSEC), widths = "auto")
-  setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MicroSEC_explain), widths = "auto")
+  setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
+  setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
   
   saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE)
 }
