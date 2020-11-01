@@ -150,7 +150,7 @@ fun_summary = function(MicroSEC){
       ifelse((Short_short_support & prob_Filter_1 < threshold_p),
              TRUE, FALSE), 
     Filter_2_hairpin_structure = 
-      ifelse((zero(FLAG_Hairpin, Total_read) > threshold_hairpin_ratio |
+      ifelse((fun_zero(FLAG_Hairpin, Total_read) > threshold_hairpin_ratio |
                 Hairpin_length >= threshold_hairpin_length),
              TRUE, FALSE),
     Filter_3_microhomology_induced_mutation = 
@@ -159,7 +159,7 @@ fun_summary = function(MicroSEC){
                    (prob_Filter_3_post <= threshold_p & Short_post_support))),
              TRUE, FALSE),
     Filter_4_soft_clipping = 
-      ifelse((zero(Soft_Clipped_read, Total_read)) > threshold_soft_clip_ratio,
+      ifelse((fun_zero(Soft_Clipped_read, Total_read)) > threshold_soft_clip_ratio,
              TRUE, FALSE),
     Filter_5_highly_homologous_region =
       ifelse((distant_homology_rate >= threshold_distant_homology),

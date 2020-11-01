@@ -18,7 +18,7 @@ This repository contains all the code and data to regenerate results from our pa
 
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
-Three files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
+Four files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
   
 File 1: mutation information file  
 This excel file should contain at least these contents:  
@@ -38,6 +38,11 @@ This file should contain at least these contents:
  Chr     Pos Ref Alt                                                                                                Mut_ID     Mut  
 chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
   
+File 4: sample information tsv file  
+Seven columns are necessary.  
+[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse]
+PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGC	Human
+
 This pipeline contains 8 filtering processes.  
 
 Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
@@ -89,8 +94,8 @@ Users should install the following packages prior to use the scripts, from an `R
 if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
-install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'tcltk', 'gtools'))
-BiocManager::install(c("Rsamtools", "Biostrings", "BSgenome.Hsapiens.UCSC.hg38", "BSgenome.Mmusculus.UCSC.mm10", "GenomicAlignments")
+install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'tcltk', 'gtools', 'devtools'))
+BiocManager::install(c("Rsamtools", "Biostrings", "BSgenome.Hsapiens.UCSC.hg38", "BSgenome.Mmusculus.UCSC.mm10", "GenomicAlignments"))
 ```
 
 which will install in about 30 minutes on a recommended machine.
@@ -128,19 +133,25 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 [1] ‘3.6.3’
 > packageVersion("gtools")
 [1] ‘3.8.2’
+> packageVersion("devtools")
+[1] ‘2.3.2’
 ```
 
 # Instructions for Use
+- How to install
+```
+devtools::install_github("MANO-B/MicroSEC", upgrade="never")  
+```
 - How to use in command line
-
-Rscript MicroSEC.R [working/output directory] [sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [progress bar Y/N] [sample type: Human or Mouse]
-
+```
+Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]  
+```  
 - Example
-
-Rscript MicroSEC.R /mnt/HDD8TB/FFPE SL_0002_L_FFPE_11-B /mnt/HDD8TB/FFPE/source/SL_mutation_somatic_200909.xlsx /mnt/HDD8TB/FFPE/source/SL_0002_L_FFPE_11_TDv4.realigned.bam /mnt/HDD8TB/FFPE/source/SL_mut_call_FFPE 150 AGATCGGAAGAGC Y Human
-
+```
+Rscript MicroSEC.R /mnt/HDD8TB/FFPE /mnt/HDD8TB/FFPE/source/Sample_list.txt Y  
+```  
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
-- Confirm the read length in the plathome
+- Confirm the read length in the platform
 - Confirm the adaptor sequence; Todai Onco Panel ("AGATCGGAAGAGC")
 - If you want to know the progress visually, [progress bar Y/N] should be Y.
 

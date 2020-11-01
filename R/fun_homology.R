@@ -20,7 +20,6 @@
 #' @export
 fun_homology = function(MicroSEC,
                         df_distant,
-                        Minimum_Homology_search_length,
                         PROGRESS_BAR = "N"){
   # initialize
   Minimum_Homology_search_length = 40
@@ -70,13 +69,11 @@ fun_homology = function(MicroSEC,
       tmp_distant = df_distant[df_distant$Number == i,][1,]
       if(tmp_distant$distant_homology > 0){
         MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME & 
-                   MicroSEC$SAMPLE == tmp_distant$SAMPLE & 
                    MicroSEC$Chr == tmp_distant$Chr & 
                    MicroSEC$Pos == tmp_distant$Pos & 
                    MicroSEC$Ref == tmp_distant$Ref & 
                    MicroSEC$Alt == tmp_distant$Alt,]$distant_homology =  
         MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME & 
-                   MicroSEC$SAMPLE == tmp_distant$SAMPLE & 
                    MicroSEC$Chr == tmp_distant$Chr & 
                    MicroSEC$Pos == tmp_distant$Pos & 
                    MicroSEC$Ref == tmp_distant$Ref & 
@@ -88,13 +85,11 @@ fun_homology = function(MicroSEC,
       tmp_distant_2 = df_distant[df_distant$Number == i,][2,]
       if(tmp_distant$distant_homology > 0 | tmp_distant_2$distant_homology > 0){
         MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME & 
-                   MicroSEC$SAMPLE == tmp_distant$SAMPLE & 
                    MicroSEC$Chr == tmp_distant$Chr &
                    MicroSEC$Pos == tmp_distant$Pos &
                    MicroSEC$Ref == tmp_distant$Ref & 
                    MicroSEC$Alt == tmp_distant$Alt,]$distant_homology = 
         MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME &
-                   MicroSEC$SAMPLE == tmp_distant$SAMPLE & 
                    MicroSEC$Chr == tmp_distant$Chr &
                    MicroSEC$Pos == tmp_distant$Pos &
                    MicroSEC$Ref == tmp_distant$Ref & 

@@ -16,7 +16,7 @@ editor_options:
 ## Introduction
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
-Three files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
+Four files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
   
 File 1: mutation information file  
 This excel file should contain at least these contents:  
@@ -36,6 +36,11 @@ This file should contain at least these contents:
  Chr     Pos Ref Alt                                                                                                Mut_ID     Mut  
 chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
   
+File 4: sample information tsv file  
+Seven columns are necessary.  
+[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse]
+PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGC	Human
+
 This pipeline contains 8 filtering processes.  
 
 Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
@@ -58,8 +63,8 @@ Supporting lengths are adjusted considering small repeat sequences around the mu
   
 Results are saved in a excel file.  
 The explatation of the results is written in detail in the second sheet of the excel file.  
-
-github url: https://github.com/MANO-B/MicroSEC
+  
+github url: https://github.com/MANO-B/MicroSEC  
   
 ## Setting
 ```{r, include = FALSE}
@@ -88,20 +93,11 @@ library(gtools)
 library(MicroSEC)
 ```
 
-## Setting for test sample analyses
-```{r}
-# load sample information tsv file
-# Seven columns are necessary.
-# [sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse]
-# example
-# PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGC	Human
-
-SAMPLE_INFO = read.csv(paste(wd, "/source/Sample_list.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, sep="\t")[1,]
-```
-
-
 ## Analysis
 ```{r}
+# load sample information tsv file
+SAMPLE_INFO = read.csv(paste(wd, "/source/Sample_list.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, sep="\t")
+
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
   MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
@@ -116,13 +112,13 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   Homology_search = NULL
   
   # load mutation information
-  #df_mutation = fun_load_mutation(MUTATION_FILE)
-  #df_BAM = fun_load_BAM(BAM_FILE)
-  #df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
+  df_mutation = fun_load_mutation(MUTATION_FILE)
+  df_BAM = fun_load_BAM(BAM_FILE)
+  df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
 
   # load genomic sequence
-  #genome = fun_load_genome(GENOME)
-  #Chr_No = fun_load_chr_no(GENOME)
+  genome = fun_load_genome(GENOME)
+  Chr_No = fun_load_chr_no(GENOME)
 
   # analysis
   result = fun_read_check(df_mutation = df_mutation,
@@ -148,6 +144,5 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
 # save the results
   fun_save(MicroSEC, wd)
 }
-
 ```
 
