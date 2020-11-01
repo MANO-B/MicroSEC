@@ -128,7 +128,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 > packageVersion("GenomicAlignments")
 [1] ‘1.22.1’
 > packageVersion("Rsamtools")
-[1] ‘2.2.3’
+[1] ‘2.0.3’
 > packageVersion("tcltk")
 [1] ‘3.6.3’
 > packageVersion("gtools")
