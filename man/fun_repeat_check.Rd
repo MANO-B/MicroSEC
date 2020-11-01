@@ -24,5 +24,5 @@ list(Pre_rep_status, Post_rep_status, Homopolymer_status)
 This function attempts to check the repetitive sequence around the mutation.
 }
 \examples{
-fun_repeat_check(Biostrings::DNAString("A"), Biostrings::DNAString("AATC"), Biostrings::DNAString("GGAAAAAAATCTCTCAACA"), 5, 0)
+fun_repeat_check(DNAString("A"), DNAString("AATC"), DNAString("GGAAAAAAATCTCTCAACA"), 5, 0)
 }

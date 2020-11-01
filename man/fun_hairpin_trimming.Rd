@@ -20,5 +20,5 @@ Adapter-trimmed Hairpin_seq
 This function attempts to find and cut the adapter sequences in the ends.
 }
 \examples{
-fun_hairpin_trimming(Biostrings::DNAString("GGAAAAAAATCTCTCAACA", "+", "AGATCC")
+fun_hairpin_trimming(DNAString("GGAAAAAAATCTCTCAACA"), "+", "AGATCC")
 }
