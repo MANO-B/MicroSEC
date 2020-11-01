@@ -1,0 +1,16 @@
+#' Devide function without 0/0 errors
+#'
+#' This function attempts to devide without 0/0 errors.
+#'
+#' @param a,b Integers
+#' @return a devided by b
+#' @examples
+#' fun_zero(0, 0)
+#' fun_zero(3, 5)
+#' @export
+fun_zero = function(a,b)ifelse(a==0 & b==0, 0, a/b)
+# The following block is used by usethis to automatically manage
+# roxygen namespace tags. Modify with care!
+## usethis namespace: start
+## usethis namespace: end
+NULL
