@@ -148,7 +148,7 @@ Rscript MicroSEC.R [working/output directory] [sample information tsv file] [pro
 ```  
 - Example
 ```
-Rscript MicroSEC.R /mnt/HDD8TB/FFPE /mnt/HDD8TB/FFPE/source/Sample_list.txt Y  
+Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list.txt Y  
 ```  
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
 - Confirm the read length in the platform

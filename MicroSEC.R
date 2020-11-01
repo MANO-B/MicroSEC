@@ -106,7 +106,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   GENOME = SAMPLE_INFO[SAMPLE,7]
   
   # initialize
-  MicroSEC = NULL
+  MSEC = NULL
   Homology_search = NULL
   
   # load mutation information
@@ -128,17 +128,17 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           READ_length = READ_length,
                           ADAPTOR_SEQ = ADAPTOR_SEQ,
                           PROGRESS_BAR = PROGRESS_BAR)
-  MicroSEC = rbind(MicroSEC, result[[1]])
+  MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
   
   # search homologous sequences
-  MicroSEC = fun_homology(MicroSEC,
+  MSEC = fun_homology(MSEC,
                           Homology_search,
                           PROGRESS_BAR = PROGRESS_BAR)
   
   # statistical analysis
-  MicroSEC = fun_summary(MicroSEC)
+  MSEC = fun_summary(MSEC)
   
   # save the results
-  fun_save(MicroSEC, wd)
+  fun_save(MSEC, wd)
 }
