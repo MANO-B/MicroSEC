@@ -11,7 +11,7 @@
 #' @param READ_length The read length in the sequence.
 #' @param ADAPTOR_SEQ The adapter sequence of the library.
 #' @param PROGRESS_BAR "Y": You can see the progress visually.
-#' @return list(MicroSEC, Homology_search)
+#' @return list(MSEC, Homology_search)
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
@@ -21,14 +21,9 @@
 #' @importFrom BiocGenerics which.max
 #' @importFrom gtools asc
 #' @importFrom Biostrings matchPattern
-#' @importFrom MicroSEC fun_setting
-#' @importFrom MicroSEC fun_repeat_check
-#' @importFrom MicroSEC fun_hairpin_trimming
-#' @importFrom MicroSEC fun_hairpin_check
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings reverseComplement
 #' @importFrom Biostrings trimLRPatterns
-#' @importFrom MicroSEC fun_support
 #' @importFrom BiocGenerics as.data.frame
 #' @export
 fun_read_check = function(df_mutation,
@@ -41,7 +36,7 @@ fun_read_check = function(df_mutation,
                           ADAPTOR_SEQ,
                           PROGRESS_BAR = "N"){
   # initialize
-  MicroSEC = NULL
+  MSEC = NULL
   Homology_search = NULL
   Length_Flag = 0
   CHROM = ""
@@ -489,7 +484,7 @@ fun_read_check = function(df_mutation,
       }
       
       # data formatting
-      MicroSEC_tmp = df_mutation[i,] %>% dplyr::mutate(
+      MSEC_tmp = df_mutation[i,] %>% dplyr::mutate(
         READ_length = READ_length, 
         mut_type = mut_type,
         Alt_length = Alt_length, 
@@ -515,7 +510,7 @@ fun_read_check = function(df_mutation,
       }
     }
     else{
-      MicroSEC_tmp = df_mutation[i,] %>% dplyr::mutate(
+      MSEC_tmp = df_mutation[i,] %>% dplyr::mutate(
         READ_length = READ_length, 
         mut_type = mut_type,
         Alt_length = 0, 
@@ -537,9 +532,9 @@ fun_read_check = function(df_mutation,
         distant_homology = 0
       )
     }
-    MicroSEC = rbind(MicroSEC, MicroSEC_tmp)
+    MSEC = rbind(MSEC, MSEC_tmp)
   }
-  return(list(MicroSEC, Homology_search))
+  return(list(MSEC, Homology_search))
 }
 
 

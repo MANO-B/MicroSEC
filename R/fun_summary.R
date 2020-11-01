@@ -2,14 +2,13 @@
 #'
 #' This function summarizes the filtering results.
 #'
-#' @param MicroSEC Mutation filtering information.
-#' @return MicroSEC
+#' @param MSEC Mutation filtering information.
+#' @return MSEC
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
-#' @importFrom MicroSEC fun_zero
 #' @export
-fun_summary = function(MicroSEC){
+fun_summary = function(MSEC){
   # thresholds
   threshold_p = 10^(-6)
   threshold_hairpin_ratio = 0.50
@@ -20,10 +19,10 @@ fun_summary = function(MicroSEC){
   threshold_low_quality_rate = 0.1
   Homopolymer_length = 15
   
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     distant_homology_rate = fun_zero(distant_homology, Total_read)
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     Pre_Minimum_length = ifelse(indel_status == 1, 
         (((Pre_Minimum_length - (indel_length + 1)) + 
             abs(Pre_Minimum_length - (indel_length + 1))) / 2) + 
@@ -45,7 +44,7 @@ fun_summary = function(MicroSEC){
           (READ_length - indel_length - 1),
         Post_support_length)
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     Pre_Minimum_length = ifelse(indel_status == 1, 
         (((Pre_Minimum_length - Pre_rep_status) + 
             abs(Pre_Minimum_length - Pre_rep_status)) / 2) + 
@@ -67,7 +66,7 @@ fun_summary = function(MicroSEC){
           (READ_length - Pre_rep_status),
         Post_support_length)
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     shortest_support_length =
       (((Pre_Minimum_length - Post_Minimum_length) - 
           abs(Pre_Minimum_length - Post_Minimum_length)) / 2) + 
@@ -81,17 +80,17 @@ fun_summary = function(MicroSEC){
           abs(Post_rep_status - (indel_length + 1))) / 2) + 
       (indel_length + 1)
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     minimum_length_1 = ifelse(indel_status == 1, minimum_length_1, 0),
     minimum_length_2 = ifelse(indel_status == 1, minimum_length_2, 0)
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     minimum_length =
       (((minimum_length_1 -  minimum_length_2) - 
           abs(minimum_length_1 -  minimum_length_2)) / 2) + 
       minimum_length_2
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     short_support_length =
       (((short_support_length - minimum_length) + 
           abs(short_support_length - minimum_length)) / 2) + 
@@ -102,7 +101,7 @@ fun_summary = function(MicroSEC){
                                    indel_length,
                                    0)),
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     short_support_length_adjust = 
       short_support_length - shortest_support_length + 1,
     Pre_support_length_adjust =
@@ -114,13 +113,13 @@ fun_summary = function(MicroSEC){
     Total_length_adjust = 
       READ_length - Altered_length - minimum_length_1 - minimum_length_2 + 1
   )
-  MicroSEC = MicroSEC %>% select(
+  MSEC = MSEC %>% select(
     -minimum_length_1, 
     -minimum_length_2,
     -minimum_length, 
     -Altered_length, 
     -shortest_support_length)
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     Short_short_support = 
       (short_support_length_adjust <= 
          threshold_short_length * Half_length_adjust),
@@ -140,12 +139,12 @@ fun_summary = function(MicroSEC){
     prob_Filter_3_post =
       (Post_support_length_adjust / Total_length_adjust) ^ Total_read
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     prob_Filter_1 = ifelse((prob_Filter_1 > 1), 1, prob_Filter_1),
     prob_Filter_3_pre = ifelse((prob_Filter_3_pre > 1), 1, prob_Filter_3_pre),
     prob_Filter_3_post = ifelse((prob_Filter_3_post > 1), 1, prob_Filter_3_post)
   )
-  MicroSEC = MicroSEC %>% mutate(
+  MSEC = MSEC %>% mutate(
     Filter_1_mutation_intra_hairpin_loop = 
       ifelse((Short_short_support & prob_Filter_1 < threshold_p),
              TRUE, FALSE), 
@@ -174,22 +173,22 @@ fun_summary = function(MicroSEC){
       ifelse((Homopolymer_status  >= Homopolymer_length), 
              TRUE, FALSE)
   )
-  MicroSEC = MicroSEC %>% mutate(
-    MicroSEC_filter_1234 = 
+  MSEC = MSEC %>% mutate(
+    MSEC_filter_1234 = 
       Filter_1_mutation_intra_hairpin_loop |
       Filter_2_hairpin_structure | 
       Filter_3_microhomology_induced_mutation | 
       Filter_4_soft_clipping,
-    MicroSEC_filter_12345 = 
-      MicroSEC_filter_1234 | 
+    MSEC_filter_12345 = 
+      MSEC_filter_1234 | 
       Filter_5_highly_homologous_region,
-    MicroSEC_filter_all = 
-      MicroSEC_filter_12345 | 
+    MSEC_filter_all = 
+      MSEC_filter_12345 | 
       Filter_6_simple_repeat |
       Filter_7_C_to_T_artifact |
       Filter_8_mutation_at_homopolymer
   )
-  return(MicroSEC)
+  return(MSEC)
 }
 
 # The following block is used by usethis to automatically manage

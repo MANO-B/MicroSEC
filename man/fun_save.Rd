@@ -4,10 +4,10 @@
 \alias{fun_save}
 \title{Save function.}
 \usage{
-fun_save(MicroSEC, wd)
+fun_save(MSEC, wd)
 }
 \arguments{
-\item{MicroSEC}{Mutation filtering information.}
+\item{MSEC}{Mutation filtering information.}
 
 \item{wd}{The directory to save.}
 }
