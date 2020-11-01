@@ -29,7 +29,7 @@ Imports:
   dplyr (>= 1.0.2),
   tcltk (>= 3.6.3),
   gtools (>= 3.8.2),
-  Biostrings (>= 2.54.0),
+  Biostrings (>= 2.52.0),
   BSgenome.Hsapiens.UCSC.hg38 (>= 1.4.1),
   BSgenome.Mmusculus.UCSC.mm10 (>= 1.4.0),
   GenomicAlignments (>= 1.22.1),
