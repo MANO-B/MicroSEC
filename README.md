@@ -212,18 +212,18 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           PROGRESS_BAR = "Y")
   MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
-
-  # search homologous sequences
-  MSEC = fun_homology(MSEC,
-                        Homology_search,
-                        PROGRESS_BAR = "Y")
+}
+# search homologous sequences
+MSEC = fun_homology(MSEC,
+                    Homology_search,
+                    PROGRESS_BAR = "Y")
  
 # statistical analysis
-  MSEC = fun_summary(MSEC)
+MSEC = fun_summary(MSEC)
 
 # save the results
-  fun_save(MSEC, wd)
-}
+fun_save(MSEC, wd)
+
 ```
 
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
