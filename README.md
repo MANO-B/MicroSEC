@@ -1,4 +1,4 @@
-![MicroSEC logo](/mnt/HDD8TB/MicroSEC/MicroSEC_logo.png){#id .class width=720 height=135px}
+![MicroSEC logo](MicroSEC_logo.png){#id .class width=720 height=135px}
 
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.
