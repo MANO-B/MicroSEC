@@ -20,7 +20,7 @@ This pipeline is designed for filtering mutations found in formalin-fixed and pa
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
 Four files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
   
-File 1: mutation information file  
+- File 1: mutation information file  
 This excel file should contain at least these contents:  
        Sample     Gene HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition
  SL_1010-N6-B SLC25A24      _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t
@@ -31,14 +31,14 @@ Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].
 Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
 Gene, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, Transition can be set to NA.  
   
-File 2: BAM file  
+- File 2: BAM file  
   
-File 3: mutation supporting read ID information file  
+- File 3: mutation supporting read ID information file  
 This file should contain at least these contents:  
  Chr     Pos Ref Alt                                                                                                Mut_ID     Mut  
 chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
   
-File 4: sample information tsv file  
+- File 4: sample information tsv file  
 Seven columns are necessary.  
 [sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse]  
 PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGC	Human  
