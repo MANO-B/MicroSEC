@@ -1,3 +1,5 @@
+![MicroSEC logo](/mnt/HDD8TB/MicroSEC/MicroSEC_logo.png){#id .class width=720 height=135px}
+
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.
 This repository contains all the code and data to regenerate results from our paper:
@@ -27,6 +29,7 @@ Total_QV>=20: The read number with total Q-value >=20.
 SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
 Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
 Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
+Gene, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, Transition can be set to NA.  
   
 File 2: BAM file  
   

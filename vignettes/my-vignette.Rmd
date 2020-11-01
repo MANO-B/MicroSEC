@@ -116,13 +116,13 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   Homology_search = NULL
   
   # load mutation information
-  df_mutation = fun_load_mutation(MUTATION_FILE)
-  df_BAM = fun_load_BAM(BAM_FILE)
-  df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
+  #df_mutation = fun_load_mutation(MUTATION_FILE)
+  #df_BAM = fun_load_BAM(BAM_FILE)
+  #df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
 
   # load genomic sequence
-  genome = fun_load_genome(GENOME)
-  Chr_No = fun_load_chr_no(GENOME)
+  #genome = fun_load_genome(GENOME)
+  #Chr_No = fun_load_chr_no(GENOME)
 
   # analysis
   result = fun_read_check(df_mutation = df_mutation,
