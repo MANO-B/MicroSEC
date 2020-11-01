@@ -89,6 +89,10 @@ SAMPLE_LIST = args[2]
 PROGRESS_BAR = args[3]
 
 setwd(wd)
+  
+# initialize
+MSEC = NULL
+Homology_search = NULL
 
 # load sample information tsv file
 SAMPLE_INFO = read.csv(SAMPLE_LIST,
@@ -104,10 +108,6 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
   ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
   GENOME = SAMPLE_INFO[SAMPLE,7]
-  
-  # initialize
-  MSEC = NULL
-  Homology_search = NULL
   
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
@@ -130,15 +130,14 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           PROGRESS_BAR = PROGRESS_BAR)
   MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
-  
-  # search homologous sequences
-  MSEC = fun_homology(MSEC,
-                          Homology_search,
-                          PROGRESS_BAR = PROGRESS_BAR)
-  
-  # statistical analysis
-  MSEC = fun_summary(MSEC)
-  
-  # save the results
-  fun_save(MSEC, wd)
 }
+# search homologous sequences
+MSEC = fun_homology(MSEC,
+                    Homology_search,
+                    PROGRESS_BAR = PROGRESS_BAR)
+  
+# statistical analysis
+MSEC = fun_summary(MSEC)
+  
+# save the results
+fun_save(MSEC, wd)
