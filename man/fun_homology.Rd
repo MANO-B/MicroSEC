@@ -4,21 +4,16 @@
 \alias{fun_homology}
 \title{Homology check function.}
 \usage{
-fun_homology(
-  MicroSEC,
-  df_distant,
-  Minimum_Homology_search_length,
-  PROGRESS_BAR = "N"
-)
+fun_homology(MicroSEC, df_distant, PROGRESS_BAR = "N")
 }
 \arguments{
 \item{MicroSEC}{Mutation filtering information.}
 
 \item{df_distant}{Sequences to be checked.}
 
-\item{Minimum_Homology_search_length}{Minimum length to define "homologous".}
-
 \item{PROGRESS_BAR}{"Y": You can see the progress visually.}
+
+\item{Minimum_Homology_search_length}{Minimum length to define "homologous".}
 }
 \value{
 MicroSEC
