@@ -178,6 +178,11 @@ library(MicroSEC)
 # load sample information tsv file
 SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/Sample_list.txt", header=FALSE, stringsAsFactors=FALSE, sep="\t")
 
+  
+# initialize
+MSEC = NULL
+Homology_search = NULL
+
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
   MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
@@ -186,10 +191,6 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
   ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
   GENOME = SAMPLE_INFO[SAMPLE,7]
-  
-  # initialize
-  MSEC = NULL
-  Homology_search = NULL
   
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
