@@ -9,6 +9,7 @@
 #' @return list(Hairpin_length, whether hairpin sequences exist or not)
 #' @importFrom Biostrings matchPattern
 #' @importFrom Biostrings DNAString
+#' @importFrom BiocGenerics as.data.frame
 #' @examples
 #' fun_hairpin_check(DNAString("GGGGGGGGAAAAAAAA"), DNAString("GGGGGGGGAAAAAAAATATATATATTTTTTTTCCCCCCCC"), 15, 16)
 #' @export

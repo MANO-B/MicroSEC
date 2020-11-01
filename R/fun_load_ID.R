@@ -15,7 +15,7 @@ fun_load_ID = function(MUTATION_SUPPORTING_READ_LIST){
   files = data.frame(file = list.files(MUTATION_SUPPORTING_READ_LIST, pattern=".gz", full.names=T))
   df_mut_call = NULL
   for(i in files$file){
-    df_mut_call  = rbind(df_mut_call, read.csv(as.character(i), header=TRUE, sep="\t"))
+    df_mut_call  = rbind(df_mut_call, read.csv(as.character(i), header=TRUE, stringsAsFactors=FALSE, sep="\t"))
   }
   # data formatting
   df_mut_call = df_mut_call %>%
@@ -23,6 +23,7 @@ fun_load_ID = function(MUTATION_SUPPORTING_READ_LIST){
     mutate(Ref = toupper(Ref)) %>%
     mutate(Alt = toupper(Alt)) %>% 
     mutate(Mut = toupper(Mut))
+  df_mut_call$Pos = as.integer(df_mut_call$Pos)
   return(df_mut_call)
 }
 

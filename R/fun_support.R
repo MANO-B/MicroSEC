@@ -12,6 +12,7 @@
 #' @importFrom Biostrings trimLRPatterns
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings reverseComplement
+#' @importFrom BiocGenerics as.data.frame
 #' @return list(Pre_support_length, Post_support_length, Soft_Clipped_read)
 #' @export
 fun_support = function(df_cigar,
@@ -19,7 +20,8 @@ fun_support = function(df_cigar,
                        mut_read_strand,
                        ADAPTOR_SEQ,
                        mut_position,
-                       Alt_length){
+                       Alt_length,
+                       indel_status){
   Pre_support_length_tmp = 0
   Post_support_length_tmp = 0
   cigar_num = as.integer(str_split(df_cigar, "[:upper:]")[[1]])
@@ -55,7 +57,7 @@ fun_support = function(df_cigar,
         }
         clipped_seq = DNAString(clipped_seq)
       }
-      if(nchar(clipped_seq) > 0){
+      if(length(clipped_seq) > 0){
         Soft_Clipped_read_tmp = 1
       }
       tmp_pos = tmp_pos + cigar_num[k]

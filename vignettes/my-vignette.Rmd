@@ -96,7 +96,7 @@ library(MicroSEC)
 # example
 # PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGC	Human
 
-SAMPLE_INFO = read.csv("./source/Sample_list.txt", header=FALSE, stringsAsFactors=FALSE, sep="\t")[1,]
+SAMPLE_INFO = read.csv(paste(wd, "/source/Sample_list.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, sep="\t")[1,]
 ```
 
 
@@ -124,6 +124,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   genome = fun_load_genome(GENOME)
   Chr_No = fun_load_chr_no(GENOME)
 
+  # analysis
   result = fun_read_check(df_mutation = df_mutation,
                           df_BAM =  df_BAM,
                           df_mut_call = df_mut_call,
@@ -133,13 +134,12 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           READ_length = READ_length,
                           ADAPTOR_SEQ = ADAPTOR_SEQ,
                           PROGRESS_BAR = "Y")
-  MicroSEC = rbind(MicroSEC, result[1])
-  Homology_search = rbind(Homology_search, result[2])
+  MicroSEC = rbind(MicroSEC, result[[1]])
+  Homology_search = rbind(Homology_search, result[[2]])
 
-  # search homologous sequences from the entire genome by matchPDict function
+  # search homologous sequences
   MicroSEC = fun_homology(MicroSEC,
-                        df_distant,
-                        Minimum_Homology_search_length,
+                        Homology_search,
                         PROGRESS_BAR = "Y")
  
 # statistical analysis

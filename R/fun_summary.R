@@ -10,6 +10,16 @@
 #' @importFrom MicroSEC fun_zero
 #' @export
 fun_summary = function(MicroSEC){
+  # thresholds
+  threshold_p = 10^(-6)
+  threshold_hairpin_ratio = 0.50
+  threshold_hairpin_length = 30
+  threshold_soft_clip_ratio = 0.90
+  threshold_short_length = 0.8
+  threshold_distant_homology = 0.2
+  threshold_low_quality_rate = 0.1
+  Homopolymer_length = 15
+  
   MicroSEC = MicroSEC %>% mutate(
     distant_homology_rate = fun_zero(distant_homology, Total_read)
   )

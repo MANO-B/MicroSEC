@@ -10,7 +10,8 @@ fun_support(
   mut_read_strand,
   ADAPTOR_SEQ,
   mut_position,
-  Alt_length
+  Alt_length,
+  indel_status
 )
 }
 \arguments{

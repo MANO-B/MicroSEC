@@ -16,12 +16,14 @@
 #' @importFrom Biostrings PDict
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings countPDict
+#' @importFrom BiocGenerics as.data.frame
 #' @export
 fun_homology = function(MicroSEC,
                         df_distant,
                         Minimum_Homology_search_length,
                         PROGRESS_BAR = "N"){
   # initialize
+  Minimum_Homology_search_length = 40
   MicroSEC$distant_homology = 0
   df_distant = df_distant %>% dplyr::mutate(
     Seq = as.character(Seq))

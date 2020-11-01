@@ -9,6 +9,7 @@
 #' @importFrom Biostrings trimLRPatterns
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings reverseComplement
+#' @importFrom BiocGenerics as.data.frame
 #' @importFrom stringr str_split
 #' @examples
 #' fun_hairpin_trimming(DNAString("GGAAAAAAATCTCTCAACA"), "+", "AGATCC")

@@ -116,7 +116,7 @@ Laxness = 1
 Length_Flag = 0
 Max_mutation_search = 50
 
-threshold_p = 10^(-5)
+threshold_p = 10^(-6)
 threshold_hairpin_ratio = 0.50
 threshold_hairpin_length = 30
 threshold_soft_clip_ratio = 0.90
