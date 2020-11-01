@@ -25,11 +25,11 @@ This excel file should contain at least these contents:
        Sample     Gene HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition
  SL_1010-N6-B SLC25A24      _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t
   
-Total_QV>=20: The read number with total Q-value >=20.  
-SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
-Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
-Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
-Gene, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, Transition can be set to NA.  
+    Total_QV>=20: The read number with total Q-value >=20.  
+    SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
+    Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
+    Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
+    Gene, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, Transition can be set to NA.  
   
 - File 2: BAM file  
   
