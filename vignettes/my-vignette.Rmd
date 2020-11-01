@@ -98,6 +98,10 @@ library(MicroSEC)
 # load sample information tsv file
 SAMPLE_INFO = read.csv(paste(wd, "/source/Sample_list.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, sep="\t")
 
+# initialize
+MSEC = NULL
+Homology_search = NULL
+  
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
   MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
@@ -106,10 +110,6 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
   ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
   GENOME = SAMPLE_INFO[SAMPLE,7]
-  
-  # initialize
-  MSEC = NULL
-  Homology_search = NULL
   
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
@@ -132,18 +132,17 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           PROGRESS_BAR = "Y")
   MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
+}
+# search homologous sequences
+MSEC = fun_homology(MSEC,
+                    Homology_search,
+                    PROGRESS_BAR = "Y")
 
-  # search homologous sequences
-  MSEC = fun_homology(MSEC,
-                        Homology_search,
-                        PROGRESS_BAR = "Y")
- 
 # statistical analysis
-  MSEC = fun_summary(MSEC)
+MSEC = fun_summary(MSEC)
 
 # save the results
-  fun_save(MSEC, wd)
-}
+fun_save(MSEC, wd)
 ```
 
 ## Information about the current R session
