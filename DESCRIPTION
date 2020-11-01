@@ -16,24 +16,24 @@ Description: Clinical sequencing of tumor is usually performed on formalin-fixed
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.4.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
-  tidyr (>= 1.1.2),
-  openxlsx (>= 4.2.2),
-  data.table (>= 1.13.2),
-  R.utils (>= 2.10.1),
-  stringr (>= 1.4.0),
-  magrittr (>= 1.5),
-  dplyr (>= 1.0.2),
-  tcltk (>= 3.6.3),
-  gtools (>= 3.8.2),
-  Biostrings (>= 2.52.0),
-  BSgenome.Hsapiens.UCSC.hg38 (>= 1.4.1),
-  BSgenome.Mmusculus.UCSC.mm10 (>= 1.4.0),
-  GenomicAlignments (>= 1.22.1),
-  Rsamtools (>= 2.0.3)
+  tidyr,
+  openxlsx,
+  data.table,
+  R.utils,
+  stringr,
+  magrittr,
+  dplyr,
+  tcltk,
+  gtools,
+  Biostrings,
+  BSgenome.Hsapiens.UCSC.hg38,
+  BSgenome.Mmusculus.UCSC.mm10,
+  GenomicAlignments,
+  Rsamtools
 Suggests: 
     testthat,
     knitr,
