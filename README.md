@@ -157,4 +157,4 @@ Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list.
 
 # Reproducibility
 
-The source code is available in MicroSEC.R. Source data is available (check our paper). Each filtering process takes about 20–30 minutes on a recommended machine.
+The source code is available in MicroSEC.R. Source data is available (check our paper). Each filtering process takes about 20–30 minutes per sample on a recommended machine.
