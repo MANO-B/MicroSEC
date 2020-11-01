@@ -10,7 +10,7 @@
 #' @return list(Pre_rep_status, Post_rep_status, Homopolymer_status)
 #' @importFrom Biostrings DNAString
 #' @examples
-#' fun_repeat_check(Biostrings::DNAString("A"), Biostrings::DNAString("AATC"), Biostrings::DNAString("GGAAAAAAATCTCTCAACA"), 5, 0)
+#' fun_repeat_check(DNAString("A"), DNAString("AATC"), DNAString("GGAAAAAAATCTCTCAACA"), 5, 0)
 #' @export
 fun_repeat_check = function(Rep_A, Rep_B, Ref_seq, Width, Del){
   Pre_rep_status = 0

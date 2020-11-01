@@ -654,14 +654,14 @@ Search_Seq_r = reverseComplement(Search_Seq_f)
 Search_Seq_f = PDict(Search_Seq_f)
 Search_Seq_r = PDict(Search_Seq_r)
 distant_homology = rep(0, length(Search_Seq_f))
+if(PROGRESS_BAR == "Y"){
+  pb = txtProgressBar(min = 0, max = Chr_No, style = 3)
+}
 for(seqname in 1:Chr_No){
   if(PROGRESS_BAR == "Y"){
-    pb = txtProgressBar(min = 0, max = Chr_No, style = 3)
     setTxtProgressBar(pb, seqname)
   }
-  #target = genome[[seqname]]
-  Chr_name = paste("chr", seqname, sep="")
-  target = genome[[Chr_name]]
+  target = genome[[seqname]]
   distant_homology = distant_homology + countPDict(Search_Seq_f, target)
   distant_homology = distant_homology + countPDict(Search_Seq_r, target)
 }
