@@ -153,7 +153,7 @@ Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list.
 - How to use in R Console
 ```
 ## Setting
-wd = "/mnt/HDD8TB/MicroSEC"
+wd = "/mnt/HDD8TB/MicroSEC" # set your working/output directory
 setwd(wd)
 
 ## Necessary packages
@@ -176,7 +176,7 @@ library(MicroSEC)
 ## Analysis
 
 # load sample information tsv file
-SAMPLE_INFO = read.csv(paste(wd, "/source/Sample_list.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, sep="\t")
+SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/Sample_list.txt", header=FALSE, stringsAsFactors=FALSE, sep="\t")
 
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
