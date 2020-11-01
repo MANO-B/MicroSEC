@@ -1,26 +1,21 @@
-#' Repeat check package.
+#' Repeat check function.
 #'
-#' This attempts to check the repetitive sequence around the mutation.
+#' This function attempts to check the repetitive sequence around the mutation.
 #'
-#' @template devtools
-#' @param quiet if `TRUE` suppresses output from this function.
-#' @seealso [load_all()] to load a package for interactive development.
+#' @param Rep_A The shorter sequence of [Ref] and [Alt].
+#' @param Rep_B The longer sequence of [Ref] and [Alt].
+#' @param Ref_seq Reference sequence around the mutation.
+#' @param Width Search length for Ref_seq.
+#' @param Del Insertion: 0, Deletion: 1
+#' @return list(Pre_rep_status, Post_rep_status, Homopolymer_status)
+#' @importFrom Biostrings DNAString
 #' @examples
-#' \dontrun{
-#' # Reload package that is in current directory
-#' reload(".")
-#'
-#' # Reload package that is in ./ggplot2/
-#' reload("ggplot2/")
-#'
-#' # Can use inst() to find the package path
-#' # This will reload the installed ggplot2 package
-#' reload(pkgload::inst("ggplot2"))
-#' }
+#' fun_repeat_check(Biostrings::DNAString("A"), Biostrings::DNAString("AATC"), Biostrings::DNAString("GGAAAAAAATCTCTCAACA"), 5, 0)
 #' @export
-#' @keywords internal
-"_PACKAGE"
-fun_repeat_check = function(Rep_A, Rep_B, Del){
+fun_repeat_check = function(Rep_A, Rep_B, Ref_seq, Width, Del){
+  Pre_rep_status = 0
+  Post_rep_status = 0
+  Homopolymer_status = 0
   Rep_B = Rep_B[2:nchar(Rep_B)]
   homo_tmp_1 = 0
   homo_tmp_2 = 0
@@ -37,7 +32,7 @@ fun_repeat_check = function(Rep_A, Rep_B, Del){
       }
     }
     if(Post_rep_status_tmp > 0){
-      Post_rep_status <<- max(Post_rep_status, Post_rep_status_tmp)
+      Post_rep_status = max(Post_rep_status, Post_rep_status_tmp)
       if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
         homo_tmp_1 = Post_rep_status_tmp + nchar(Rep_seq)
       }
@@ -56,16 +51,17 @@ fun_repeat_check = function(Rep_A, Rep_B, Del){
       }
     }
     if(Pre_rep_status_tmp > 0){
-      Pre_rep_status <<- max(Pre_rep_status, Pre_rep_status_tmp)
+      Pre_rep_status = max(Pre_rep_status, Pre_rep_status_tmp)
       if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
         homo_tmp_2 = Pre_rep_status_tmp + nchar(Rep_seq)
       }
     }
   }
-  Homopolymer_status <<- max(homo_tmp_1, homo_tmp_2)
+  Homopolymer_status = max(homo_tmp_1, homo_tmp_2)
   if((Post_rep_status + Post_rep_status) > 0 & gsub(as.character(Rep_B[1]), "", as.character(Rep_B)) == ""){
-    Homopolymer_status <<- homo_tmp_1 + homo_tmp_2 - nchar(Rep_B)
+    Homopolymer_status = homo_tmp_1 + homo_tmp_2 - nchar(Rep_B)
   }
+  return(list(Pre_rep_status, Post_rep_status, Homopolymer_status))
 }
 
 # The following block is used by usethis to automatically manage
