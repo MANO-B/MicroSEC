@@ -78,7 +78,7 @@ fun_save = function(MSEC, wd){
   
   FLAG = FALSE
   while (!FLAG) {
-    FLAG = saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", Sys.time(), ".xlsx", sep=""), overwrite = FALSE, returnValue = TRUE)
+    FLAG = saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", as.numeric(Sys.time()), ".xlsx", sep=""), overwrite = FALSE, returnValue = TRUE)
   }
 }
 
