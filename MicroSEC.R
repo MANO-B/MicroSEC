@@ -1,5 +1,6 @@
 # MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples
 # 
+# Version 1.0.5: save function modified (Nov. 2, 2020)
 # Version 1.0.4: package install via github (Nov. 1, 2020)
 # Version 1.0.3: parameter justification, version management with github (Oct. 29, 2020)
 # Version 1.0.2: Indel length correction based on Bowtie2 penalty score (Oct. 28, 2020)
