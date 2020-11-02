@@ -93,10 +93,11 @@ library(gtools)
 library(MicroSEC)
 ```
 
+
 ## Analysis
 ```{r, eval=FALSE}
 # load sample information tsv file
-SAMPLE_INFO = read.csv(paste(wd, "/source/Sample_list.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, sep="\t")
+SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", header=FALSE, stringsAsFactors=FALSE, sep="\t")
 
 # initialize
 MSEC = NULL

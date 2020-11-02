@@ -76,7 +76,7 @@ fun_save = function(MSEC, wd){
   setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
   setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
   
-  saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE)
+  saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", Sys.time(), ".xlsx", sep=""), overwrite = TRUE)
 }
 
 
