@@ -52,34 +52,31 @@ fun_save = function(MSEC, wd){
     Filter_5_highly_homologous_region = ">=20% mutations were called by chimeric reads comprising two distant regions",
     Filter_6_simple_repeat = "Mutations locating at simple repeat sequences",
     Filter_7_C_to_G_artifact = "C>T_g false positive calls in FFPE samples",
-    Filter_8_mutation_at_homopolymer =  "Indel mutations located inside a >=15 homopolymer",
-    MSEC_filter_1234 = "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",
-    MSEC_filter_12345 = "One or more filters of Fitler 1, 2, 3, 4, or 5 are TRUE",
-    MSEC_filter_all= "One or more filters are TRUE"
-  )
-  MSEC_explain = data.frame(t(MSEC_explain))
-  colnames(MSEC_explain) = c("Explanation")
-  MSEC_explain_Name = data.frame(rownames(MSEC_explain))
-  colnames(MSEC_explain_Name) = c("Name")
-  MSEC_explain = cbind(MSEC_explain_Name, MSEC_explain)
-  colnames(MSEC_explain) = c("Name", "Explanation")
-  
-  # save the results
-  NewWb = createWorkbook()
-  addWorksheet(wb = NewWb, sheetName = "MicroSEC_results", gridLines = TRUE)
-  addWorksheet(wb = NewWb, sheetName = "MicroSEC_explanation", gridLines = TRUE)
-  writeData(wb = NewWb, sheet = "MicroSEC_results", x = MSEC,
-            xy = c(1,1), borders = "all", withFilter=TRUE)
-  writeData(wb = NewWb, sheet = "MicroSEC_explanation", x = MSEC_explain,
-            xy = c(1,1), borders = "all")
-  freezePane(wb = NewWb, sheet = "MicroSEC_results", firstActiveRow = 2)
-  setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
-  setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
-  
-  FLAG = FALSE
-  while (!FLAG) {
-    FLAG = saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", as.numeric(Sys.time()), ".xlsx", sep=""), overwrite = FALSE, returnValue = TRUE)
-  }
+      Filter_8_mutation_at_homopolymer =  "Indel mutations located inside a >=15 homopolymer",
+      MSEC_filter_1234 = "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",
+      MSEC_filter_12345 = "One or more filters of Fitler 1, 2, 3, 4, or 5 are TRUE",
+      MSEC_filter_all= "One or more filters are TRUE"
+    )
+    MSEC_explain = data.frame(t(MSEC_explain))
+    colnames(MSEC_explain) = c("Explanation")
+    MSEC_explain_Name = data.frame(rownames(MSEC_explain))
+    colnames(MSEC_explain_Name) = c("Name")
+    MSEC_explain = cbind(MSEC_explain_Name, MSEC_explain)
+    colnames(MSEC_explain) = c("Name", "Explanation")
+    
+    # save the results
+    NewWb = createWorkbook()
+    addWorksheet(wb = NewWb, sheetName = "MicroSEC_results", gridLines = TRUE)
+    addWorksheet(wb = NewWb, sheetName = "MicroSEC_explanation", gridLines = TRUE)
+    writeData(wb = NewWb, sheet = "MicroSEC_results", x = MSEC,
+              xy = c(1,1), borders = "all", withFilter=TRUE)
+    writeData(wb = NewWb, sheet = "MicroSEC_explanation", x = MSEC_explain,
+              xy = c(1,1), borders = "all")
+    freezePane(wb = NewWb, sheet = "MicroSEC_results", firstActiveRow = 2)
+    setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
+    setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
+    
+    saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", MSEC$Sample[[1]], "_", Sys.Date(), ".xlsx", sep=""), overwrite = FALSE, returnValue = TRUE)
 }
 
 
