@@ -26,6 +26,16 @@ library(MicroSEC)
 library(tidyverse)
 ```
 
+depth補正
+リードの開始位置で評価
+補正前のリードでの合計／総リード数
+
+indelの場合のみ
+端までの【indel長+1】に追加の変異が常にあるか
+逆側の5塩基内に追加の変異が常にあるか
+penalty scoreを足す
+snv: 4k-5
+indel: 4k+4
 
 ## Sample information file making step
 ```{r}

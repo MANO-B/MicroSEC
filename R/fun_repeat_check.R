@@ -32,7 +32,7 @@ fun_repeat_check = function(Rep_A, Rep_B, Ref_seq, Width, Del){
         check_rep = FALSE
       }
     }
-    if(Post_rep_status_tmp > 0){
+    if(Post_rep_status_tmp >= length(Rep_seq)){
       Post_rep_status = max(Post_rep_status, Post_rep_status_tmp)
       if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
         homo_tmp_1 = Post_rep_status_tmp + length(Rep_seq)
@@ -51,7 +51,7 @@ fun_repeat_check = function(Rep_A, Rep_B, Ref_seq, Width, Del){
         check_rep = FALSE
       }
     }
-    if(Pre_rep_status_tmp > 0){
+    if(Pre_rep_status_tmp >= length(Rep_seq)){
       Pre_rep_status = max(Pre_rep_status, Pre_rep_status_tmp)
       if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
         homo_tmp_2 = Pre_rep_status_tmp + length(Rep_seq)

@@ -61,6 +61,10 @@ fun_read_check = function(df_mutation,
     WITH_INDEL_1 = FALSE
     WITH_INDEL_2 = FALSE
     mut_call = logical(0)
+    Co_mut_Pre = 0
+    Co_mut_Post = 0
+    penalty_Pre = 0
+    penalty_Post = 0
     # extract mutation supporting reads
     if(df_mutation[i,"Chr"] != CHROM){
       CHROM = df_mutation[i,"Chr"]
@@ -79,13 +83,20 @@ fun_read_check = function(df_mutation,
       indel_status = 1
       WITH_INDEL_1 = TRUE
       WITH_INDEL_2 = TRUE
+      Co_mut_Pre = 3
+      Co_mut_Post = 3
     }
     if(mut_type == "del"){
       indel_length = nchar(df_mutation[i,"Ref"]) - 1
       indel_status = 1
       WITH_INDEL_1 = TRUE
       WITH_INDEL_2 = TRUE
+      Co_mut_Pre = 3
+      Co_mut_Post = 3
     }
+    Ref_indel = c(Ref_seq[1:Width], DNAString(df_mutation[i,"Alt"]), 
+                  Ref_seq[(Width + nchar(df_mutation[i,"Ref"]) + 1):
+                          (2 * Width + 1)])
     if(dim(mut_read)[[1]] == 0 & indel_status == 1){
       for(tmp in 1:Max_mutation_search){
         if(dim(mut_read)[[1]] == 0){
@@ -102,13 +113,11 @@ fun_read_check = function(df_mutation,
       if(indel_status == 0){
         mut_call = which(mut_detail == str_sub(df_mutation[i,"Alt"], 
                                                start = 1, end = 1))
-      }
-      else if(mut_type == "del"){
+      } else if(mut_type == "del"){
         mut_call = which(mut_detail == str_replace(df_mutation[i,"Ref"],
                                                    pattern=df_mutation[i,"Alt"],
                                                    replacement=".-"))
-      }
-      else if(mut_type == "ins"){
+      } else if(mut_type == "ins"){
         mut_call = which(mut_detail == str_replace(df_mutation[i,"Alt"],
                                                    pattern=df_mutation[i,"Ref"],
                                                    replacement=".+"))
@@ -324,8 +333,7 @@ fun_read_check = function(df_mutation,
             mut_position = min(
               length(df_seq), start(mutation_supporting_1) + Pre_search_length)
             FLAG_1 = Hairpin_search_length
-          }
-          else if(length(mutation_supporting_2) == 1){
+          } else if(length(mutation_supporting_2) == 1){
             mut_position = min(
               length(df_seq), start(mutation_supporting_2) + Post_search_length)
             FLAG_2 = Hairpin_search_length
@@ -335,6 +343,54 @@ fun_read_check = function(df_mutation,
             Reverse_seq = logical(0)
             FLAG_Hairpin_tmp = 0
             check_hairpin = 1
+            if(indel_status == 1){
+              comut_FLAG = TRUE
+              for(comut in 0:3){
+                if(comut_FLAG == TRUE)
+                  Co_mut_Pre_tmp = length(
+                    matchPattern(df_seq[
+                      min(1,(mut_position - indel_length - 1)):
+                        max((mut_position + nchar(df_mutation[i,"Alt"]) + 4),
+                            READ_length)],
+                      Ref_indel[(Width - indel_length):
+                                (Width + nchar(df_mutation[i,"Alt"]) + 5)],
+                       max.mismatch=comut, 
+                       min.mismatch=comut,
+                       with.indels=FALSE, 
+                       fixed=TRUE))
+                if(Co_mut_Pre_tmp > 0){
+                  Co_mut_Pre = min(Co_mut_Pre, comut)
+                  comut_FLAG = FALSE
+                }
+              }
+              comut_FLAG = TRUE
+              for(comut in 0:3){
+                if(comut_FLAG == TRUE)
+                  Co_mut_Post_tmp = length(
+                    matchPattern(df_seq[
+                      min(1,(mut_position - 4)):
+                      max((mut_position + nchar(df_mutation[i,"Alt"]) +
+                             indel_length - 1),
+                          READ_length)],
+                      Ref_indel[(Width - 3):
+                                (Width + nchar(df_mutation[i,"Alt"]) +
+                                   indel_length)],
+                      max.mismatch=comut, 
+                      min.mismatch=comut,
+                      with.indels=FALSE, 
+                      fixed=TRUE))
+                if(Co_mut_Pre_tmp > 0){
+                  Co_mut_Post = min(Co_mut_Post, comut)
+                  comut_FLAG = FALSE
+                }
+              }
+              penalty_Pre = 5 * Co_mut_Pre
+              penalty_Post = 5 * Co_mut_Pre
+            } else{
+              penalty_Pre = max(0, 4 * Alt_length - 5)
+              penalty_Post = max(0, 4 * Alt_length - 5)
+            }
+
             # hairpin length calculation
             Hairpin_seq = fun_hairpin_trimming(
                           df_seq[max(1,(mut_position - FLAG_1)):
@@ -503,13 +559,14 @@ fun_read_check = function(df_mutation,
         Homopolymer_status = Homopolymer_status,
         indel_status = indel_status,
         indel_length = indel_length,
-        distant_homology = distant_homology
+        distant_homology = distant_homology,
+        penalty_Pre = penalty_Pre,
+        penalty_Post = penalty_Post
       )
       if(FLAG_Hairpin == 0){
         Homology_search = rbind(Homology_search, Homology_search_tmp)
       }
-    }
-    else{
+    } else{
       MSEC_tmp = df_mutation[i,] %>% dplyr::mutate(
         READ_length = READ_length, 
         mut_type = mut_type,
@@ -529,7 +586,9 @@ fun_read_check = function(df_mutation,
         Homopolymer_status = 0,
         indel_status = 0,
         indel_length = 0,
-        distant_homology = 0
+        distant_homology = 0,
+        penalty_Pre = 0,
+        penalty_Post = 0
       )
     }
     MSEC = rbind(MSEC, MSEC_tmp)
