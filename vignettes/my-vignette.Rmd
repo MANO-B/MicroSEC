@@ -67,7 +67,7 @@ The explatation of the results is written in detail in the second sheet of the e
 github url: https://github.com/MANO-B/MicroSEC  
   
 ## Setting
-```{r, eval=FALSE}
+```{r}
 wd = "/mnt/HDD8TB/MicroSEC"
 knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, warning=FALSE, message=TRUE, comment = "#>")
 knitr::opts_knit$set(root.dir = wd)

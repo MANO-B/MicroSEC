@@ -38,6 +38,7 @@ fun_read_check = function(df_mutation,
   # initialize
   MSEC = NULL
   Homology_search = NULL
+  Mut_depth = NULL
   Length_Flag = 0
   CHROM = ""
   Pre_search_length = 0
@@ -65,6 +66,7 @@ fun_read_check = function(df_mutation,
     Co_mut_Post = 0
     penalty_Pre = 0
     penalty_Post = 0
+    Mut_depth_tmp = rep(0, 160)
     # extract mutation supporting reads
     if(df_mutation[i,"Chr"] != CHROM){
       CHROM = df_mutation[i,"Chr"]
@@ -74,6 +76,7 @@ fun_read_check = function(df_mutation,
       df_BAM_strand = df_BAM$strand[ID_No]
       df_BAM_cigar = df_BAM$cigar[ID_No]
       df_BAM_qual = df_BAM$qual[ID_No]
+      df_BAM_pos = df_BAM$pos[ID_No]
     }
     mut_read = df_mut_call %>% 
       filter(Chr == df_mutation[i,"Chr"] & Pos == df_mutation[i,"Pos"])
@@ -201,6 +204,9 @@ fun_read_check = function(df_mutation,
         Pre_rep_status = Rep_status[[1]]
         Post_rep_status = Rep_status[[2]]
         Homopolymer_status = Rep_status[[3]]
+      }
+      for(depth in 1:(READ_length + 1)){
+        Mut_depth_tmp[depth] = sum(df_BAM_pos == (df_mutation[i,"Pos"] + 1 - depth))
       }
       if(PROGRESS_BAR == "Y"){
         pb = txtProgressBar(min = 0, 
@@ -384,11 +390,6 @@ fun_read_check = function(df_mutation,
                   comut_FLAG = FALSE
                 }
               }
-              penalty_Pre = 5 * Co_mut_Pre
-              penalty_Post = 5 * Co_mut_Pre
-            } else{
-              penalty_Pre = max(0, 4 * Alt_length - 5)
-              penalty_Post = max(0, 4 * Alt_length - 5)
             }
 
             # hairpin length calculation
@@ -538,7 +539,14 @@ fun_read_check = function(df_mutation,
           }
         }
       }
-      
+      if(indel_status == 1){
+        penalty_Pre = 5 * Co_mut_Pre
+        penalty_Post = 5 * Co_mut_Pre
+      } else{
+        penalty_Pre = max(0, 4 * Alt_length - 5)
+        penalty_Post = max(0, 4 * Alt_length - 5)
+      }
+    
       # data formatting
       MSEC_tmp = df_mutation[i,] %>% dplyr::mutate(
         READ_length = READ_length, 
@@ -591,7 +599,10 @@ fun_read_check = function(df_mutation,
         penalty_Post = 0
       )
     }
+    Mut_depth_tmp = t(cumsum(Mut_depth_tmp))
+    colnames(Mut_depth_tmp) = paste("Depth",1:33,sep="")
     MSEC = rbind(MSEC, MSEC_tmp)
+    Mut_depth = rbind(Mut_depth, Mut_depth_tmp)
   }
   return(list(MSEC, Homology_search))
 }

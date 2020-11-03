@@ -9,6 +9,7 @@
 #' @importFrom dplyr select
 #' @export
 fun_analysis = function(MSEC,
+                        Mut_depth,
                         threshold_p = 10^(-6),
                         threshold_hairpin_ratio = 0.50,
                         threshold_hairpin_length = 30,
@@ -19,23 +20,44 @@ fun_analysis = function(MSEC,
                         Homopolymer_length = 15){
   MSEC = MSEC %>% mutate(
     Short_short_support = 
-      (short_support_length_adjust <= 
-         threshold_short_length * Half_length_adjust),
+      (short_support_length_total <= 
+         threshold_short_length * Half_length_total),
     Short_pre_support = 
-      (Pre_support_length_adjust <= 
-         threshold_short_length * Total_length_adjust),
+      (Pre_support_length_total <= 
+         threshold_short_length * Total_length_total),
     Short_post_support = 
-      (Post_support_length_adjust <= 
-         threshold_short_length * Total_length_adjust),
+      (Post_support_length_total <= 
+         threshold_short_length * Total_length_total),
     High_rate_Q18 = 
       ifelse((Low_quality_base_rate_under_Q18 < threshold_low_quality_rate),
-             TRUE, FALSE),
+             TRUE, FALSE)
+  )
+  MSEC$short_support_length_adjust_sum = 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$short_support_length_adjust) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$short_support_length_adjust + 1) -
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$shortest_support_length_adjust) +
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$shortest_support_length_adjust + 1)
+  MSEC$Pre_support_length_adjust_sum =
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_support_length_adjust + 1) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_Minimum_length_adjust + 1)
+  MSEC$Post_support_length_adjust_sum =
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$Post_Minimum_length_adjust) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$Post_support_length_adjust)
+  MSEC$Half_length_adjust_sum =
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$minimum_length) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$Half_length) -
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Half_length + 1) +
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length + 1)
+  MSEC$Total_length_adjust_sum = 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$minimum_length_2) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length_1 + 1)
+  MSEC = MSEC %>% mutate(
     prob_Filter_1 = 
-      (short_support_length_adjust / Half_length_adjust) ^ Total_read,
+      (short_support_length_adjust_sum / Half_length_adjust_sum) ^ Total_read,
     prob_Filter_3_pre = 
-      (Pre_support_length_adjust / Total_length_adjust) ^ Total_read,
+      (Pre_support_length_adjust_sum / Total_length_adjust_sum) ^ Total_read,
     prob_Filter_3_post =
-      (Post_support_length_adjust / Total_length_adjust) ^ Total_read
+      (Post_support_length_adjust_sum / Total_length_adjust_sum) ^ Total_read
   )
   MSEC = MSEC %>% mutate(
     prob_Filter_1 = ifelse((prob_Filter_1 > 1), 1, prob_Filter_1),

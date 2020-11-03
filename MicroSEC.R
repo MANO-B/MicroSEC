@@ -94,6 +94,7 @@ setwd(wd)
 # initialize
 MSEC = NULL
 Homology_search = NULL
+Mut_depth = NULL
 
 # load sample information tsv file
 SAMPLE_INFO = read.csv(SAMPLE_LIST,
@@ -131,6 +132,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           PROGRESS_BAR = PROGRESS_BAR)
   MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
+  Mut_depth = rbind(Mut_depth, result[[3]])
 }
 # search homologous sequences
 MSEC = fun_homology(MSEC,
@@ -140,6 +142,7 @@ MSEC = fun_homology(MSEC,
 # statistical analysis
 MSEC = fun_summary(MSEC)
 MSEC = fun_analysis(MSEC,
+                    Mut_depth,
                     threshold_p = 10^(-6),
                     threshold_hairpin_ratio = 0.50,
                     threshold_hairpin_length = 30,

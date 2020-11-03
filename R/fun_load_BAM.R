@@ -12,7 +12,7 @@
 fun_load_BAM = function(BAM_FILE){
   file_BAM <- BamFile(BAM_FILE)
   df_BAM = scanBam(file_BAM)[[1]]
-  df_BAM = df_BAM[c("qname", "rname", "strand", "cigar", "seq", "qual")]
+  df_BAM = df_BAM[c("qname", "rname", "strand", "cigar", "seq", "qual", "pos")]
   return(df_BAM)
 }
 

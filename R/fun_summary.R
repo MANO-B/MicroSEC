@@ -65,7 +65,7 @@ fun_summary = function(MSEC){
         Post_support_length_adjust)
   )
   MSEC = MSEC %>% mutate(
-    shortest_support_length =
+    shortest_support_length_adjust =
       (((Pre_Minimum_length_adjust - Post_Minimum_length_adjust) - 
           abs(Pre_Minimum_length_adjust - Post_Minimum_length_adjust)) / 2) + 
       Post_Minimum_length_adjust,
@@ -98,27 +98,20 @@ fun_summary = function(MSEC){
                             ifelse(mut_type == "ins",
                                    indel_length,
                                    0)),
+    Half_length = as.integer((READ_length - Altered_length) / 2)
   )
   MSEC = MSEC %>% mutate(
-    short_support_length_adjust = 
+    short_support_length_total = 
       short_support_length_adjust - shortest_support_length + 1,
-    Pre_support_length_adjust =
+    Pre_support_length_total =
       Pre_support_length_adjust - Pre_Minimum_length_adjust + 1,
-    Post_support_length_adjust = 
+    Post_support_length_total = 
       Post_support_length_adjust - Post_Minimum_length_adjust + 1,
-    Half_length_adjust =
-      as.integer((READ_length - Altered_length) / 2)  - minimum_length + 1,
-    Total_length_adjust = 
+    Half_length_total =
+      Half_length - minimum_length + 1,
+    Total_length_total = 
       READ_length - Altered_length - minimum_length_1 - minimum_length_2 + 1
   )
-  MSEC = MSEC %>% select(
-    -penalty_Pre,
-    -penalty_Post
-    -minimum_length_1, 
-    -minimum_length_2,
-    -minimum_length, 
-    -Altered_length, 
-    -shortest_support_length)
   return(MSEC)
 }
 
