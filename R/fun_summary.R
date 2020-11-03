@@ -102,7 +102,7 @@ fun_summary = function(MSEC){
   )
   MSEC = MSEC %>% mutate(
     short_support_length_total = 
-      short_support_length_adjust - shortest_support_length + 1,
+      short_support_length_adjust - shortest_support_length_adjust + 1,
     Pre_support_length_total =
       Pre_support_length_adjust - Pre_Minimum_length_adjust + 1,
     Post_support_length_total = 

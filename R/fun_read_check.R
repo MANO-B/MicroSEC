@@ -599,8 +599,9 @@ fun_read_check = function(df_mutation,
         penalty_Post = 0
       )
     }
+    Mut_depth_tmp = c(0, Mut_depth_tmp)
     Mut_depth_tmp = t(cumsum(Mut_depth_tmp))
-    colnames(Mut_depth_tmp) = paste("Depth", 1:160, sep="")
+    colnames(Mut_depth_tmp) = paste("Depth", 0:160, sep="")
     MSEC = rbind(MSEC, MSEC_tmp)
     Mut_depth = rbind(Mut_depth, Mut_depth_tmp)
   }

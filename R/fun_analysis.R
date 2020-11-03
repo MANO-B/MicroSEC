@@ -33,31 +33,31 @@ fun_analysis = function(MSEC,
              TRUE, FALSE)
   )
   MSEC$short_support_length_adjust_sum = 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$shortest_support_length_adjust) -
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + MSEC$short_support_length_adjust) + 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$short_support_length_adjust + 1) -
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$shortest_support_length_adjust)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 2 - MSEC$shortest_support_length_adjust) -
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$short_support_length_adjust) + 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$short_support_length_adjust + 2) -
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$shortest_support_length_adjust + 1)
   MSEC$Pre_support_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_support_length_adjust + 1) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_Minimum_length_adjust)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_support_length_adjust + 2) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_Minimum_length_adjust + 1)
   MSEC$Post_support_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$Post_Minimum_length_adjust) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Post_support_length_adjust)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 2 - MSEC$Post_Minimum_length_adjust) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Post_support_length_adjust + 1)
   MSEC$Half_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$minimum_length) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Half_length) +
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Half_length + 1) -
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 2 - MSEC$minimum_length) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Half_length + 1) +
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Half_length + 2) -
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length + 1)
   MSEC$Total_length_adjust_sum = 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$minimum_length_2) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length_1)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$minimum_length_2) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length_1 + 1)
   MSEC = MSEC %>% mutate(
     prob_Filter_1 = 
-      fun_zero(short_support_length_adjust_sum / Half_length_adjust_sum) ^ Total_read,
+      fun_zero(short_support_length_adjust_sum, Half_length_adjust_sum) ^ Total_read,
     prob_Filter_3_pre = 
-      fun_zero(Pre_support_length_adjust_sum / Total_length_adjust_sum) ^ Total_read,
+      fun_zero(Pre_support_length_adjust_sum, Total_length_adjust_sum) ^ Total_read,
     prob_Filter_3_post =
-      fun_zero(Post_support_length_adjust_sum / Total_length_adjust_sum) ^ Total_read
+      fun_zero(Post_support_length_adjust_sum, Total_length_adjust_sum) ^ Total_read
   )
   MSEC = MSEC %>% mutate(
     prob_Filter_1 = ifelse((prob_Filter_1 > 1), 1, prob_Filter_1),
