@@ -134,6 +134,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           PROGRESS_BAR = "Y")
   MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
+  Mut_depth = rbind(Mut_depth, result[[3]])
 }
 # search homologous sequences
 MSEC = fun_homology(MSEC,

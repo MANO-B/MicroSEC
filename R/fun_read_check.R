@@ -355,8 +355,8 @@ fun_read_check = function(df_mutation,
                 if(comut_FLAG == TRUE)
                   Co_mut_Pre_tmp = length(
                     matchPattern(df_seq[
-                      min(1,(mut_position - indel_length - 1)):
-                        max((mut_position + nchar(df_mutation[i,"Alt"]) + 4),
+                      max(1,(mut_position - indel_length - 1)):
+                        min((mut_position + nchar(df_mutation[i,"Alt"]) + 4),
                             READ_length)],
                       Ref_indel[(Width - indel_length):
                                 (Width + nchar(df_mutation[i,"Alt"]) + 5)],
@@ -374,8 +374,8 @@ fun_read_check = function(df_mutation,
                 if(comut_FLAG == TRUE)
                   Co_mut_Post_tmp = length(
                     matchPattern(df_seq[
-                      min(1,(mut_position - 4)):
-                      max((mut_position + nchar(df_mutation[i,"Alt"]) +
+                      max(1,(mut_position - 4)):
+                      min((mut_position + nchar(df_mutation[i,"Alt"]) +
                              indel_length - 1),
                           READ_length)],
                       Ref_indel[(Width - 3):
