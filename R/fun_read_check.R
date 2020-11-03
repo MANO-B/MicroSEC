@@ -97,9 +97,6 @@ fun_read_check = function(df_mutation,
       Co_mut_Pre = 3
       Co_mut_Post = 3
     }
-    Ref_indel = c(Ref_seq[1:Width], DNAString(df_mutation[i,"Alt"]), 
-                  Ref_seq[(Width + nchar(df_mutation[i,"Ref"]) + 1):
-                          (2 * Width + 1)])
     if(dim(mut_read)[[1]] == 0 & indel_status == 1){
       for(tmp in 1:Max_mutation_search){
         if(dim(mut_read)[[1]] == 0){
@@ -154,6 +151,9 @@ fun_read_check = function(df_mutation,
       Ref_seq = genome[[df_mutation[i,"Chr"]]][
         (df_mutation[i,"Pos"] - Error - Width):
         (df_mutation[i,"Pos"] - Error + Width)]
+      Ref_indel = c(Ref_seq[1:Width], DNAString(df_mutation[i,"Alt"]), 
+                    Ref_seq[(Width + nchar(df_mutation[i,"Ref"]) + 1):
+                              (2 * Width + 1)])
       Neighbor_seq = df_mutation[i,"Neighborhood_sequence"]
       Alt_length = nchar(df_mutation[i,"Alt"])
       # sequence information around the mutation position
@@ -253,17 +253,17 @@ fun_read_check = function(df_mutation,
         if(length(df_seq) > 0){
           # determine mutation position in each read
           mutation_supporting_1 = matchPattern(Peri_seq_1,
-                                    df_seq,
-                                    max.mismatch=Mut_near_1 + Laxness,
-                                    min.mismatch=0, 
-                                    with.indels=WITH_INDEL_1,
-                                    fixed=FALSE)
+                                               df_seq,
+                                               max.mismatch=Mut_near_1 + Laxness,
+                                               min.mismatch=0, 
+                                               with.indels=WITH_INDEL_1,
+                                               fixed=FALSE)
           mutation_supporting_2 = matchPattern(Peri_seq_2,
-                                    df_seq, 
-                                    max.mismatch=Mut_near_2 + Laxness,
-                                    min.mismatch=0,
-                                    with.indels=WITH_INDEL_2, 
-                                    fixed=FALSE)
+                                               df_seq, 
+                                               max.mismatch=Mut_near_2 + Laxness,
+                                               min.mismatch=0,
+                                               with.indels=WITH_INDEL_2, 
+                                               fixed=FALSE)
           if(length(mutation_supporting_1) != 1 & 
              length(mutation_supporting_2) != 1){
             Length_Flag = 1
@@ -308,10 +308,10 @@ fun_read_check = function(df_mutation,
                      length(mutation_supporting_2) != 1){
                     Setting = fun_setting(
                       PRE = Pre_search_length_default + Lax_1 * Laxness,
-                            POST = Post_search_length_default,
-                            Neighbor_seq = Neighbor_seq,
-                            neighbor_length = neighbor_length,
-                            Alt_length = Alt_length)
+                      POST = Post_search_length_default,
+                      Neighbor_seq = Neighbor_seq,
+                      neighbor_length = neighbor_length,
+                      Alt_length = Alt_length)
                     Pre_search_length = Setting[[1]]
                     Post_search_length = Setting[[2]]
                     Peri_seq_1 = Setting[[3]]
@@ -604,7 +604,7 @@ fun_read_check = function(df_mutation,
     MSEC = rbind(MSEC, MSEC_tmp)
     Mut_depth = rbind(Mut_depth, Mut_depth_tmp)
   }
-  return(list(MSEC, Homology_search))
+  return(list(MSEC, Homology_search, Mut_depth))
 }
 
 
