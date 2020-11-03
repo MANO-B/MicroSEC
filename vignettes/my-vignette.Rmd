@@ -97,11 +97,12 @@ library(MicroSEC)
 ## Analysis
 ```{r, eval=FALSE}
 # load sample information tsv file
-SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", header=FALSE, stringsAsFactors=FALSE, sep="\t")
+SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", header=FALSE, stringsAsFactors=FALSE, sep="\t")[1,]
 
 # initialize
 MSEC = NULL
 Homology_search = NULL
+Mut_depth = NULL
   
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
@@ -113,13 +114,13 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   GENOME = SAMPLE_INFO[SAMPLE,7]
   
   # load mutation information
-  df_mutation = fun_load_mutation(MUTATION_FILE)
-  df_BAM = fun_load_BAM(BAM_FILE)
-  df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
+  #df_mutation = fun_load_mutation(MUTATION_FILE)
+  #df_BAM = fun_load_BAM(BAM_FILE)
+  #df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
 
   # load genomic sequence
-  genome = fun_load_genome(GENOME)
-  Chr_No = fun_load_chr_no(GENOME)
+  #genome = fun_load_genome(GENOME)
+  #Chr_No = fun_load_chr_no(GENOME)
 
   # analysis
   result = fun_read_check(df_mutation = df_mutation,
@@ -141,6 +142,16 @@ MSEC = fun_homology(MSEC,
 
 # statistical analysis
 MSEC = fun_summary(MSEC)
+MSEC = fun_analysis(MSEC,
+                    Mut_depth,
+                    threshold_p = 10^(-6),
+                    threshold_hairpin_ratio = 0.50,
+                    threshold_hairpin_length = 30,
+                    threshold_soft_clip_ratio = 0.90,
+                    threshold_short_length = 0.8,
+                    threshold_distant_homology = 0.2,
+                    threshold_low_quality_rate = 0.1,
+                    Homopolymer_length = 15)
 
 # save the results
 fun_save(MSEC, wd)
