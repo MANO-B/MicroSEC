@@ -398,7 +398,7 @@ fun_read_check = function(df_mutation,
                   with.indels=FALSE, 
                   fixed=TRUE))
               if(Co_mut_Pre_tmp > 0){
-                Co_mut_Post = min(Co_mut_Post, comut)
+                Co_mut_Post = 0
               }
               Co_mut_Post_tmp = length(
                 matchPattern(df_seq[
@@ -412,7 +412,7 @@ fun_read_check = function(df_mutation,
                   with.indels=FALSE, 
                   fixed=TRUE))
               if(Co_mut_Pre_tmp > 0){
-                Co_mut_Post = min(Co_mut_Post, comut)
+                Co_mut_Post = 0
               }
             }
 
@@ -572,14 +572,14 @@ fun_read_check = function(df_mutation,
       } else{
         penalty_Pre = max(0, 4 * Alt_length - 5)
         penalty_Post = max(0, 4 * Alt_length - 5)
-      }
-      if(Co_mut_Pre > 0 & Pre_Minimum_length >= max(1, Alt_length * 4 - 5)){
-        penalty_Pre = penalty_Pre + 4
-        Caution = paste(Caution, "Anther mutation may exist in neighbor,")
-      }
-      if(Co_mut_Post > 0 & Post_Minimum_length >= max(1, Alt_length * 4 - 5)){
-        penalty_Post = penalty_Post + 4
-        Caution = paste(Caution, "Anther mutation may exist in neighbor,")
+        if(Co_mut_Pre > 0 & Pre_Minimum_length >= max(1, Alt_length * 4 - 5)){
+          penalty_Pre = penalty_Pre + 4
+          Caution = paste(Caution, "Anther mutation may exist in neighbor,")
+        }
+        if(Co_mut_Post > 0 & Post_Minimum_length >= max(1, Alt_length * 4 - 5)){
+          penalty_Post = penalty_Post + 4
+          Caution = paste(Caution, "Anther mutation may exist in neighbor,")
+        }
       }
       
       # data formatting
