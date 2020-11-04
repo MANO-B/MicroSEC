@@ -10,6 +10,8 @@
 #' @export
 fun_analysis = function(MSEC,
                         Mut_depth,
+                        Short_Homology_search_length = 4,
+                        Minimum_Homology_search_length = 40,
                         threshold_p = 10^(-6),
                         threshold_hairpin_ratio = 0.50,
                         threshold_hairpin_length = 30,
@@ -30,6 +32,12 @@ fun_analysis = function(MSEC,
          threshold_short_length * Total_length_total),
     High_rate_Q18 = 
       ifelse((Low_quality_base_rate_under_Q18 < threshold_low_quality_rate),
+             TRUE, FALSE),
+    Not_long_repeat = 
+      ifelse((Short_Homology_search_length +
+                Pre_rep_status +
+                Post_rep_status + 
+                Alt_length < Minimum_Homology_search_length),
              TRUE, FALSE)
   )
   MSEC$short_support_length_adjust_sum = 
@@ -52,6 +60,17 @@ fun_analysis = function(MSEC,
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$minimum_length_2) - 
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length_1 + 1)
   MSEC = MSEC %>% mutate(
+    Short_short_support_sum = 
+      (short_support_length_adjust_sum <= 
+         Half_length_adjust_sum * Half_length_total),
+    Short_pre_support_sum = 
+      (Pre_support_length_adjust_sum <= 
+         Total_length_adjust_sum * Total_length_total),
+    Short_post_support_sum = 
+      (Post_support_length_adjust_sum <= 
+         Total_length_adjust_sum * Total_length_total)
+  )
+  MSEC = MSEC %>% mutate(
     prob_Filter_1 = 
       fun_zero(short_support_length_adjust_sum, Half_length_adjust_sum) ^ Total_read,
     prob_Filter_3_pre = 
@@ -66,7 +85,7 @@ fun_analysis = function(MSEC,
   )
   MSEC = MSEC %>% mutate(
     Filter_1_mutation_intra_hairpin_loop = 
-      ifelse((Short_short_support & prob_Filter_1 < threshold_p),
+      ifelse((Short_short_support & Short_short_support_sum & prob_Filter_1 < threshold_p),
              TRUE, FALSE), 
     Filter_2_hairpin_structure = 
       ifelse((fun_zero(FLAG_Hairpin, Total_read) > threshold_hairpin_ratio |
@@ -74,14 +93,14 @@ fun_analysis = function(MSEC,
              TRUE, FALSE),
     Filter_3_microhomology_induced_mutation = 
       ifelse((High_rate_Q18 & 
-                ((prob_Filter_3_pre <= threshold_p & Short_pre_support) | 
-                   (prob_Filter_3_post <= threshold_p & Short_post_support))),
+                ((prob_Filter_3_pre <= threshold_p & Short_pre_support & Short_pre_support_sum) | 
+                   (prob_Filter_3_post <= threshold_p & Short_post_support & Short_post_support_sum))),
              TRUE, FALSE),
     Filter_4_soft_clipping = 
       ifelse((fun_zero(Soft_Clipped_read, Total_read)) > threshold_soft_clip_ratio,
              TRUE, FALSE),
     Filter_5_highly_homologous_region =
-      ifelse((distant_homology_rate >= threshold_distant_homology),
+      ifelse((distant_homology_rate >= threshold_distant_homology & Not_long_repeat),
              TRUE, FALSE),
     Filter_6_simple_repeat =
       ifelse((SimpleRepeat_TRF == "Y"),
@@ -94,6 +113,24 @@ fun_analysis = function(MSEC,
              TRUE, FALSE)
   )
   MSEC = MSEC %>% mutate(
+    Caution = 
+      ifelse((distant_homology_rate >= threshold_distant_homology & !Not_long_repeat),
+             paste(Caution, "too repetitive to analyze homology,"), Caution)
+  )
+  MSEC = MSEC %>% mutate(
+    Caution = 
+      ifelse((prob_Filter_1 < threshold_p &
+              !Filter_1_mutation_intra_hairpin_loop),
+             paste(Caution, "Filter 1: p is small, but supported enough long,"), Caution)
+  )
+  MSEC = MSEC %>% mutate(
+    Caution = 
+      ifelse(((prob_Filter_3_pre < threshold_p |
+                prob_Filter_3_post < threshold_p) &
+                !Filter_3_microhomology_induced_mutation),
+             paste(Caution, "Filter 3: p is small, but supported enough long,"), Caution)
+  )
+MSEC = MSEC %>% mutate(
     MSEC_filter_1234 = 
       Filter_1_mutation_intra_hairpin_loop |
       Filter_2_hairpin_structure | 
@@ -106,7 +143,8 @@ fun_analysis = function(MSEC,
       MSEC_filter_12345 | 
       Filter_6_simple_repeat |
       Filter_7_C_to_T_artifact |
-      Filter_8_mutation_at_homopolymer
+      Filter_8_mutation_at_homopolymer,
+    Comment = Caution
   )
   return(MSEC)
 }

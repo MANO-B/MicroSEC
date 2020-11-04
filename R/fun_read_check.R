@@ -34,6 +34,7 @@ fun_read_check = function(df_mutation,
                           SAMPLE_NAME,
                           READ_length,
                           ADAPTOR_SEQ,
+                          Short_Homology_search_length,
                           PROGRESS_BAR = "N"){
   # initialize
   MSEC = NULL
@@ -46,8 +47,6 @@ fun_read_check = function(df_mutation,
   Post_search_length_default = 20
   Post_search_length = 20
   Minimum_Hairpin_length = 15
-  Short_Homology_search_length = 4
-  Minimum_Homology_search_length = 40
   Width = 150
   Hairpin_search_length = 50
   Max_mutation_search = 50
@@ -62,11 +61,12 @@ fun_read_check = function(df_mutation,
     WITH_INDEL_1 = FALSE
     WITH_INDEL_2 = FALSE
     mut_call = logical(0)
-    Co_mut_Pre = 0
-    Co_mut_Post = 0
+    Co_mut_Pre = 3
+    Co_mut_Post = 3
     penalty_Pre = 0
     penalty_Post = 0
     Mut_depth_tmp = rep(0, 160)
+    Caution = ""
     # extract mutation supporting reads
     if(df_mutation[i,"Chr"] != CHROM){
       CHROM = df_mutation[i,"Chr"]
@@ -86,16 +86,12 @@ fun_read_check = function(df_mutation,
       indel_status = 1
       WITH_INDEL_1 = TRUE
       WITH_INDEL_2 = TRUE
-      Co_mut_Pre = 3
-      Co_mut_Post = 3
     }
     if(mut_type == "del"){
       indel_length = nchar(df_mutation[i,"Ref"]) - 1
       indel_status = 1
       WITH_INDEL_1 = TRUE
       WITH_INDEL_2 = TRUE
-      Co_mut_Pre = 3
-      Co_mut_Post = 3
     }
     if(dim(mut_read)[[1]] == 0 & indel_status == 1){
       for(tmp in 1:Max_mutation_search){
@@ -390,6 +386,34 @@ fun_read_check = function(df_mutation,
                   comut_FLAG = FALSE
                 }
               }
+            } else{
+              Co_mut_Pre_tmp = length(
+                matchPattern(df_seq[
+                    max(1,(mut_position - max(1, Alt_length * 4 - 5))):
+                      mut_position],
+                  Ref_indel[(Width - max(1, Alt_length * 4 - 5) + 1):
+                              (Width + 1)],
+                  max.mismatch=0, 
+                  min.mismatch=0,
+                  with.indels=FALSE, 
+                  fixed=TRUE))
+              if(Co_mut_Pre_tmp > 0){
+                Co_mut_Post = min(Co_mut_Post, comut)
+              }
+              Co_mut_Post_tmp = length(
+                matchPattern(df_seq[
+                  mut_position:
+                  min(READ_length, 
+                      (mut_position + max(1, Alt_length * 4 - 5)))],
+                  Ref_indel[(Width + 1):
+                      (Width + max(1, Alt_length * 4 - 5) + 1)],
+                  max.mismatch=0, 
+                  min.mismatch=0,
+                  with.indels=FALSE, 
+                  fixed=TRUE))
+              if(Co_mut_Pre_tmp > 0){
+                Co_mut_Post = min(Co_mut_Post, comut)
+              }
             }
 
             # hairpin length calculation
@@ -541,12 +565,23 @@ fun_read_check = function(df_mutation,
       }
       if(indel_status == 1){
         penalty_Pre = 5 * Co_mut_Pre
-        penalty_Post = 5 * Co_mut_Pre
+        penalty_Post = 5 * Co_mut_Post
+        if(Co_mut_Pre > 0 | Co_mut_Post > 0){
+          Caution = paste(Caution, "anther co-mutation may exist in neighbor,")
+        }
       } else{
         penalty_Pre = max(0, 4 * Alt_length - 5)
         penalty_Post = max(0, 4 * Alt_length - 5)
       }
-    
+      if(Co_mut_Pre > 0 & Pre_Minimum_length >= max(1, Alt_length * 4 - 5)){
+        penalty_Pre = penalty_Pre + 4
+        Caution = paste(Caution, "Anther mutation may exist in neighbor,")
+      }
+      if(Co_mut_Post > 0 & Post_Minimum_length >= max(1, Alt_length * 4 - 5)){
+        penalty_Post = penalty_Post + 4
+        Caution = paste(Caution, "Anther mutation may exist in neighbor,")
+      }
+      
       # data formatting
       MSEC_tmp = df_mutation[i,] %>% dplyr::mutate(
         READ_length = READ_length, 
@@ -569,7 +604,8 @@ fun_read_check = function(df_mutation,
         indel_length = indel_length,
         distant_homology = distant_homology,
         penalty_Pre = penalty_Pre,
-        penalty_Post = penalty_Post
+        penalty_Post = penalty_Post,
+        Caution = Caution
       )
       if(FLAG_Hairpin == 0){
         Homology_search = rbind(Homology_search, Homology_search_tmp)
@@ -596,7 +632,8 @@ fun_read_check = function(df_mutation,
         indel_length = 0,
         distant_homology = 0,
         penalty_Pre = 0,
-        penalty_Post = 0
+        penalty_Post = 0,
+        Caution = ""
       )
     }
     Mut_depth_tmp = c(0, Mut_depth_tmp)

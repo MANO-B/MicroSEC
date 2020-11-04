@@ -13,6 +13,7 @@ fun_read_check(
   SAMPLE_NAME,
   READ_length,
   ADAPTOR_SEQ,
+  Short_Homology_search_length,
   PROGRESS_BAR = "N"
 )
 }

@@ -129,6 +129,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           SAMPLE_NAME = SAMPLE_NAME,
                           READ_length = READ_length,
                           ADAPTOR_SEQ = ADAPTOR_SEQ,
+                          Short_Homology_search_length = 4,
                           PROGRESS_BAR = PROGRESS_BAR)
   MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
@@ -137,12 +138,15 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
 # search homologous sequences
 MSEC = fun_homology(MSEC,
                     Homology_search,
+                    Minimum_Homology_search_length = 40,
                     PROGRESS_BAR = PROGRESS_BAR)
   
 # statistical analysis
 MSEC = fun_summary(MSEC)
 MSEC = fun_analysis(MSEC,
                     Mut_depth,
+                    Short_Homology_search_length = 4,
+                    Minimum_Homology_search_length = 40,
                     threshold_p = 10^(-6),
                     threshold_hairpin_ratio = 0.50,
                     threshold_hairpin_length = 30,

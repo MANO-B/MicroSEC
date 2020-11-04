@@ -7,6 +7,8 @@
 fun_analysis(
   MSEC,
   Mut_depth,
+  Short_Homology_search_length = 4,
+  Minimum_Homology_search_length = 40,
   threshold_p = 10^(-6),
   threshold_hairpin_ratio = 0.5,
   threshold_hairpin_length = 30,
