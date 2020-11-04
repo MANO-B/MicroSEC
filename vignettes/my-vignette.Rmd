@@ -111,7 +111,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
 
   # analysis
   result = fun_read_check(df_mutation = df_mutation,
-                          df_BAM =  df_BAM,
+                          df_BAM = df_BAM,
                           df_mut_call = df_mut_call,
                           genome = genome,
                           Chr_No = Chr_No,
