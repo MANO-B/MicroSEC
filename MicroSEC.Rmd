@@ -29,8 +29,15 @@ library(tidyverse)
 depth補正
 リードの開始位置で評価
 補正前のリードでの合計／総リード数
+apiece
+nominated
+MANO-finder
 
-
+Mutation l
+Potential Sequence Error with Uneven Distribution On Chimeric Reads Caller 
+PSEUDO-CRC
+Maldistribution,   originating sequence error c 
+MICR and A N Originating sequence error cleaner: MANO-SEC 
 ## Sample information file making step
 ```{r}
 # TOP somatic mutations reported to patients

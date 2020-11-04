@@ -58,7 +58,7 @@ Filter 5  : >=20% mutations were called by chimeric reads comprising two distant
 Filter 6  : Mutations locating at simple repeat sequences.  
 Filter 7  : C>T_g false positive calls in FFPE samples.  
 Filter 8  : Indel mutations locating at a >=15 homopolymer.  
- 
+  
 Supporting lengths are adjusted considering small repeat sequences around the mutations.  
   
 Results are saved in a excel file.  
@@ -76,26 +76,13 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 ## Necessary packages
 ```{r packages, eval=FALSE}
-library(tidyr)
-library(openxlsx)
-library(data.table)
-library(R.utils)
-library(stringr)
-library(magrittr)
-library(dplyr)
-library(Biostrings)
-library(BSgenome.Hsapiens.UCSC.hg38)
-library(BSgenome.Mmusculus.UCSC.mm10)
-library(GenomicAlignments)
-library(Rsamtools)
-library(tcltk)
-library(gtools)
 library(MicroSEC)
 ```
 
 
 ## Analysis
 ```{r, eval=FALSE}
+library(MicroSEC)
 # load sample information tsv file
 SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", header=FALSE, stringsAsFactors=FALSE, sep="\t")
 

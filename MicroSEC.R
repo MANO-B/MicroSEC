@@ -60,7 +60,8 @@
 # Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]
 #
 # Example
-# Rscript MicroSEC.R /mnt/HDD8TB/FFPE /mnt/HDD8TB/FFPE/source/Sample_list.txt Y
+# Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list.txt Y
+# Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv Y
 #
 # If you want to know the progress visually, [progress bar Y/N] should be Y.
 #
@@ -68,20 +69,6 @@
 # The explatation of the results is written in detail in the second sheet of the excel file.
 
 # load necessary packages
-library(tidyr)
-library(openxlsx)
-library(data.table)
-library(R.utils)
-library(stringr)
-library(magrittr)
-library(dplyr)
-library(Biostrings)
-library(BSgenome.Hsapiens.UCSC.hg38)
-library(BSgenome.Mmusculus.UCSC.mm10)
-library(GenomicAlignments)
-library(Rsamtools)
-library(tcltk)
-library(gtools)
 library(MicroSEC)
 
 # set arguments

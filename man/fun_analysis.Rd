@@ -21,6 +21,28 @@ fun_analysis(
 }
 \arguments{
 \item{MSEC}{Mutation filtering information.}
+
+\item{Mut_depth}{Mutation coverage data.}
+
+\item{Short_Homology_search_length}{Small sequence for homology search.}
+
+\item{Minimum_Homology_search_length}{The sequence length for homology search.}
+
+\item{threshold_p}{The largest p value of significant errors.}
+
+\item{threshold_hairpin_ratio}{The smallest hairpin read ratio.}
+
+\item{threshold_hairpin_length}{The shortest hairpin length.}
+
+\item{threshold_soft_clip_ratio}{The smallest rate of significantly soft-clipped reads.}
+
+\item{threshold_short_length}{Reads shorter than that are analyzed.}
+
+\item{threshold_distant_homology}{The smallest rate of reads from other regions.}
+
+\item{threshold_low_quality_rate}{The smallest rate of low quality bases.}
+
+\item{Homopolymer_length}{The smallest length of homopolymers.}
 }
 \value{
 MSEC

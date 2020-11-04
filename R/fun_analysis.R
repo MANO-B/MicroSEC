@@ -3,6 +3,17 @@
 #' This function analyzes the filtering results.
 #'
 #' @param MSEC Mutation filtering information.
+#' @param Mut_depth Mutation coverage data.
+#' @param Short_Homology_search_length Small sequence for homology search.
+#' @param Minimum_Homology_search_length The sequence length for homology search.
+#' @param threshold_p The largest p value of significant errors.
+#' @param threshold_hairpin_ratio The smallest hairpin read ratio.
+#' @param threshold_hairpin_length  The shortest hairpin length.
+#' @param threshold_soft_clip_ratio The smallest rate of significantly soft-clipped reads.
+#' @param threshold_short_length Reads shorter than that are analyzed. 
+#' @param threshold_distant_homology The smallest rate of reads from other regions.
+#' @param threshold_low_quality_rate The smallest rate of low quality bases.
+#' @param Homopolymer_length The smallest length of homopolymers.
 #' @return MSEC
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
@@ -41,19 +52,19 @@ fun_analysis = function(MSEC,
              TRUE, FALSE)
   )
   MSEC$short_support_length_adjust_sum = 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 2 - MSEC$shortest_support_length_adjust) -
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 1 - MSEC$short_support_length_adjust) + 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$shortest_support_length_adjust) -
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 1 - MSEC$short_support_length_adjust) + 
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$short_support_length_adjust + 2) -
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$shortest_support_length_adjust + 1)
   MSEC$Pre_support_length_adjust_sum =
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_support_length_adjust + 2) - 
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_Minimum_length_adjust + 1)
   MSEC$Post_support_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 2 - MSEC$Post_Minimum_length_adjust) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Post_support_length_adjust + 1)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$Post_Minimum_length_adjust) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length - MSEC$Post_support_length_adjust + 1)
   MSEC$Half_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length + 2 - MSEC$minimum_length) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Half_length + 1) +
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$minimum_length) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length - MSEC$Half_length + 1) +
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Half_length + 2) -
     mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length + 1)
   MSEC$Total_length_adjust_sum = 

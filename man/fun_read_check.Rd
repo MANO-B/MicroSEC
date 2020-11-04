@@ -34,6 +34,8 @@ fun_read_check(
 
 \item{ADAPTOR_SEQ}{The adapter sequence of the library.}
 
+\item{Short_Homology_search_length}{Small sequence for homology search.}
+
 \item{PROGRESS_BAR}{"Y": You can see the progress visually.}
 }
 \value{
