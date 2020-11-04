@@ -37,6 +37,8 @@ depth補正
 df_mutation_raw = read.xlsx("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/TOP315_summary.xlsx", sheet = 3)
 df_mutation_raw = df_mutation_raw %>% dplyr::select(ID, 遺伝子, DNA変異, アミノ酸変異, `アリル頻度・リード数・コピー数・LRRスウスウ`, マップ率, 平均深度, 総リード数スウ, ユニークリード率)
 colnames(df_mutation_raw) = c("Sample_ID", "Gene", "HGVS.c", "HGVS.p", "Freq_info", "Mapped_rate", "Mean_depth", "Total_reads", "Unique_read_rate")
+df_mutation_raw = subset(df_mutation_raw, !(is.na(df_mutation_raw$HGVS.c)))
+df_mutation_raw$HGVS.p = replace(df_mutation_raw$HGVS.p, which(is.na(df_mutation_raw$HGVS.p)), "_")
 
 # Sample data formatting
 df_sample_info = read_tsv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/Sample_initial_list.txt")
