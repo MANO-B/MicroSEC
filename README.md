@@ -232,6 +232,18 @@ fun_save(MSEC, wd)
 
 ```
 
+- Output file
+  one excel file and one tsv file are saved in the working/output directory.
+```
+MicroSEC-result_[Sample name]_[Date].xlsx
+MicroSEC_[Sample name].tsv
+```
+  like following:
+```
+MicroSEC-result_PC9_2020-11-05.xlsx
+MicroSEC_PC9.tsv
+```
+
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
 - Confirm the read length in the platform
 - Confirm the adaptor sequence; Todai Onco Panel ("AGATCGGAAGAGC")
