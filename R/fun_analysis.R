@@ -115,13 +115,13 @@ fun_analysis = function(MSEC,
   MSEC = MSEC %>% mutate(
     Short_short_support_sum = 
       (short_support_length_adjust_sum <= 
-         Half_length_adjust_sum * Half_length_total),
+         Half_length_adjust_sum * threshold_short_length),
     Short_pre_support_sum = 
       (Pre_support_length_adjust_sum <= 
-         Total_length_adjust_sum * Total_length_total),
+         Total_length_adjust_sum * threshold_short_length),
     Short_post_support_sum = 
       (Post_support_length_adjust_sum <= 
-         Total_length_adjust_sum * Total_length_total)
+         Total_length_adjust_sum * threshold_short_length)
   )
   MSEC = MSEC %>% mutate(
     prob_Filter_1 = 
