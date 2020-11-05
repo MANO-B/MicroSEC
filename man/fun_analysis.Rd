@@ -11,7 +11,6 @@ fun_analysis(
   Minimum_Homology_search_length = 40,
   threshold_p = 10^(-6),
   threshold_hairpin_ratio = 0.5,
-  threshold_hairpin_length = 30,
   threshold_soft_clip_ratio = 0.9,
   threshold_short_length = 0.8,
   threshold_distant_homology = 0.2,
@@ -26,19 +25,20 @@ fun_analysis(
 
 \item{Short_Homology_search_length}{Small sequence for homology search.}
 
-\item{Minimum_Homology_search_length}{The sequence length for homology search.}
+\item{Minimum_Homology_search_length}{The sequence length for homology
+search.}
 
 \item{threshold_p}{The largest p value of significant errors.}
 
 \item{threshold_hairpin_ratio}{The smallest hairpin read ratio.}
 
-\item{threshold_hairpin_length}{The shortest hairpin length.}
-
-\item{threshold_soft_clip_ratio}{The smallest rate of significantly soft-clipped reads.}
+\item{threshold_soft_clip_ratio}{The smallest rate of significantly
+soft-clipped reads.}
 
 \item{threshold_short_length}{Reads shorter than that are analyzed.}
 
-\item{threshold_distant_homology}{The smallest rate of reads from other regions.}
+\item{threshold_distant_homology}{The smallest rate of reads from other
+regions.}
 
 \item{threshold_low_quality_rate}{The smallest rate of low quality bases.}
 

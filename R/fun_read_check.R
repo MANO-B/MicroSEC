@@ -113,13 +113,15 @@ fun_read_check = function(df_mutation,
           mut_call = which(mut_detail == str_sub(df_mutation[i,"Alt"], 
                                                  start = 1, end = 1))
         } else if(mut_type == "del"){
-          mut_call = which(mut_detail == str_replace(df_mutation[i,"Ref"],
-                                                     pattern=df_mutation[i,"Alt"],
-                                                     replacement=".-"))
+          mut_call = which(mut_detail ==
+                             str_replace(df_mutation[i,"Ref"],
+                                         pattern=df_mutation[i,"Alt"],
+                                         replacement=".-"))
         } else if(mut_type == "ins"){
-          mut_call = which(mut_detail == str_replace(df_mutation[i,"Alt"],
-                                                     pattern=df_mutation[i,"Ref"],
-                                                     replacement=".+"))
+          mut_call = which(mut_detail ==
+                             str_replace(df_mutation[i,"Alt"],
+                                         pattern=df_mutation[i,"Ref"],
+                                         replacement=".+"))
         }
       }
       if(PROGRESS_BAR == "Y"){
@@ -204,7 +206,8 @@ fun_read_check = function(df_mutation,
           Homopolymer_status = Rep_status[[3]]
         }
         for(depth in 1:(READ_length + 1)){
-          Mut_depth_tmp[depth] = sum(df_BAM_pos == (df_mutation[i,"Pos"] + 1 - depth))
+          Mut_depth_tmp[depth] = 
+            sum(df_BAM_pos == (df_mutation[i,"Pos"] + 1 - depth))
         }
         if(PROGRESS_BAR == "Y"){
           pb = txtProgressBar(min = 0, 
@@ -250,18 +253,20 @@ fun_read_check = function(df_mutation,
           df_qual = as.vector(asc(as.character(df_qual[1])))
           if(length(df_seq) > 0){
             # determine mutation position in each read
-            mutation_supporting_1 = matchPattern(Peri_seq_1,
-                                                 df_seq,
-                                                 max.mismatch=Mut_near_1 + Laxness,
-                                                 min.mismatch=0, 
-                                                 with.indels=WITH_INDEL_1,
-                                                 fixed=FALSE)
-            mutation_supporting_2 = matchPattern(Peri_seq_2,
-                                                 df_seq, 
-                                                 max.mismatch=Mut_near_2 + Laxness,
-                                                 min.mismatch=0,
-                                                 with.indels=WITH_INDEL_2, 
-                                                 fixed=FALSE)
+            mutation_supporting_1 =
+              matchPattern(Peri_seq_1,
+                           df_seq,
+                           max.mismatch=Mut_near_1 + Laxness,
+                           min.mismatch=0, 
+                           with.indels=WITH_INDEL_1,
+                           fixed=FALSE)
+            mutation_supporting_2 = 
+              matchPattern(Peri_seq_2,
+                           df_seq, 
+                           max.mismatch=Mut_near_2 + Laxness,
+                           min.mismatch=0,
+                           with.indels=WITH_INDEL_2, 
+                           fixed=FALSE)
             if(length(mutation_supporting_1) != 1 & 
                length(mutation_supporting_2) != 1){
               Length_Flag = 1
@@ -335,11 +340,13 @@ fun_read_check = function(df_mutation,
             }
             if(length(mutation_supporting_1) == 1){
               mut_position = min(
-                length(df_seq), start(mutation_supporting_1) + Pre_search_length)
+                length(df_seq),
+                start(mutation_supporting_1) + Pre_search_length)
               FLAG_1 = Hairpin_search_length
             } else if(length(mutation_supporting_2) == 1){
               mut_position = min(
-                length(df_seq), start(mutation_supporting_2) + Post_search_length)
+                length(df_seq),
+                start(mutation_supporting_2) + Post_search_length)
               FLAG_2 = Hairpin_search_length
             }
             if(mut_position > 0){
@@ -389,42 +396,46 @@ fun_read_check = function(df_mutation,
                   }
                 }
               } else{
-                Co_mut_Pre_tmp = length(
-                  matchPattern(df_seq[
-                      max(1,(mut_position - max(1, Alt_length * 4 - 5))):
-                        mut_position],
-                    Ref_indel[(Width - max(1, Alt_length * 4 - 5) + 1):
-                                (Width + 1)],
-                    max.mismatch=0, 
-                    min.mismatch=0,
-                    with.indels=FALSE, 
-                    fixed=TRUE))
-                if(Co_mut_Pre_tmp > 0){
-                  Co_mut_Pre = 0
+                if((mut_position - max(1, Alt_length * 4 - 5)) > 0){
+                  Co_mut_Pre_tmp = length(
+                    matchPattern(df_seq[
+                        (mut_position - max(1, Alt_length * 4 - 5)):
+                          mut_position],
+                      Ref_indel[(Width - max(1, Alt_length * 4 - 5) + 1):
+                                  (Width + 1)],
+                      max.mismatch=0, 
+                      min.mismatch=0,
+                      with.indels=FALSE, 
+                      fixed=TRUE))
+                  if(Co_mut_Pre_tmp > 0){
+                    Co_mut_Pre = 0
+                  }
                 }
-                Co_mut_Post_tmp = length(
-                  matchPattern(df_seq[
-                    mut_position:
-                    min(length(df_seq), 
-                        (mut_position + max(1, Alt_length * 4 - 5)))],
-                    Ref_indel[(Width + 1):
-                        (Width + max(1, Alt_length * 4 - 5) + 1)],
-                    max.mismatch=0, 
-                    min.mismatch=0,
-                    with.indels=FALSE, 
-                    fixed=TRUE))
-                if(Co_mut_Post_tmp > 0){
-                  Co_mut_Post = 0
+                if((mut_position + max(1, Alt_length * 4 - 5)) <=
+                   length(df_seq)){
+                  Co_mut_Post_tmp = length(
+                    matchPattern(df_seq[
+                      mut_position:
+                          (mut_position + max(1, Alt_length * 4 - 5))],
+                      Ref_indel[(Width + 1):
+                          (Width + max(1, Alt_length * 4 - 5) + 1)],
+                      max.mismatch=0, 
+                      min.mismatch=0,
+                      with.indels=FALSE, 
+                      fixed=TRUE))
+                  if(Co_mut_Post_tmp > 0){
+                    Co_mut_Post = 0
+                  }
                 }
               }
   
               # hairpin length calculation
               Hairpin_seq = fun_hairpin_trimming(
-                            df_seq[max(1,(mut_position - FLAG_1)):
-                                   min(length(df_seq),
-                                       (mut_position + FLAG_2 + Alt_length - 1))],
-                            mut_read_strand[[j]],
-                            ADAPTOR_SEQ)
+                          df_seq[max(1,(mut_position - FLAG_1)):
+                                 min(length(df_seq),
+                                     (mut_position + FLAG_2 + Alt_length - 1))],
+                          mut_read_strand[[j]],
+                          ADAPTOR_SEQ)
               if(Minimum_Hairpin_length < length(Hairpin_seq)){
                 for(hair in Minimum_Hairpin_length:length(Hairpin_seq)){
                   if(check_hairpin == 1){
@@ -486,7 +497,8 @@ fun_read_check = function(df_mutation,
   
               # adjustment for consecutive snv
               if(mut_type == "snv"){
-                Post_support_length_tmp = Post_support_length_tmp - Alt_length + 1
+                Post_support_length_tmp =
+                  Post_support_length_tmp - Alt_length + 1
               }
               
               # read quality check
@@ -507,7 +519,7 @@ fun_read_check = function(df_mutation,
                 } else{
                   Pre_Homology_search_seq = df_seq[1:
                     min(length(df_seq), 
-                        mut_position + Short_Homology_search_length + Alt_length)]
+                     mut_position + Short_Homology_search_length + Alt_length)]
                   Post_Homology_search_seq = df_seq[
                     max(1, mut_position - Short_Homology_search_length):
                     length(df_seq)]
@@ -567,18 +579,23 @@ fun_read_check = function(df_mutation,
           penalty_Pre = 5 * Co_mut_Pre
           penalty_Post = 5 * Co_mut_Post
           if(Co_mut_Pre > 0 | Co_mut_Post > 0){
-            Caution = paste(Caution, "anther co-mutation may exist in neighbor,")
+            Caution = paste(Caution, 
+                            "anther co-mutation may exist in neighbor,")
           }
         } else{
           penalty_Pre = max(0, 4 * Alt_length - 5)
           penalty_Post = max(0, 4 * Alt_length - 5)
-          if(Co_mut_Pre > 0 & Pre_Minimum_length >= max(1, Alt_length * 4 - 5)){
-            penalty_Pre = penalty_Pre + 4
-            Caution = paste(Caution, "anther co-mutation may exist in neighbor,")
+          if(Co_mut_Pre > 0 & 
+             Pre_support_length >= max(1, Alt_length * 4 - 5)){
+              penalty_Pre = penalty_Pre + 4
+              Caution = paste(Caution, 
+                              "anther co-mutation may exist in neighbor,")
           }
-          if(Co_mut_Post > 0 & Post_Minimum_length >= max(1, Alt_length * 4 - 5)){
-            penalty_Post = penalty_Post + 4
-            Caution = paste(Caution, "anther co-mutation may exist in neighbor,")
+          if(Co_mut_Post > 0 &
+             Post_support_length >= max(1, Alt_length * 4 - 5)){
+              penalty_Post = penalty_Post + 4
+              Caution = paste(Caution,
+                              "anther co-mutation may exist in neighbor,")
           }
         }
         

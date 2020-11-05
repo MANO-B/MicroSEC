@@ -1,3 +1,8 @@
+private source codes
+
+Potential Sequence Error with Uneven Distribution-Omitter
+PSEUDO
+
 ## Setting
 ```{r, eval=FALSE}
 wd = "/mnt/HDD8TB/MicroSEC"
@@ -26,18 +31,6 @@ library(MicroSEC)
 library(tidyverse)
 ```
 
-depth補正
-リードの開始位置で評価
-補正前のリードでの合計／総リード数
-apiece
-nominated
-MANO-finder
-
-Mutation l
-Potential Sequence Error with Uneven Distribution On Chimeric Reads Caller 
-PSEUDO-CRC
-Maldistribution,   originating sequence error c 
-MICR and A N Originating sequence error cleaner: MANO-SEC 
 ## Sample information file making step
 ```{r}
 # TOP somatic mutations reported to patients
@@ -84,9 +77,9 @@ write.table(df_list, "/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.
 ```{r, eval=FALSE}
 library(ggplot2)
 
-MicroSEC = read.xlsx(paste(wd, "/output/MicroSEC-result_2020-10-31.xlsx", sep=""), sheet = 1)
+MSEC_result = read.xlsx("/mnt/HDD8TB/MicroSEC/MicroSEC-result_CAUP-H17-08384-1-T_NS_TDv3_2020-11-05.xlsx", sheet = 1)
 
-df = MicroSEC %>% dplyr::filter(Total_read >= 10 & Filter_6_simple_repeat == FALSE & Filter_8_mutation_at_homopolymer == FALSE)
+df = MSEC_result %>% dplyr::filter(Total_read >= 10 & Filter_6_simple_repeat == FALSE & Filter_8_mutation_at_homopolymer == FALSE)
 g = ggplot(df, aes(x = Low_quality_base_rate_under_Q18, y = ..density..,))
 g = g + geom_histogram(binwidth=0.01, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 14))
@@ -98,8 +91,8 @@ Total_count = rep(0,36)
 Passed_count = rep(0,36)
 Filtered_rate = rep(0,36)
 for(i in 1:36){
-  Total_count[i] = dim(MicroSEC %>% dplyr::filter(Total_read == (4 + i) & Filter_6_simple_repeat == FALSE & Filter_8_mutation_at_homopolymer == FALSE))[1]
-  Passed_count[i] = dim(MicroSEC %>% dplyr::filter(Total_read == (4 + i) & Filter_6_simple_repeat == FALSE & Filter_8_mutation_at_homopolymer == FALSE & MicroSEC_filter_12345 == FALSE))[1]
+  Total_count[i] = dim(MSEC_result %>% dplyr::filter(Total_read == (4 + i) & Filter_6_simple_repeat == FALSE & Filter_8_mutation_at_homopolymer == FALSE))[1]
+  Passed_count[i] = dim(MSEC_result %>% dplyr::filter(Total_read == (4 + i) & Filter_6_simple_repeat == FALSE & Filter_8_mutation_at_homopolymer == FALSE & MSEC_result_filter_12345 == FALSE))[1]
   Filtered_rate[i] = 1 - zero(Passed_count[i], Total_count[i])
 }
 
@@ -152,7 +145,8 @@ for(CELL_ in CELL){
 
 CCLE = fread(paste(wd, "/source/CCLE_DepMap_18q3_maf_20180718.txt", sep=""), stringsAsFactors=FALSE, header=TRUE, sep="\t")
 CCLE = CCLE %>% dplyr::filter(Tumor_Sample_Barcode %in% c("NCIH3122_LUNG", "RH30_SOFT_TISSUE", "PC9_LUNG", "LS411N_LARGE_INTESTINE"))
-CCLE = CCLE %>% dplyr::select(Sample=Tumor_Sample_Barcode, Gene=Hugo_Symbol, HGVS.p=Protein_Change, Chr=Chromosome, Pos=Start_position, Start=Start_position, End=End_position, Strand=Strand, Mut_type=Variant_Type, Ref=Reference_Allele, Alt=Tumor_Seq_Allele1)
+CCLE = CCLE %>% dplyr::select(Sample=Tumor_Sample_Barcode, Gene=Hugo_Symbol, HGVS.c=cDNA_Change, HGVS.p=Protein_Change, Chr=Chromosome, Pos=Start_position, Start=Start_position, End=End_position, Strand=Strand, Mut_type=Variant_Type, Ref=Reference_Allele, Alt=Tumor_Seq_Allele1)
+CCLE = CCLE %>% dplyr::mutate(`Total_QV>=20`=0, `%Alt`=0, SimpleRepeat_TRF=NA, Neighborhood_sequence="", Transition=NA)
 
 CCLE = CCLE %>% dplyr::mutate(Chr=paste("chr", CCLE$Chr, sep=""))
 CCLE = CCLE %>% dplyr::mutate(hg19tohg38=paste(CCLE$Chr, ":", CCLE$Start, "-", CCLE$End, sep=""))
@@ -220,19 +214,10 @@ CCLE = CCLE %>% dplyr::mutate(Neighborhood_sequence = ifelse(Mut_type == "ins", 
 
 CCLE = CCLE %>% dplyr::mutate(Mut_type = paste(Alt_length, "-", Mut_type, sep=""))
 CCLE = CCLE %>% dplyr::mutate(Ref = Ref_indel, Alt = Alt_indel)
-CCLE = CCLE %>% dplyr::select(Sample, Gene, HGVS.p, Mut_type, `Total_QV>=20`, `%Alt`, Chr, Pos, Ref, Alt, SimpleRepeat_TRF, Neighborhood_sequence, Transition)
+CCLE = CCLE %>% dplyr::select(Sample, Gene, HGVS.c, HGVS.p, Mut_type, `Total_QV>=20`, `%Alt`, Chr, Pos, Ref, Alt, SimpleRepeat_TRF, Neighborhood_sequence, Transition)
 
 write.xlsx(as.data.frame(as.matrix(CCLE)), paste(wd, "/source/CCLE.xlsx", sep=""))
 ```
-
-```{r}
-library(devtools)
-library(roxygen2)
-library(usethis)
-
-
-```
-
 
 ## Information about the current R session
 ```{r, eval=FALSE}

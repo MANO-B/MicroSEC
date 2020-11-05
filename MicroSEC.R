@@ -41,8 +41,8 @@
 # Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
 # Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).  
 # Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.  
-# Filter 2  : Palindromic sequences exist within 150 bases (2-1 or 2-2).  
-# Filter 2-1: A reverse complementary sequence consisting >= 30 bases exists on the opposite strand.  
+# Filter 2  : Hairpin-structure induced error detection (2-1 or 2-2).  
+# Filter 2-1: Palindromic sequences exist within 150 bases. 
 # Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
 # Filter 3  : 3’-/5’-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
 # Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
@@ -138,7 +138,6 @@ MSEC = fun_analysis(MSEC,
                     Minimum_Homology_search_length = 40,
                     threshold_p = 10^(-6),
                     threshold_hairpin_ratio = 0.50,
-                    threshold_hairpin_length = 30,
                     threshold_soft_clip_ratio = 0.90,
                     threshold_short_length = 0.8,
                     threshold_distant_homology = 0.2,

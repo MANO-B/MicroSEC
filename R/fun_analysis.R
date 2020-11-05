@@ -5,13 +5,15 @@
 #' @param MSEC Mutation filtering information.
 #' @param Mut_depth Mutation coverage data.
 #' @param Short_Homology_search_length Small sequence for homology search.
-#' @param Minimum_Homology_search_length The sequence length for homology search.
+#' @param Minimum_Homology_search_length The sequence length for homology
+#'   search.
 #' @param threshold_p The largest p value of significant errors.
 #' @param threshold_hairpin_ratio The smallest hairpin read ratio.
-#' @param threshold_hairpin_length  The shortest hairpin length.
-#' @param threshold_soft_clip_ratio The smallest rate of significantly soft-clipped reads.
+#' @param threshold_soft_clip_ratio The smallest rate of significantly 
+#'   soft-clipped reads.
 #' @param threshold_short_length Reads shorter than that are analyzed. 
-#' @param threshold_distant_homology The smallest rate of reads from other regions.
+#' @param threshold_distant_homology The smallest rate of reads from other 
+#'   regions.
 #' @param threshold_low_quality_rate The smallest rate of low quality bases.
 #' @param Homopolymer_length The smallest length of homopolymers.
 #' @return MSEC
@@ -25,7 +27,6 @@ fun_analysis = function(MSEC,
                         Minimum_Homology_search_length = 40,
                         threshold_p = 10^(-6),
                         threshold_hairpin_ratio = 0.50,
-                        threshold_hairpin_length = 30,
                         threshold_soft_clip_ratio = 0.90,
                         threshold_short_length = 0.8,
                         threshold_distant_homology = 0.2,
@@ -52,24 +53,65 @@ fun_analysis = function(MSEC,
              TRUE, FALSE)
   )
   MSEC$short_support_length_adjust_sum = 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$shortest_support_length_adjust) -
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 1 - MSEC$short_support_length_adjust) + 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$short_support_length_adjust + 2) -
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$shortest_support_length_adjust + 1)
+    mapply(function(x, y) {return (Mut_depth[x,y])},
+           1:dim(MSEC)[1], 
+           MSEC$READ_length -
+           MSEC$Altered_length + 2 -
+           MSEC$shortest_support_length_adjust) -
+    mapply(function(x, y) {return (Mut_depth[x,y])},
+           1:dim(MSEC)[1], 
+           MSEC$READ_length - 
+           MSEC$Altered_length + 1 - 
+           MSEC$short_support_length_adjust) + 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1],
+           MSEC$short_support_length_adjust + 2) -
+    mapply(function(x, y) {return (Mut_depth[x,y])},
+           1:dim(MSEC)[1],
+           MSEC$shortest_support_length_adjust + 1)
   MSEC$Pre_support_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_support_length_adjust + 2) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Pre_Minimum_length_adjust + 1)
+    mapply(function(x, y) {return (Mut_depth[x,y])},
+           1:dim(MSEC)[1],
+           MSEC$Pre_support_length_adjust + 2) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1], 
+           MSEC$Pre_Minimum_length_adjust + 1)
   MSEC$Post_support_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$Post_Minimum_length_adjust) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length - MSEC$Post_support_length_adjust + 1)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1],
+           MSEC$READ_length - 
+           MSEC$Altered_length + 2 - 
+           MSEC$Post_Minimum_length_adjust) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])},
+           1:dim(MSEC)[1], 
+           MSEC$READ_length - 
+           MSEC$Altered_length - 
+           MSEC$Post_support_length_adjust + 1)
   MSEC$Half_length_adjust_sum =
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$minimum_length) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length - MSEC$Half_length + 1) +
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$Half_length + 2) -
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length + 1)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1], 
+           MSEC$READ_length - 
+           MSEC$Altered_length + 2 - 
+           MSEC$minimum_length) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])},
+           1:dim(MSEC)[1],
+           MSEC$READ_length - 
+           MSEC$Altered_length - 
+           MSEC$Half_length + 1) +
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1],
+           MSEC$Half_length + 2) -
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1],
+           MSEC$minimum_length + 1)
   MSEC$Total_length_adjust_sum = 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$READ_length - MSEC$Altered_length + 2 - MSEC$minimum_length_2) - 
-    mapply(function(x, y) {return (Mut_depth[x,y])}, 1:dim(MSEC)[1], MSEC$minimum_length_1 + 1)
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1], 
+           MSEC$READ_length - 
+           MSEC$Altered_length + 2 - 
+           MSEC$minimum_length_2) - 
+    mapply(function(x, y) {return (Mut_depth[x,y])}, 
+           1:dim(MSEC)[1], MSEC$minimum_length_1 + 1)
   MSEC = MSEC %>% mutate(
     Short_short_support_sum = 
       (short_support_length_adjust_sum <= 
@@ -83,35 +125,48 @@ fun_analysis = function(MSEC,
   )
   MSEC = MSEC %>% mutate(
     prob_Filter_1 = 
-      fun_zero(short_support_length_adjust_sum, Half_length_adjust_sum) ^ Total_read,
+      fun_zero(short_support_length_adjust_sum, 
+               Half_length_adjust_sum) ^ Total_read,
     prob_Filter_3_pre = 
-      fun_zero(Pre_support_length_adjust_sum, Total_length_adjust_sum) ^ Total_read,
+      fun_zero(Pre_support_length_adjust_sum, 
+               Total_length_adjust_sum) ^ Total_read,
     prob_Filter_3_post =
-      fun_zero(Post_support_length_adjust_sum, Total_length_adjust_sum) ^ Total_read
+      fun_zero(Post_support_length_adjust_sum, 
+               Total_length_adjust_sum) ^ Total_read
   )
   MSEC = MSEC %>% mutate(
-    prob_Filter_1 = ifelse((prob_Filter_1 > 1), 1, prob_Filter_1),
-    prob_Filter_3_pre = ifelse((prob_Filter_3_pre > 1), 1, prob_Filter_3_pre),
-    prob_Filter_3_post = ifelse((prob_Filter_3_post > 1), 1, prob_Filter_3_post)
+    prob_Filter_1 = ifelse((prob_Filter_1 > 1),
+                           1, prob_Filter_1),
+    prob_Filter_3_pre = ifelse((prob_Filter_3_pre > 1),
+                               1, prob_Filter_3_pre),
+    prob_Filter_3_post = ifelse((prob_Filter_3_post > 1),
+                                1, prob_Filter_3_post)
   )
   MSEC = MSEC %>% mutate(
     Filter_1_mutation_intra_hairpin_loop = 
-      ifelse((Short_short_support & Short_short_support_sum & prob_Filter_1 < threshold_p),
+      ifelse((Short_short_support &
+                Short_short_support_sum &
+                prob_Filter_1 < threshold_p),
              TRUE, FALSE), 
     Filter_2_hairpin_structure = 
-      ifelse((fun_zero(FLAG_Hairpin, Total_read) > threshold_hairpin_ratio |
-                Hairpin_length >= threshold_hairpin_length),
+      ifelse((fun_zero(FLAG_Hairpin, Total_read) > threshold_hairpin_ratio),
              TRUE, FALSE),
     Filter_3_microhomology_induced_mutation = 
       ifelse((High_rate_Q18 & 
-                ((prob_Filter_3_pre <= threshold_p & Short_pre_support & Short_pre_support_sum) | 
-                   (prob_Filter_3_post <= threshold_p & Short_post_support & Short_post_support_sum))),
+                ((prob_Filter_3_pre <= threshold_p & 
+                    Short_pre_support &
+                    Short_pre_support_sum) | 
+                 (prob_Filter_3_post <= threshold_p &
+                    Short_post_support &
+                    Short_post_support_sum))),
              TRUE, FALSE),
     Filter_4_soft_clipping = 
-      ifelse((fun_zero(Soft_Clipped_read, Total_read)) > threshold_soft_clip_ratio,
+      ifelse((fun_zero(Soft_Clipped_read, Total_read)) >
+               threshold_soft_clip_ratio,
              TRUE, FALSE),
     Filter_5_highly_homologous_region =
-      ifelse((distant_homology_rate >= threshold_distant_homology & Not_long_repeat),
+      ifelse((distant_homology_rate >= threshold_distant_homology & 
+                Not_long_repeat),
              TRUE, FALSE),
     Filter_6_simple_repeat =
       ifelse((SimpleRepeat_TRF == "Y"),
@@ -125,21 +180,28 @@ fun_analysis = function(MSEC,
   )
   MSEC = MSEC %>% mutate(
     Caution = 
-      ifelse((distant_homology_rate >= threshold_distant_homology & !Not_long_repeat),
-             paste(Caution, "too repetitive to analyze homology,"), Caution)
+      ifelse((distant_homology_rate >= threshold_distant_homology & 
+                !Not_long_repeat),
+             paste(Caution, 
+                   "too repetitive to analyze homology,"),
+             Caution)
   )
   MSEC = MSEC %>% mutate(
     Caution = 
       ifelse((prob_Filter_1 < threshold_p &
               !Filter_1_mutation_intra_hairpin_loop),
-             paste(Caution, "Filter 1: p is small, but supported enough long,"), Caution)
+             paste(Caution,
+                   "Filter 1: p is small, but supported enough long,"),
+             Caution)
   )
   MSEC = MSEC %>% mutate(
     Caution = 
       ifelse(((prob_Filter_3_pre < threshold_p |
                 prob_Filter_3_post < threshold_p) &
                 !Filter_3_microhomology_induced_mutation),
-             paste(Caution, "Filter 3: p is small, but supported enough long,"), Caution)
+             paste(Caution, 
+                   "Filter 3: p is small, but supported enough long,"), 
+             Caution)
   )
 MSEC = MSEC %>% mutate(
     MSEC_filter_1234 = 
