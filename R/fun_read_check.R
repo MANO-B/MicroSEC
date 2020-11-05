@@ -252,6 +252,7 @@ fun_read_check = function(df_mutation,
           df_seq = df_seq[[1]]
           df_qual = as.vector(asc(as.character(df_qual[1])))
           if(length(df_seq) > 0){
+            
             # determine mutation position in each read
             mutation_supporting_1 =
               matchPattern(Peri_seq_1,
@@ -354,6 +355,8 @@ fun_read_check = function(df_mutation,
               Reverse_seq = logical(0)
               FLAG_Hairpin_tmp = 0
               check_hairpin = 1
+              
+              # search co-mutations on neighbor
               if(indel_status == 1){
                 comut_FLAG = TRUE
                 for(comut in 0:3){
