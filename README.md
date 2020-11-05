@@ -53,7 +53,7 @@ This pipeline contains 8 filtering processes.
         Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).  
         Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.  
 - Filter 2  : Hairpin-structure induced error detection (2-1 or 2-2).  
-        Filter 2-1: Palindromic sequences exist within 150 bases. 
+        Filter 2-1: Palindromic sequences exist within 150 bases.  
         Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
 - Filter 3  : 3’-/5’-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
         Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
