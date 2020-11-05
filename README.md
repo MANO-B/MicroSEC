@@ -157,20 +157,6 @@ wd = "/mnt/HDD8TB/MicroSEC" # set your working/output directory
 setwd(wd)
 
 ## Necessary packages
-library(tidyr)
-library(openxlsx)
-library(data.table)
-library(R.utils)
-library(stringr)
-library(magrittr)
-library(dplyr)
-library(Biostrings)
-library(BSgenome.Hsapiens.UCSC.hg38)
-library(BSgenome.Mmusculus.UCSC.mm10)
-library(GenomicAlignments)
-library(Rsamtools)
-library(tcltk)
-library(gtools)
 library(MicroSEC)
 
 ## Analysis

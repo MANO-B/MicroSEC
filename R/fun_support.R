@@ -46,8 +46,7 @@ fun_support = function(df_cigar,
           clipped_seq = clipped_seq[[1]]
         }
         clipped_seq = DNAString(clipped_seq)
-      }
-      else{
+      } else{
         clipped_seq = reverseComplement(clipped_seq)
         clipped_seq = trimLRPatterns(Rpattern = ADAPTOR_SEQ,
                                      subject = clipped_seq)
@@ -66,20 +65,17 @@ fun_support = function(df_cigar,
       if((tmp_pos + cigar_num[k] - 1) < mut_position){
         Pre_support_length_tmp = 
           Pre_support_length_tmp + cigar_num[k]
-      }
-      else if(tmp_pos > (mut_position + Alt_length - 1)){
+      } else if(tmp_pos > (mut_position + Alt_length - 1)){
         Post_support_length_tmp = 
           Post_support_length_tmp + cigar_num[k]
-      }
-      else{
+      } else{
         if(indel_status == 1){
           Pre_support_length_tmp = 
             Pre_support_length_tmp + (mut_position - tmp_pos)
           Post_support_length_tmp = 
             Post_support_length_tmp + 
             (cigar_num[k] + tmp_pos - mut_position)
-        }
-        else{
+        } else{
           Pre_support_length_tmp =
             Pre_support_length_tmp + (mut_position - tmp_pos)
           Post_support_length_tmp = 

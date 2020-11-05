@@ -89,8 +89,7 @@ fun_read_check = function(df_mutation,
         indel_status = 1
         WITH_INDEL_1 = TRUE
         WITH_INDEL_2 = TRUE
-      }
-      if(mut_type == "del"){
+      } else if(mut_type == "del"){
         indel_length = nchar(df_mutation[i,"Ref"]) - 1
         indel_status = 1
         WITH_INDEL_1 = TRUE
@@ -193,8 +192,7 @@ fun_read_check = function(df_mutation,
           Pre_rep_status = Rep_status[[1]]
           Post_rep_status = Rep_status[[2]]
           Homopolymer_status = Rep_status[[3]]
-        }
-        if(mut_type == "del"){
+        } else if(mut_type == "del"){
           Rep_status = fun_repeat_check(Rep_A = DNAString(df_mutation[i,"Alt"]),
                                         Rep_B = DNAString(df_mutation[i,"Ref"]),
                                         Ref_seq = Ref_seq,
@@ -356,7 +354,7 @@ fun_read_check = function(df_mutation,
                       matchPattern(df_seq[
                         max(1,(mut_position - indel_length - 1)):
                           min((mut_position + nchar(df_mutation[i,"Alt"]) + 4),
-                              READ_length)],
+                              length(df_seq))],
                         Ref_indel[(Width - indel_length):
                                   (Width + nchar(df_mutation[i,"Alt"]) + 5)],
                          max.mismatch=comut, 
@@ -376,7 +374,7 @@ fun_read_check = function(df_mutation,
                         max(1,(mut_position - 4)):
                         min((mut_position + nchar(df_mutation[i,"Alt"]) +
                                indel_length - 1),
-                            READ_length)],
+                            length(df_seq))],
                         Ref_indel[(Width - 3):
                                   (Width + nchar(df_mutation[i,"Alt"]) +
                                      indel_length)],
@@ -406,7 +404,7 @@ fun_read_check = function(df_mutation,
                 Co_mut_Post_tmp = length(
                   matchPattern(df_seq[
                     mut_position:
-                    min(READ_length, 
+                    min(length(df_seq), 
                         (mut_position + max(1, Alt_length * 4 - 5)))],
                     Ref_indel[(Width + 1):
                         (Width + max(1, Alt_length * 4 - 5) + 1)],
@@ -505,8 +503,7 @@ fun_read_check = function(df_mutation,
                     max(1, mut_position - Short_Homology_search_length
                                         - Pre_rep_status):
                     length(df_seq)]
-                }
-                if(indel_status == 0){
+                } else{
                   Pre_Homology_search_seq = df_seq[1:
                     min(length(df_seq), 
                         mut_position + Short_Homology_search_length + Alt_length)]
@@ -521,8 +518,7 @@ fun_read_check = function(df_mutation,
                     ADAPTOR_SEQ)
                   Pre_Homology_search_seq = 
                     reverseComplement(Pre_Homology_search_seq)
-                }
-                if(mut_read_strand[[j]] == "+"){
+                } else{
                   Post_Homology_search_seq = fun_hairpin_trimming(
                     Post_Homology_search_seq,
                     mut_read_strand[[j]],
@@ -577,11 +573,11 @@ fun_read_check = function(df_mutation,
           penalty_Post = max(0, 4 * Alt_length - 5)
           if(Co_mut_Pre > 0 & Pre_Minimum_length >= max(1, Alt_length * 4 - 5)){
             penalty_Pre = penalty_Pre + 4
-            Caution = paste(Caution, "Anther mutation may exist in neighbor,")
+            Caution = paste(Caution, "anther co-mutation may exist in neighbor,")
           }
           if(Co_mut_Post > 0 & Post_Minimum_length >= max(1, Alt_length * 4 - 5)){
             penalty_Post = penalty_Post + 4
-            Caution = paste(Caution, "Anther mutation may exist in neighbor,")
+            Caution = paste(Caution, "anther co-mutation may exist in neighbor,")
           }
         }
         

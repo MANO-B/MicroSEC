@@ -6,4 +6,5 @@ archive
 output
 source
 Meta
-.xlsx
+*.xlsx
+*.tsv

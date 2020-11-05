@@ -77,7 +77,7 @@ fun_save = function(MSEC, wd){
     setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
     
     saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", MSEC$Sample[[1]], "_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE, returnValue = FALSE)
-    write.table(MSEC, file=paste(wd, "/MicroSEC_", MSEC$Sample[[1]], ".tsv", sep=""), sep = "\t", na="", row.names=TRUE, col.names=TRUE, quote=FALSE)
+    write.table(MSEC, file=paste(wd, "/MicroSEC_", MSEC$Sample[[1]], ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
 }
 
 
