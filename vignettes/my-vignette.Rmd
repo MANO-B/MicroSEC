@@ -11,8 +11,6 @@ editor_options:
   chunk_output_type: inline
 ---
 
-![MicroSEC logo](/mnt/HDD8TB/MicroSEC/MicroSEC_logo.png){#id .class width=720 height=135px}
-
 ## Introduction
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
