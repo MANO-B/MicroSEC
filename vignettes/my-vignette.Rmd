@@ -84,7 +84,7 @@ library(MicroSEC)
 ```{r, eval=FALSE}
 library(MicroSEC)
 # load sample information tsv file
-SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", header=FALSE, stringsAsFactors=FALSE, sep="\t")
+SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", header=FALSE, stringsAsFactors=FALSE, sep="\t")[3,]
 
 # initialize
 MSEC = NULL
@@ -101,9 +101,9 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   GENOME = SAMPLE_INFO[SAMPLE,7]
   
   # load mutation information
-  df_mutation = fun_load_mutation(MUTATION_FILE)
-  df_BAM = fun_load_BAM(BAM_FILE)
-  df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
+  #df_mutation = fun_load_mutation(MUTATION_FILE)
+  #df_BAM = fun_load_BAM(BAM_FILE)
+  #df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
 
   # load genomic sequence
   genome = fun_load_genome(GENOME)

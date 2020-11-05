@@ -62,6 +62,7 @@
 # Example
 # Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list.txt Y
 # Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv Y
+# Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info_test.tsv Y
 #
 # If you want to know the progress visually, [progress bar Y/N] should be Y.
 #

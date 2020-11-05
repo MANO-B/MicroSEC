@@ -26,7 +26,8 @@
 #' @importFrom Biostrings reverseComplement
 #' @importFrom Biostrings trimLRPatterns
 #' @importFrom Biostrings width
-#' @importFrom BiocGenerics as.data.frame
+#' @importFrom Biostrings start
+#' #' @importFrom BiocGenerics as.data.frame
 #' @export
 fun_read_check = function(df_mutation,
                           df_BAM,
