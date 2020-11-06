@@ -84,49 +84,42 @@ library(MicroSEC)
 ## Analysis
 ```{r, eval=FALSE}
 library(MicroSEC)
-# load sample information tsv file
-SAMPLE_INFO = read.csv(
-  "/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", 
-  header=FALSE, stringsAsFactors=FALSE, sep="\t")[4,]
 
 # initialize
 MSEC = NULL
 Homology_search = NULL
 Mut_depth = NULL
 
-for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
-  SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
-  MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
-  BAM_FILE = SAMPLE_INFO[SAMPLE,3]
-  MUTATION_SUPPORTING_READ_LIST = SAMPLE_INFO[SAMPLE,4]
-  READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
-  ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
-  GENOME = SAMPLE_INFO[SAMPLE,7]
+# test data
+SAMPLE_NAME = "TEST"
+READ_length = 151
+ADAPTOR_SEQ = "AGATCGGAAGAGC"
+GENOME = "Human"
 
-  # load mutation information
-  df_mutation = fun_load_mutation(MUTATION_FILE)
-  df_BAM = fun_load_BAM(BAM_FILE)
-  df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
+# load mutation information
+data(exampleMutation)
+data(exampleBAM)
+data(exampleMutCall)
 
-  # load genomic sequence
-  genome = fun_load_genome(GENOME)
-  Chr_No = fun_load_chr_no(GENOME)
+# load genomic sequence
+genome = fun_load_genome(GENOME)
+Chr_No = fun_load_chr_no(GENOME)
 
-  # analysis
-  result = fun_read_check(df_mutation = df_mutation,
-                          df_BAM = df_BAM,
-                          df_mut_call = df_mut_call,
-                          genome = genome,
-                          Chr_No = Chr_No,
-                          SAMPLE_NAME = SAMPLE_NAME,
-                          READ_length = READ_length,
-                          ADAPTOR_SEQ = ADAPTOR_SEQ,
-                          Short_Homology_search_length = 4,
-                          PROGRESS_BAR = PROGRESS_BAR)
-  MSEC = rbind(MSEC, result[[1]])
-  Homology_search = rbind(Homology_search, result[[2]])
-  Mut_depth = rbind(Mut_depth, result[[3]])
-}
+# analysis
+result = fun_read_check(df_mutation = exampleMutation,
+                        df_BAM = exampleBAM,
+                        df_mut_call = exampleMutCall,
+                        genome = genome,
+                        Chr_No = Chr_No,
+                        SAMPLE_NAME = SAMPLE_NAME,
+                        READ_length = READ_length,
+                        ADAPTOR_SEQ = ADAPTOR_SEQ,
+                        Short_Homology_search_length = 4,
+                        PROGRESS_BAR = PROGRESS_BAR)
+MSEC = rbind(MSEC, result[[1]])
+Homology_search = rbind(Homology_search, result[[2]])
+Mut_depth = rbind(Mut_depth, result[[3]])
+
 # search homologous sequences
 MSEC = fun_homology(MSEC,
                     Homology_search,

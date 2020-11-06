@@ -219,6 +219,73 @@ CCLE = CCLE %>% dplyr::select(Sample, Gene, HGVS.c, HGVS.p, Mut_type, `Total_QV>
 write.xlsx(as.data.frame(as.matrix(CCLE)), paste(wd, "/source/CCLE.xlsx", sep=""))
 ```
 
+## Sample data generation
+```{r}
+ID_data = read.csv("/mnt/HDD8TB/MicroSEC/source/extract.txt", header=FALSE, stringsAsFactors=FALSE, sep="\t")
+colnames(ID_data) = c("chr", "pos")
+ID = rep(FALSE, length(df_BAM$rname))
+for(i in 1:dim(ID_data)[1]){
+  ID = ID | (df_BAM$rname == ID_data$chr[[i]] &  df_BAM$pos > ID_data$pos[[i]] - 160 & df_BAM$pos < ID_data$pos[[i]] + 10)
+}
+df_BAM$rname = df_BAM$rname[ID]
+df_BAM$qname = df_BAM$qname[ID]
+df_BAM$seq = df_BAM$seq[ID]
+df_BAM$strand = df_BAM$strand[ID]
+df_BAM$cigar = df_BAM$cigar[ID]
+df_BAM$qual = df_BAM$qual[ID]
+df_BAM$pos = df_BAM$pos[ID]
+
+df_mut_call = df_mut_call %>% 
+        filter((Chr == ID_data$chr[[1]] & Pos == ID_data$pos[[1]]) | 
+                 (Chr == ID_data$chr[[2]] & Pos == ID_data$pos[[2]]) | 
+                 (Chr == ID_data$chr[[3]] & Pos == ID_data$pos[[3]]) |
+                 (Chr == ID_data$chr[[4]] & Pos == ID_data$pos[[4]]))
+mut_read = df_mut_call[1,]
+mut_read_ID_list = str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+mut_read_ID_list = mut_read_ID_list[[2]]
+mut_read_ID = str_sub(str_split(mut_read_ID_list,",")[[1]], start=1, end=-2)
+
+mut_read = df_mut_call[2,]
+mut_read_ID_list = str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+mut_read_ID_list = mut_read_ID_list[[2]]
+mut_read_ID = c(mut_read_ID, str_sub(str_split(mut_read_ID_list,",")[[1]], start=1, end=-2))
+
+mut_read = df_mut_call[3,]
+mut_read_ID_list = str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+mut_read_ID_list = mut_read_ID_list[[2]]
+mut_read_ID = c(mut_read_ID, str_sub(str_split(mut_read_ID_list,",")[[1]], start=1, end=-2))
+
+mut_read = df_mut_call[4,]
+mut_read_ID_list = str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+mut_read_ID_list = mut_read_ID_list[[3]]
+mut_read_ID = c(mut_read_ID, str_sub(str_split(mut_read_ID_list,",")[[1]], start=1, end=-2))
+
+ID_No = df_BAM$qname %in% mut_read_ID
+df_BAM$rname = df_BAM$rname[ID_No]
+df_BAM$qname = df_BAM$qname[ID_No]
+df_BAM$seq = df_BAM$seq[ID_No]
+df_BAM$strand = df_BAM$strand[ID_No]
+df_BAM$cigar = df_BAM$cigar[ID_No]
+df_BAM$qual = df_BAM$qual[ID_No]
+df_BAM$pos = df_BAM$pos[ID_No]
+
+exampleMutation = df_mutation[c(9,10,34,35),]
+
+exampleBAM=NULL
+exampleBAM$rname = as.character(df_BAM$rname)
+exampleBAM$qname = as.character(df_BAM$qname)
+exampleBAM$seq = DNAStringSet(as.character(df_BAM$seq))
+exampleBAM$strand = as.character(df_BAM$strand)
+exampleBAM$cigar = as.character(df_BAM$cigar)
+exampleBAM$qual = as.character(df_BAM$qual)
+exampleBAM$pos = as.integer(df_BAM$pos)
+exampleMutCall = df_mut_call
+
+usethis::use_data(exampleBAM, overwrite=TRUE)
+usethis::use_data(exampleMutCall, overwrite=TRUE)
+usethis::use_data(exampleMutation, overwrite=TRUE)
+
+```
 
 ## Information about the current R session
 ```{r, eval=FALSE}

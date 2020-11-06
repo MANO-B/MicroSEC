@@ -34,7 +34,9 @@ Imports:
   GenomicAlignments,
   Rsamtools
 Suggests: 
-    testthat,
-    knitr,
-    rmarkdown
+  testthat,
+  knitr,
+  rmarkdown
 VignetteBuilder: knitr
+URL: https://github.com/MANO-B/MicroSEC/
+BugReports: https://github.com/MANO-B/MicroSEC/issues
