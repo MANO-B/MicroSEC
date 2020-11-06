@@ -92,12 +92,6 @@ MSEC = NULL
 Homology_search = NULL
 Mut_depth = NULL
 
-if(PROGRESS_BAR == "Y"){
-  pb = txtProgressBar(min = 0, 
-                      max = dim(SAMPLE_INFO)[1],
-                      style = 3)
-}
-
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
   MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
@@ -106,12 +100,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
   ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
   GENOME = SAMPLE_INFO[SAMPLE,7]
-  
-  if(PROGRESS_BAR == "Y"){
-    cat(paste("Sample screening:", SAMPLE, "/", dim(SAMPLE_INFO)[1]))
-    setTxtProgressBar(pb, SAMPLE)
-  }
-  
+
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
   df_BAM = fun_load_BAM(BAM_FILE)

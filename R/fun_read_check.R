@@ -57,11 +57,6 @@ fun_read_check = function(df_mutation,
     neighbor_length = 20
     Laxness = 1
     
-    if(PROGRESS_BAR == "Y"){
-      pb1 = txtProgressBar(min = 0, 
-                          max = max(1, length(df_mutation[,1])),
-                          style = 3)
-    }
     # analyze each somatic mutation
     for(i in 1:length(df_mutation[,1])){
       Error = 0
@@ -128,10 +123,6 @@ fun_read_check = function(df_mutation,
                                          pattern=df_mutation[i,"Ref"],
                                          replacement=".+"))
         }
-      }
-      if(PROGRESS_BAR == "Y"){
-        cat(paste("Mutation screening:", i, "/", dim(df_mutation)[[1]]))
-        setTxtProgressBar(pb1, i)
       }
       # if mutation supporting reads exist
       if(length(mut_call) > 0){
@@ -216,7 +207,7 @@ fun_read_check = function(df_mutation,
             sum(df_BAM_pos == (df_mutation[i,"Pos"] + 1 - depth))
         }
         if(PROGRESS_BAR == "Y"){
-          pb2 = txtProgressBar(min = 0, 
+          pb = txtProgressBar(min = 0, 
                                max = max(1, length(mut_read_ID)),
                                style = 3)
         }
@@ -239,8 +230,9 @@ fun_read_check = function(df_mutation,
           FLAG_2 = Pre_search_length
           # progress bar
           if(PROGRESS_BAR == "Y"){
-            cat(paste("Read screening:", j, "/", length(mut_read_ID)))
-            setTxtProgressBar(pb2, j)
+            cat(paste("Read:", j, "/", length(mut_read_ID),
+                      "Mutation:", i, "/", dim(df_mutation)))
+            setTxtProgressBar(pb, j)
           }
           # specific read selection
           ID_No = df_BAM_qname == mut_read_ID[[j]]
