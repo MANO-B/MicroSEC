@@ -17,6 +17,7 @@
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings countPDict
 #' @importFrom BiocGenerics as.data.frame
+#' @importFrom GenomeInfoDb seqnames
 #' @export
 fun_homology = function(MicroSEC,
                         df_distant,

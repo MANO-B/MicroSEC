@@ -72,14 +72,13 @@ knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE,
                       warning=FALSE, message=TRUE, comment = "#>")
 knitr::opts_knit$set(root.dir = wd)
 options(rmarkdown.html_vignette.check_title = FALSE)
-PROGRESS_BAR = "Y"
+PROGRESS_BAR = "N"
 ```
 
 ## Necessary packages
 ```{r packages}
 library(MicroSEC)
 ```
-
 
 ## Analysis
 ```{r}
@@ -140,6 +139,11 @@ MSEC = fun_analysis(MSEC,
 
 # save the results
 fun_save(MSEC, wd)
+```
+
+## Results
+```{r}
+MSEC
 ```
 
 ## Information about the current R session
