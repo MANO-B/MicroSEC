@@ -68,9 +68,11 @@ github url: https://github.com/MANO-B/MicroSEC
 ## Setting
 ```{r}
 wd = "/mnt/HDD8TB/MicroSEC"
-knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, warning=FALSE, message=TRUE, comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, 
+                      warning=FALSE, message=TRUE, comment = "#>")
 knitr::opts_knit$set(root.dir = wd)
 options(rmarkdown.html_vignette.check_title = FALSE)
+PROGRESS_BAR = "Y"
 ```
 
 ## Necessary packages
@@ -83,13 +85,21 @@ library(MicroSEC)
 ```{r, eval=FALSE}
 library(MicroSEC)
 # load sample information tsv file
-SAMPLE_INFO = read.csv("/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", header=FALSE, stringsAsFactors=FALSE, sep="\t")[3,]
+SAMPLE_INFO = read.csv(
+  "/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", 
+  header=FALSE, stringsAsFactors=FALSE, sep="\t")[3,]
 
 # initialize
 MSEC = NULL
 Homology_search = NULL
 Mut_depth = NULL
-  
+
+if(PROGRESS_BAR == "Y"){
+  pb = txtProgressBar(min = 0, 
+                      max = dim(SAMPLE_INFO)[1],
+                      style = 3)
+}
+
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
   MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
@@ -98,7 +108,13 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
   ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
   GENOME = SAMPLE_INFO[SAMPLE,7]
-  
+
+  if(PROGRESS_BAR == "Y"){
+    setTxtProgressBar(
+      title=paste("Sample screening:", SAMPLE, "/", dim(SAMPLE_INFO)[1]), 
+      pb, SAMPLE)
+  }
+
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
   df_BAM = fun_load_BAM(BAM_FILE)
@@ -118,7 +134,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           READ_length = READ_length,
                           ADAPTOR_SEQ = ADAPTOR_SEQ,
                           Short_Homology_search_length = 4,
-                          PROGRESS_BAR = "Y")
+                          PROGRESS_BAR = PROGRESS_BAR)
   MSEC = rbind(MSEC, result[[1]])
   Homology_search = rbind(Homology_search, result[[2]])
   Mut_depth = rbind(Mut_depth, result[[3]])
@@ -127,7 +143,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
 MSEC = fun_homology(MSEC,
                     Homology_search,
                     Minimum_Homology_search_length = 40,
-                    PROGRESS_BAR = "Y")
+                    PROGRESS_BAR = PROGRESS_BAR)
 
 # statistical analysis
 MSEC = fun_summary(MSEC)

@@ -81,16 +81,22 @@ PROGRESS_BAR = args[3]
 
 setwd(wd)
   
-# initialize
-MSEC = NULL
-Homology_search = NULL
-Mut_depth = NULL
-
 # load sample information tsv file
 SAMPLE_INFO = read.csv(SAMPLE_LIST,
                        header=FALSE,
                        stringsAsFactors=FALSE,
                        sep="\t")
+
+# initialize
+MSEC = NULL
+Homology_search = NULL
+Mut_depth = NULL
+
+if(PROGRESS_BAR == "Y"){
+  pb = txtProgressBar(min = 0, 
+                      max = dim(SAMPLE_INFO)[1],
+                      style = 3)
+}
 
 for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
@@ -101,6 +107,12 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
   GENOME = SAMPLE_INFO[SAMPLE,7]
   
+  if(PROGRESS_BAR == "Y"){
+    setTxtProgressBar(
+      title=paste("Sample screening:", SAMPLE, "/", dim(SAMPLE_INFO)[1]), 
+      pb, SAMPLE)
+  }
+
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
   df_BAM = fun_load_BAM(BAM_FILE)

@@ -21,7 +21,7 @@
 fun_homology = function(MicroSEC,
                         df_distant,
                         Minimum_Homology_search_length,
-                        PROGRESS_BAR = "N"){
+                        PROGRESS_BAR){
   # initialize
   MicroSEC$distant_homology = 0
   df_distant = df_distant %>% dplyr::mutate(
@@ -51,7 +51,9 @@ fun_homology = function(MicroSEC,
   }
   for(seqname in 1:Chr_No){
     if(PROGRESS_BAR == "Y"){
-      setTxtProgressBar(pb, seqname)
+      setTxtProgressBar(
+        title=paste("Chromosome screening:", seqname, "/", Chr_No), 
+        pb, seqname)
     }
     target = genome[[seqname]]
     distant_homology = distant_homology + countPDict(Search_Seq_f, target)
@@ -63,7 +65,9 @@ fun_homology = function(MicroSEC,
   }
   for(i in 1:MAX_No){
     if(PROGRESS_BAR == "Y"){
-      setTxtProgressBar(pb, i)
+      setTxtProgressBar(
+        title=paste("Homologous region counting:", i, "/", MAX_No), 
+        pb, i)
     }
     if(dim(df_distant[df_distant$Number == i,])[1] == 1){
       tmp_distant = df_distant[df_distant$Number == i,][1,]

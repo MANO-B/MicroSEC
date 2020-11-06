@@ -14,7 +14,7 @@ fun_read_check(
   READ_length,
   ADAPTOR_SEQ,
   Short_Homology_search_length,
-  PROGRESS_BAR = "N"
+  PROGRESS_BAR
 )
 }
 \arguments{

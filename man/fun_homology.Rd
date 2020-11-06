@@ -8,7 +8,7 @@ fun_homology(
   MicroSEC,
   df_distant,
   Minimum_Homology_search_length,
-  PROGRESS_BAR = "N"
+  PROGRESS_BAR
 )
 }
 \arguments{
