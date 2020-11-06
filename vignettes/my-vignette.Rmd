@@ -67,7 +67,7 @@ github url: https://github.com/MANO-B/MicroSEC
   
 ## Setting
 ```{r}
-wd = "/mnt/HDD8TB/MicroSEC"
+wd = "/mnt/HDD8TB/MicroSEC/archive"
 knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, 
                       warning=FALSE, message=TRUE, comment = "#>")
 knitr::opts_knit$set(root.dir = wd)
@@ -76,13 +76,13 @@ PROGRESS_BAR = "Y"
 ```
 
 ## Necessary packages
-```{r packages, eval=FALSE}
+```{r packages}
 library(MicroSEC)
 ```
 
 
 ## Analysis
-```{r, eval=FALSE}
+```{r}
 # initialize
 MSEC = NULL
 Homology_search = NULL
