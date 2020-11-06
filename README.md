@@ -140,6 +140,8 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 [1] ‘3.8.2’
 > packageVersion("devtools")
 [1] ‘2.3.2’
+packageVersion("GenomeInfoDb")
+[1] ‘1.22.1’
 ```
 
 # Instructions for Use
