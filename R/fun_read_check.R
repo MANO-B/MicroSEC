@@ -130,9 +130,8 @@ fun_read_check = function(df_mutation,
         }
       }
       if(PROGRESS_BAR == "Y"){
-        setTxtProgressBar(
-          title=paste("Mutation screening:", i, "/", dim(df_mutation)[[1]]), 
-          pb1, i)
+        cat(paste("Mutation screening:", i, "/", dim(df_mutation)[[1]]))
+        setTxtProgressBar(pb1, i)
       }
       # if mutation supporting reads exist
       if(length(mut_call) > 0){
@@ -240,9 +239,8 @@ fun_read_check = function(df_mutation,
           FLAG_2 = Pre_search_length
           # progress bar
           if(PROGRESS_BAR == "Y"){
-            setTxtProgressBar(
-              title=paste("Read screening:", j, "/", length(mut_read_ID)), 
-              pb2, j)
+            cat(paste("Read screening:", j, "/", length(mut_read_ID)))
+            setTxtProgressBar(pb2, j)
           }
           # specific read selection
           ID_No = df_BAM_qname == mut_read_ID[[j]]

@@ -87,7 +87,7 @@ library(MicroSEC)
 # load sample information tsv file
 SAMPLE_INFO = read.csv(
   "/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info.tsv", 
-  header=FALSE, stringsAsFactors=FALSE, sep="\t")[3,]
+  header=FALSE, stringsAsFactors=FALSE, sep="\t")[4,]
 
 # initialize
 MSEC = NULL
@@ -110,9 +110,8 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   GENOME = SAMPLE_INFO[SAMPLE,7]
 
   if(PROGRESS_BAR == "Y"){
-    setTxtProgressBar(
-      title=paste("Sample screening:", SAMPLE, "/", dim(SAMPLE_INFO)[1]), 
-      pb, SAMPLE)
+    cat(paste("Sample screening:", SAMPLE, "/", dim(SAMPLE_INFO)[1]))
+    setTxtProgressBar(pb, SAMPLE)
   }
 
   # load mutation information

@@ -108,11 +108,10 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   GENOME = SAMPLE_INFO[SAMPLE,7]
   
   if(PROGRESS_BAR == "Y"){
-    setTxtProgressBar(
-      title=paste("Sample screening:", SAMPLE, "/", dim(SAMPLE_INFO)[1]), 
-      pb, SAMPLE)
+    cat(paste("Sample screening:", SAMPLE, "/", dim(SAMPLE_INFO)[1]))
+    setTxtProgressBar(pb, SAMPLE)
   }
-
+  
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
   df_BAM = fun_load_BAM(BAM_FILE)
