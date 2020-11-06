@@ -32,7 +32,8 @@ Imports:
   BSgenome.Hsapiens.UCSC.hg38,
   BSgenome.Mmusculus.UCSC.mm10,
   GenomicAlignments,
-  Rsamtools
+  Rsamtools,
+  GenomeInfoDb
 Suggests: 
   testthat,
   knitr,
