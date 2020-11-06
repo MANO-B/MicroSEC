@@ -219,7 +219,23 @@ MSEC = MSEC %>% mutate(
       Filter_8_mutation_at_homopolymer,
     Comment = Caution
   )
-  return(MSEC)
+MSEC = MSEC %>% select(-mut_type, -Alt_length, -Hairpin_length, 
+        -Pre_Minimum_length, -Post_Minimum_length,
+        -Low_quality_base_rate_under_Q18, -Pre_rep_status, -Post_rep_status, 
+        -Homopolymer_status, -indel_status, -indel_length, -penalty_Pre,
+        -penalty_Post, -Caution, Pre_Minimum_length_adjust, 
+        -Post_Minimum_length_adjust, -Pre_support_length_adjust,
+        -Post_support_length_adjust, -shortest_support_length_adjust,
+        -minimum_length_1, -minimum_length_2, -minimum_length,
+        -short_support_length_adjust, -Altered_length,
+        -short_support_length_total, -Pre_support_length_total,
+        -Post_support_length_total, -Half_length_total,
+        -Total_length_total, -Short_short_support, -Short_pre_support,
+        -Short_post_support, -High_rate_Q18, -Not_long_repeat,
+        -Short_short_support_sum, -Short_pre_support_sum,
+        -Short_post_support_sum
+        )
+return(MSEC)
 }
 
 # The following block is used by usethis to automatically manage
