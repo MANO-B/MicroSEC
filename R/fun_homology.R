@@ -51,8 +51,8 @@ fun_homology = function(MicroSEC,
   }
   for(seqname in 1:Chr_No){
     if(PROGRESS_BAR == "Y"){
-      cat(paste("Chromosome screening:", seqname, "/", Chr_No))
       setTxtProgressBar(pb, seqname)
+      cat(paste("Chromosome screening:", seqname, "/", Chr_No))
     }
     target = genome[[seqname]]
     distant_homology = distant_homology + countPDict(Search_Seq_f, target)
@@ -64,8 +64,8 @@ fun_homology = function(MicroSEC,
   }
   for(i in 1:MAX_No){
     if(PROGRESS_BAR == "Y"){
-      cat(paste("Homologous region counting:", i, "/", MAX_No))
       setTxtProgressBar(pb, i)
+      cat(paste("Homologous region counting:", i, "/", MAX_No))
     }
     if(dim(df_distant[df_distant$Number == i,])[1] == 1){
       tmp_distant = df_distant[df_distant$Number == i,][1,]

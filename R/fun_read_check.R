@@ -581,7 +581,7 @@ fun_read_check = function(df_mutation,
           penalty_Post = 5 * Co_mut_Post
           if(Co_mut_Pre > 0 | Co_mut_Post > 0){
             Caution = paste(Caution, 
-                            "anther co-mutation may exist in neighbor,")
+                            "another co-mutation may exist in neighbor,")
           }
         } else{
           penalty_Pre = max(0, 4 * Alt_length - 5)
@@ -590,13 +590,13 @@ fun_read_check = function(df_mutation,
              Pre_support_length >= max(1, Alt_length * 4 - 5)){
               penalty_Pre = penalty_Pre + 4
               Caution = paste(Caution, 
-                              "anther co-mutation may exist in neighbor,")
+                              "another co-mutation may exist in neighbor,")
           }
           if(Co_mut_Post > 0 &
              Post_support_length >= max(1, Alt_length * 4 - 5)){
               penalty_Post = penalty_Post + 4
               Caution = paste(Caution,
-                              "anther co-mutation may exist in neighbor,")
+                              "another co-mutation may exist in neighbor,")
           }
         }
         
