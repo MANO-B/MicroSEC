@@ -83,8 +83,6 @@ library(MicroSEC)
 
 ## Analysis
 ```{r, eval=FALSE}
-library(MicroSEC)
-
 # initialize
 MSEC = NULL
 Homology_search = NULL
