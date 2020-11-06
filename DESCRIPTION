@@ -27,7 +27,6 @@ Imports:
   stringr,
   magrittr,
   dplyr,
-  tcltk,
   gtools,
   Biostrings,
   BSgenome.Hsapiens.UCSC.hg38,
