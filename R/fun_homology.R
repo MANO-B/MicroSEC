@@ -54,7 +54,8 @@ fun_homology = function(MicroSEC,
       setTxtProgressBar(pb, seqname)
       cat(paste("Chromosome screening:", seqname, "/", Chr_No))
     }
-    target = genome[[seqname]]
+    
+    target = genome[[seqnames(genome)[[seqname]]]]
     distant_homology = distant_homology + countPDict(Search_Seq_f, target)
     distant_homology = distant_homology + countPDict(Search_Seq_r, target)
   }
