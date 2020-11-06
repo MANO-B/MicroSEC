@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Masachika Ikegami" />
+
+<meta name="date" content="2020-11-06" />
+
+<title>MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples</h1>
+<h4 class="author">Masachika Ikegami</h4>
+<h4 class="date">2020-11-06</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.<br />
+The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.<br />
+Four files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.</p>
+<p>File 1: mutation information file<br />
+This excel file should contain at least these contents:<br />
+Sample Gene HGVS.c HGVS.p Mut_type Total_QV&gt;=20 %Alt Chr Pos Ref Alt SimpleRepeat_TRF Neighborhood_sequence Transition<br />
+SL_1010-N6-B SLC25A24 _ _ 1-snv 366 1.0929 chr1 108130741 C T N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC C&gt;T_t</p>
+<p>Total_QV&gt;=20: The read number with total Q-value &gt;=20.<br />
+SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.<br />
+Neighborhood_sequence: [5’-20 bases] + [Alt sequence] + [3’-20 bases].<br />
+Transition: 1-snv mutation pattern with a 3’-base. C&gt;T_t represents CT to TT mutation. C&gt;T_g_FFPE represents the possible FFPE artifact.<br />
+Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.<br />
+Gene, HGVS.c, HGVS.p, Total_QV&gt;=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.</p>
+<p>File 2: BAM file</p>
+<p>File 3: mutation supporting read ID information file<br />
+This file should contain at least these contents:<br />
+Chr Pos Ref Alt Mut_ID Mut<br />
+chr1 2561609 T A _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r .;A;N#</p>
+<p>File 4: sample information tsv file<br />
+Seven columns are necessary.<br />
+[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse] PC9 ./source/CCLE.xlsx ./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam ./source/PC9_Cell_line 127 AGATCGGAAGAGC Human</p>
+<p>This pipeline contains 8 filtering processes.</p>
+<p>Filter 1 : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).<br />
+Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).<br />
+Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.<br />
+Filter 2 : Hairpin-structure induced error detection (2-1 or 2-2).<br />
+Filter 2-1: Palindromic sequences exist within 150 bases. Filter 2-2: &gt;=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting &gt;= 15 bases.<br />
+Filter 3 : 3’-/5’-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).<br />
+Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).<br />
+Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.<br />
+Filter 3-3: &lt;10% of bases are low quality (Quality score &lt;18).<br />
+Filter 4 : &gt;=90% mutation-supporting reads are soft-clipped (after cutting adaptor sequence).<br />
+Filter 5 : &gt;=20% mutations were called by chimeric reads comprising two distant regions.<br />
+Filter 6 : Mutations locating at simple repeat sequences.<br />
+Filter 7 : C&gt;T_g false positive calls in FFPE samples.<br />
+Filter 8 : Indel mutations locating at a &gt;=15 homopolymer.</p>
+<p>Supporting lengths are adjusted considering small repeat sequences around the mutations.</p>
+<p>Results are saved in a excel file.<br />
+The explatation of the results is written in detail in the second sheet of the excel file.</p>
+<p>github url: <a href="https://github.com/MANO-B/MicroSEC" class="uri">https://github.com/MANO-B/MicroSEC</a></p>
+</div>
+<div id="setting" class="section level2">
+<h2>Setting</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>wd =<span class="st"> &quot;/mnt/HDD8TB/MicroSEC/archive&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">collapse =</span> <span class="ot">TRUE</span>, <span class="dt">fig.width=</span><span class="dv">12</span>, <span class="dt">fig.height=</span><span class="dv">8</span>, <span class="dt">echo=</span><span class="ot">TRUE</span>, </span>
+<span id="cb1-3"><a href="#cb1-3"></a>                      <span class="dt">warning=</span><span class="ot">FALSE</span>, <span class="dt">message=</span><span class="ot">TRUE</span>, <span class="dt">comment =</span> <span class="st">&quot;#&gt;&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>knitr<span class="op">::</span>opts_knit<span class="op">$</span><span class="kw">set</span>(<span class="dt">root.dir =</span> wd)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="kw">options</span>(<span class="dt">rmarkdown.html_vignette.check_title =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>PROGRESS_BAR =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
+</div>
+<div id="necessary-packages" class="section level2">
+<h2>Necessary packages</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(MicroSEC)</span></code></pre></div>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># initialize</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>MSEC =<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>Homology_search =<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>Mut_depth =<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co"># test data</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>SAMPLE_NAME =<span class="st"> &quot;TEST&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>READ_length =<span class="st"> </span><span class="dv">151</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>ADAPTOR_SEQ =<span class="st"> &quot;AGATCGGAAGAGC&quot;</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>GENOME =<span class="st"> &quot;Human&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co"># load mutation information</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="kw">data</span>(exampleMutation)</span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="kw">data</span>(exampleBAM)</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="kw">data</span>(exampleMutCall)</span>
+<span id="cb3-16"><a href="#cb3-16"></a></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co"># load genomic sequence</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>genome =<span class="st"> </span><span class="kw">fun_load_genome</span>(GENOME)</span>
+<span id="cb3-19"><a href="#cb3-19"></a>Chr_No =<span class="st"> </span><span class="kw">fun_load_chr_no</span>(GENOME)</span>
+<span id="cb3-20"><a href="#cb3-20"></a></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co"># analysis</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a>result =<span class="st"> </span><span class="kw">fun_read_check</span>(<span class="dt">df_mutation =</span> exampleMutation,</span>
+<span id="cb3-23"><a href="#cb3-23"></a>                        <span class="dt">df_BAM =</span> exampleBAM,</span>
+<span id="cb3-24"><a href="#cb3-24"></a>                        <span class="dt">df_mut_call =</span> exampleMutCall,</span>
+<span id="cb3-25"><a href="#cb3-25"></a>                        <span class="dt">genome =</span> genome,</span>
+<span id="cb3-26"><a href="#cb3-26"></a>                        <span class="dt">Chr_No =</span> Chr_No,</span>
+<span id="cb3-27"><a href="#cb3-27"></a>                        <span class="dt">SAMPLE_NAME =</span> SAMPLE_NAME,</span>
+<span id="cb3-28"><a href="#cb3-28"></a>                        <span class="dt">READ_length =</span> READ_length,</span>
+<span id="cb3-29"><a href="#cb3-29"></a>                        <span class="dt">ADAPTOR_SEQ =</span> ADAPTOR_SEQ,</span>
+<span id="cb3-30"><a href="#cb3-30"></a>                        <span class="dt">Short_Homology_search_length =</span> <span class="dv">4</span>,</span>
+<span id="cb3-31"><a href="#cb3-31"></a>                        <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
+<span id="cb3-32"><a href="#cb3-32"></a>MSEC =<span class="st"> </span><span class="kw">rbind</span>(MSEC, result[[<span class="dv">1</span>]])</span>
+<span id="cb3-33"><a href="#cb3-33"></a>Homology_search =<span class="st"> </span><span class="kw">rbind</span>(Homology_search, result[[<span class="dv">2</span>]])</span>
+<span id="cb3-34"><a href="#cb3-34"></a>Mut_depth =<span class="st"> </span><span class="kw">rbind</span>(Mut_depth, result[[<span class="dv">3</span>]])</span>
+<span id="cb3-35"><a href="#cb3-35"></a></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co"># search homologous sequences</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a>MSEC =<span class="st"> </span><span class="kw">fun_homology</span>(MSEC,</span>
+<span id="cb3-38"><a href="#cb3-38"></a>                    Homology_search,</span>
+<span id="cb3-39"><a href="#cb3-39"></a>                    <span class="dt">Minimum_Homology_search_length =</span> <span class="dv">40</span>,</span>
+<span id="cb3-40"><a href="#cb3-40"></a>                    <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
+<span id="cb3-41"><a href="#cb3-41"></a></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="co"># statistical analysis</span></span>
+<span id="cb3-43"><a href="#cb3-43"></a>MSEC =<span class="st"> </span><span class="kw">fun_summary</span>(MSEC)</span>
+<span id="cb3-44"><a href="#cb3-44"></a>MSEC =<span class="st"> </span><span class="kw">fun_analysis</span>(MSEC,</span>
+<span id="cb3-45"><a href="#cb3-45"></a>                    Mut_depth,</span>
+<span id="cb3-46"><a href="#cb3-46"></a>                    <span class="dt">Short_Homology_search_length =</span> <span class="dv">4</span>,</span>
+<span id="cb3-47"><a href="#cb3-47"></a>                    <span class="dt">Minimum_Homology_search_length =</span> <span class="dv">40</span>,</span>
+<span id="cb3-48"><a href="#cb3-48"></a>                    <span class="dt">threshold_p =</span> <span class="dv">10</span><span class="op">^</span>(<span class="op">-</span><span class="dv">6</span>),</span>
+<span id="cb3-49"><a href="#cb3-49"></a>                    <span class="dt">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
+<span id="cb3-50"><a href="#cb3-50"></a>                    <span class="dt">threshold_soft_clip_ratio =</span> <span class="fl">0.90</span>,</span>
+<span id="cb3-51"><a href="#cb3-51"></a>                    <span class="dt">threshold_short_length =</span> <span class="fl">0.8</span>,</span>
+<span id="cb3-52"><a href="#cb3-52"></a>                    <span class="dt">threshold_distant_homology =</span> <span class="fl">0.2</span>,</span>
+<span id="cb3-53"><a href="#cb3-53"></a>                    <span class="dt">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
+<span id="cb3-54"><a href="#cb3-54"></a>                    <span class="dt">Homopolymer_length =</span> <span class="dv">15</span>)</span>
+<span id="cb3-55"><a href="#cb3-55"></a></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="co"># save the results</span></span>
+<span id="cb3-57"><a href="#cb3-57"></a><span class="kw">fun_save</span>(MSEC, wd)</span></code></pre></div>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>MSEC</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt;               Sample   Gene                 HGVS.c       HGVS.p Mut_type</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; 1 H15-11943-1-T_TDv3  KMT2D              c.2887G&gt;A  p.Ala963Thr    1-snv</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; 2 H15-11943-1-T_TDv3  KMT2D              c.2886T&gt;C  p.Gly962Gly    1-snv</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt; 3 H15-11943-1-T_TDv3   TP53           c.783-114G&gt;A            _    1-snv</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; 4 H15-11943-1-T_TDv3   TP53           c.783-117T&gt;C            _    1-snv</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; 5 H15-11943-1-T_TDv3 PIK3CA         c.-76-3489delA            _    1-del</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; 6 H15-11943-1-T_TDv3 PIK3CA              c.3073A&gt;G p.Thr1025Ala    1-snv</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; 7 H15-11943-1-T_TDv3   EGFR              c.2573T&gt;G  p.Leu858Arg    1-snv</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; 8 H15-11943-1-T_TDv3   EGFR c.3114+15_3114+16delTC            _    2-del</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;   Total_QV&gt;=20     %Alt   Chr       Pos Ref Alt SimpleRepeat_TRF</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; 1          163  6.74847 chr12  49050701   C   T                N</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; 2          162  7.40741 chr12  49050702   A   G                N</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt; 3          189  8.46561 chr17   7673951   C   T                N</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; 4          183  9.83607 chr17   7673954   A   G                N</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; 5          134 17.16420  chr3 179195260  GA   G                N</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; 6          185 27.56760  chr3 179234230   A   G                N</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; 7          315 44.44440  chr7  55191822   T   G                N</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; 8          231  6.92641  chr7  55201369 GTC   G                N</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt;                       Neighborhood_sequence Transition READ_length Total_read</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; 1 AGGGTCACTGTCCCCTTTGGTACCAAAGGGGTACTCTAACT         NA         151         11</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; 2 GGGTCACTGTCCCCTTTGGCGCCAAAGGGGTACTCTAACTC         NA         151         12</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; 3 ACCCTTGTCCTTTCTGGAGCTTAAGCTCCAGCTCCAGGTAG         NA         151         16</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; 4 CTTGTCCTTTCTGGAGCCTAGGCTCCAGCTCCAGGTAGGTG         NA         151         18</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; 5 TATTTACTTGCCTTCTCGGTGAAAAAAAAAACAACAACAAA         NA         151         23</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; 6 ACATTGCATACATTCGAAAGGCCCTAGCCTTAGATAAAACT         NA         151         51</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; 7 CAAGATCACAGATTTTGGGCGGGCCAAACTGCTGGGTGCGG         NA         151        140</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; 8 CTCTCTGGTATGAAATCTCTGTCTCTCTCTCTCTCAAGCTG         NA         151         16</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;   Soft_Clipped_read FLAG_Hairpin Pre_support_length Post_support_length</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt; 1                11           10                132                 137</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; 2                12           10                133                 136</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt; 3                14           16                140                 134</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt; 4                14           16                143                 131</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt; 5                 9            0                130                 130</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt; 6                10            0                144                 131</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt; 7                37            0                147                 135</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co">#&gt; 8                 2            0                 97                 144</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="co">#&gt;   short_support_length distant_homology_rate prob_Filter_1 prob_Filter_3_pre</span></span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="co">#&gt; 1                   11                     0  2.794410e-11      0.5101794659</span></span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co">#&gt; 2                   10                     0  1.138642e-16      0.4120721277</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a><span class="co">#&gt; 3                   10                     0  2.254597e-19      0.1180670870</span></span>
+<span id="cb4-42"><a href="#cb4-42"></a><span class="co">#&gt; 4                   18                     0  7.602715e-14      0.1600788940</span></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co">#&gt; 5                   70                     0  1.384192e-03      0.0304539889</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a><span class="co">#&gt; 6                   72                     0  1.134132e-01      0.0115221008</span></span>
+<span id="cb4-45"><a href="#cb4-45"></a><span class="co">#&gt; 7                   68                     0  8.203053e-06      0.0537795550</span></span>
+<span id="cb4-46"><a href="#cb4-46"></a><span class="co">#&gt; 8                   75                     0  1.000000e+00      0.0004783243</span></span>
+<span id="cb4-47"><a href="#cb4-47"></a><span class="co">#&gt;   prob_Filter_3_post Filter_1_mutation_intra_hairpin_loop</span></span>
+<span id="cb4-48"><a href="#cb4-48"></a><span class="co">#&gt; 1       0.2681971521                                 TRUE</span></span>
+<span id="cb4-49"><a href="#cb4-49"></a><span class="co">#&gt; 2       0.2379553368                                 TRUE</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a><span class="co">#&gt; 3       0.0519644737                                 TRUE</span></span>
+<span id="cb4-51"><a href="#cb4-51"></a><span class="co">#&gt; 4       0.0635856288                                 TRUE</span></span>
+<span id="cb4-52"><a href="#cb4-52"></a><span class="co">#&gt; 5       0.0161038299                                FALSE</span></span>
+<span id="cb4-53"><a href="#cb4-53"></a><span class="co">#&gt; 6       0.0157100141                                FALSE</span></span>
+<span id="cb4-54"><a href="#cb4-54"></a><span class="co">#&gt; 7       0.0001750834                                FALSE</span></span>
+<span id="cb4-55"><a href="#cb4-55"></a><span class="co">#&gt; 8       0.1146106607                                FALSE</span></span>
+<span id="cb4-56"><a href="#cb4-56"></a><span class="co">#&gt;   Filter_2_hairpin_structure Filter_3_microhomology_induced_mutation</span></span>
+<span id="cb4-57"><a href="#cb4-57"></a><span class="co">#&gt; 1                       TRUE                                   FALSE</span></span>
+<span id="cb4-58"><a href="#cb4-58"></a><span class="co">#&gt; 2                       TRUE                                   FALSE</span></span>
+<span id="cb4-59"><a href="#cb4-59"></a><span class="co">#&gt; 3                       TRUE                                   FALSE</span></span>
+<span id="cb4-60"><a href="#cb4-60"></a><span class="co">#&gt; 4                       TRUE                                   FALSE</span></span>
+<span id="cb4-61"><a href="#cb4-61"></a><span class="co">#&gt; 5                      FALSE                                   FALSE</span></span>
+<span id="cb4-62"><a href="#cb4-62"></a><span class="co">#&gt; 6                      FALSE                                   FALSE</span></span>
+<span id="cb4-63"><a href="#cb4-63"></a><span class="co">#&gt; 7                      FALSE                                   FALSE</span></span>
+<span id="cb4-64"><a href="#cb4-64"></a><span class="co">#&gt; 8                      FALSE                                   FALSE</span></span>
+<span id="cb4-65"><a href="#cb4-65"></a><span class="co">#&gt;   Filter_4_soft_clipping Filter_5_highly_homologous_region</span></span>
+<span id="cb4-66"><a href="#cb4-66"></a><span class="co">#&gt; 1                   TRUE                             FALSE</span></span>
+<span id="cb4-67"><a href="#cb4-67"></a><span class="co">#&gt; 2                   TRUE                             FALSE</span></span>
+<span id="cb4-68"><a href="#cb4-68"></a><span class="co">#&gt; 3                  FALSE                             FALSE</span></span>
+<span id="cb4-69"><a href="#cb4-69"></a><span class="co">#&gt; 4                  FALSE                             FALSE</span></span>
+<span id="cb4-70"><a href="#cb4-70"></a><span class="co">#&gt; 5                  FALSE                             FALSE</span></span>
+<span id="cb4-71"><a href="#cb4-71"></a><span class="co">#&gt; 6                  FALSE                             FALSE</span></span>
+<span id="cb4-72"><a href="#cb4-72"></a><span class="co">#&gt; 7                  FALSE                             FALSE</span></span>
+<span id="cb4-73"><a href="#cb4-73"></a><span class="co">#&gt; 8                  FALSE                             FALSE</span></span>
+<span id="cb4-74"><a href="#cb4-74"></a><span class="co">#&gt;   Filter_6_simple_repeat Filter_7_C_to_T_artifact</span></span>
+<span id="cb4-75"><a href="#cb4-75"></a><span class="co">#&gt; 1                  FALSE                    FALSE</span></span>
+<span id="cb4-76"><a href="#cb4-76"></a><span class="co">#&gt; 2                  FALSE                    FALSE</span></span>
+<span id="cb4-77"><a href="#cb4-77"></a><span class="co">#&gt; 3                  FALSE                    FALSE</span></span>
+<span id="cb4-78"><a href="#cb4-78"></a><span class="co">#&gt; 4                  FALSE                    FALSE</span></span>
+<span id="cb4-79"><a href="#cb4-79"></a><span class="co">#&gt; 5                  FALSE                    FALSE</span></span>
+<span id="cb4-80"><a href="#cb4-80"></a><span class="co">#&gt; 6                  FALSE                    FALSE</span></span>
+<span id="cb4-81"><a href="#cb4-81"></a><span class="co">#&gt; 7                  FALSE                    FALSE</span></span>
+<span id="cb4-82"><a href="#cb4-82"></a><span class="co">#&gt; 8                  FALSE                    FALSE</span></span>
+<span id="cb4-83"><a href="#cb4-83"></a><span class="co">#&gt;   Filter_8_mutation_at_homopolymer MSEC_filter_1234 MSEC_filter_12345</span></span>
+<span id="cb4-84"><a href="#cb4-84"></a><span class="co">#&gt; 1                            FALSE             TRUE              TRUE</span></span>
+<span id="cb4-85"><a href="#cb4-85"></a><span class="co">#&gt; 2                            FALSE             TRUE              TRUE</span></span>
+<span id="cb4-86"><a href="#cb4-86"></a><span class="co">#&gt; 3                            FALSE             TRUE              TRUE</span></span>
+<span id="cb4-87"><a href="#cb4-87"></a><span class="co">#&gt; 4                            FALSE             TRUE              TRUE</span></span>
+<span id="cb4-88"><a href="#cb4-88"></a><span class="co">#&gt; 5                            FALSE            FALSE             FALSE</span></span>
+<span id="cb4-89"><a href="#cb4-89"></a><span class="co">#&gt; 6                            FALSE            FALSE             FALSE</span></span>
+<span id="cb4-90"><a href="#cb4-90"></a><span class="co">#&gt; 7                            FALSE            FALSE             FALSE</span></span>
+<span id="cb4-91"><a href="#cb4-91"></a><span class="co">#&gt; 8                            FALSE            FALSE             FALSE</span></span>
+<span id="cb4-92"><a href="#cb4-92"></a><span class="co">#&gt;   MSEC_filter_all                                     Comment</span></span>
+<span id="cb4-93"><a href="#cb4-93"></a><span class="co">#&gt; 1            TRUE  another co-mutation may exist in neighbor,</span></span>
+<span id="cb4-94"><a href="#cb4-94"></a><span class="co">#&gt; 2            TRUE  another co-mutation may exist in neighbor,</span></span>
+<span id="cb4-95"><a href="#cb4-95"></a><span class="co">#&gt; 3            TRUE                                            </span></span>
+<span id="cb4-96"><a href="#cb4-96"></a><span class="co">#&gt; 4            TRUE                                            </span></span>
+<span id="cb4-97"><a href="#cb4-97"></a><span class="co">#&gt; 5           FALSE                                            </span></span>
+<span id="cb4-98"><a href="#cb4-98"></a><span class="co">#&gt; 6           FALSE                                            </span></span>
+<span id="cb4-99"><a href="#cb4-99"></a><span class="co">#&gt; 7           FALSE                                            </span></span>
+<span id="cb4-100"><a href="#cb4-100"></a><span class="co">#&gt; 8           FALSE</span></span></code></pre></div>
+</div>
+<div id="information-about-the-current-r-session" class="section level2">
+<h2>Information about the current R session</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">sessionInfo</span>()</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; R version 3.6.3 (2020-02-29)</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; Running under: Ubuntu 18.04.4 LTS</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; Matrix products: default</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.7.1</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.7.1</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; </span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; locale:</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=C              </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   </span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 </span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       </span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; attached base packages:</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; </span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; other attached packages:</span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; [1] MicroSEC_1.0.6</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt;  [1] Biobase_2.46.0                     pkgload_1.1.0                     </span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt;  [3] tidyr_1.1.2                        R.utils_2.10.1                    </span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;  [5] gtools_3.8.2                       assertthat_0.2.1                  </span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;  [7] stats4_3.6.3                       BSgenome_1.54.0                   </span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;  [9] GenomeInfoDbData_1.2.2             Rsamtools_2.2.3                   </span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt; [11] yaml_2.2.1                         remotes_2.2.0                     </span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt; [13] sessioninfo_1.1.1                  pillar_1.4.6                      </span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt; [15] backports_1.1.10                   lattice_0.20-41                   </span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt; [17] glue_1.4.2                         digest_0.6.27                     </span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt; [19] GenomicRanges_1.38.0               XVector_0.26.0                    </span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt; [21] htmltools_0.5.0                    Matrix_1.2-18                     </span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt; [23] R.oo_1.24.0                        XML_4.0-0                         </span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt; [25] pkgconfig_2.0.3                    devtools_2.3.2                    </span></span>
+<span id="cb5-38"><a href="#cb5-38"></a><span class="co">#&gt; [27] zlibbioc_1.32.0                    purrr_0.3.4                       </span></span>
+<span id="cb5-39"><a href="#cb5-39"></a><span class="co">#&gt; [29] processx_3.4.4                     openxlsx_4.2.2                    </span></span>
+<span id="cb5-40"><a href="#cb5-40"></a><span class="co">#&gt; [31] BiocParallel_1.20.1                tibble_3.0.4                      </span></span>
+<span id="cb5-41"><a href="#cb5-41"></a><span class="co">#&gt; [33] generics_0.0.2                     IRanges_2.20.2                    </span></span>
+<span id="cb5-42"><a href="#cb5-42"></a><span class="co">#&gt; [35] usethis_1.6.3                      ellipsis_0.3.1                    </span></span>
+<span id="cb5-43"><a href="#cb5-43"></a><span class="co">#&gt; [37] withr_2.3.0                        SummarizedExperiment_1.16.1       </span></span>
+<span id="cb5-44"><a href="#cb5-44"></a><span class="co">#&gt; [39] BiocGenerics_0.32.0                cli_2.1.0                         </span></span>
+<span id="cb5-45"><a href="#cb5-45"></a><span class="co">#&gt; [41] magrittr_1.5                       crayon_1.3.4                      </span></span>
+<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#&gt; [43] evaluate_0.14                      memoise_1.1.0                     </span></span>
+<span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt; [45] ps_1.4.0                           R.methodsS3_1.8.1                 </span></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt; [47] fs_1.5.0                           fansi_0.4.1                       </span></span>
+<span id="cb5-49"><a href="#cb5-49"></a><span class="co">#&gt; [49] xml2_1.3.2                         pkgbuild_1.1.0                    </span></span>
+<span id="cb5-50"><a href="#cb5-50"></a><span class="co">#&gt; [51] tools_3.6.3                        data.table_1.13.2                 </span></span>
+<span id="cb5-51"><a href="#cb5-51"></a><span class="co">#&gt; [53] prettyunits_1.1.1                  lifecycle_0.2.0                   </span></span>
+<span id="cb5-52"><a href="#cb5-52"></a><span class="co">#&gt; [55] matrixStats_0.57.0                 stringr_1.4.0                     </span></span>
+<span id="cb5-53"><a href="#cb5-53"></a><span class="co">#&gt; [57] S4Vectors_0.24.4                   zip_2.1.1                         </span></span>
+<span id="cb5-54"><a href="#cb5-54"></a><span class="co">#&gt; [59] DelayedArray_0.12.3                callr_3.5.1                       </span></span>
+<span id="cb5-55"><a href="#cb5-55"></a><span class="co">#&gt; [61] Biostrings_2.54.0                  compiler_3.6.3                    </span></span>
+<span id="cb5-56"><a href="#cb5-56"></a><span class="co">#&gt; [63] GenomeInfoDb_1.22.1                rlang_0.4.8                       </span></span>
+<span id="cb5-57"><a href="#cb5-57"></a><span class="co">#&gt; [65] grid_3.6.3                         RCurl_1.98-1.2                    </span></span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="co">#&gt; [67] rstudioapi_0.11                    rmarkdown_2.5                     </span></span>
+<span id="cb5-59"><a href="#cb5-59"></a><span class="co">#&gt; [69] bitops_1.0-6                       testthat_2.3.2                    </span></span>
+<span id="cb5-60"><a href="#cb5-60"></a><span class="co">#&gt; [71] roxygen2_7.1.1                     R6_2.4.1                          </span></span>
+<span id="cb5-61"><a href="#cb5-61"></a><span class="co">#&gt; [73] GenomicAlignments_1.22.1           knitr_1.30                        </span></span>
+<span id="cb5-62"><a href="#cb5-62"></a><span class="co">#&gt; [75] dplyr_1.0.2                        rtracklayer_1.46.0                </span></span>
+<span id="cb5-63"><a href="#cb5-63"></a><span class="co">#&gt; [77] commonmark_1.7                     rprojroot_1.3-2                   </span></span>
+<span id="cb5-64"><a href="#cb5-64"></a><span class="co">#&gt; [79] desc_1.2.0                         stringi_1.5.3                     </span></span>
+<span id="cb5-65"><a href="#cb5-65"></a><span class="co">#&gt; [81] parallel_3.6.3                     BSgenome.Mmusculus.UCSC.mm10_1.4.0</span></span>
+<span id="cb5-66"><a href="#cb5-66"></a><span class="co">#&gt; [83] Rcpp_1.0.5                         vctrs_0.3.4                       </span></span>
+<span id="cb5-67"><a href="#cb5-67"></a><span class="co">#&gt; [85] tidyselect_1.1.0                   xfun_0.18                         </span></span>
+<span id="cb5-68"><a href="#cb5-68"></a><span class="co">#&gt; [87] BSgenome.Hsapiens.UCSC.hg38_1.4.1</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
