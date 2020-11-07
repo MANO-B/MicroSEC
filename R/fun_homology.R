@@ -51,7 +51,7 @@ fun_homology = function(MicroSEC,
     pb = txtProgressBar(min = 0,
                         max = Chr_No,
                         width = 20,
-                        style = 3)
+                        style = 2)
   }
   for(seqname in 1:Chr_No){
     if(PROGRESS_BAR == "Y"){
@@ -71,7 +71,7 @@ fun_homology = function(MicroSEC,
     pb = txtProgressBar(min = 0, 
                         max = max(1, dim(df_distant)[1]), 
                         width = 20,
-                        style = 3)
+                        style = 2)
   }
   for(i in 1:MAX_No){
     if(PROGRESS_BAR == "Y"){
