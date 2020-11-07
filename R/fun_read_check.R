@@ -210,8 +210,9 @@ fun_read_check = function(df_mutation,
         }
         if(PROGRESS_BAR == "Y"){
           pb = txtProgressBar(min = 0, 
-                               max = max(1, length(mut_read_ID)),
-                               style = 3)
+                              max = max(1, length(mut_read_ID)),
+                              width = 20,
+                              style = 3)
         }
         # analyze each mutation supporting read
         for(j in 1:length(mut_read_ID)){

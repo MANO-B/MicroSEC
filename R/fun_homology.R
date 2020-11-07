@@ -48,7 +48,10 @@ fun_homology = function(MicroSEC,
   Search_Seq_r = PDict(Search_Seq_r)
   distant_homology = rep(0, length(Search_Seq_f))
   if(PROGRESS_BAR == "Y"){
-    pb = txtProgressBar(min = 0, max = Chr_No, style = 3)
+    pb = txtProgressBar(min = 0,
+                        max = Chr_No,
+                        width = 20,
+                        style = 3)
   }
   for(seqname in 1:Chr_No){
     if(PROGRESS_BAR == "Y"){
@@ -62,7 +65,10 @@ fun_homology = function(MicroSEC,
   }
   df_distant$distant_homology = distant_homology
   if(PROGRESS_BAR == "Y"){
-    pb = txtProgressBar(min = 0, max = max(1, dim(df_distant)[1]), style = 3)
+    pb = txtProgressBar(min = 0, 
+                        max = max(1, dim(df_distant)[1]), 
+                        width = 20,
+                        style = 3)
   }
   for(i in 1:MAX_No){
     if(PROGRESS_BAR == "Y"){
