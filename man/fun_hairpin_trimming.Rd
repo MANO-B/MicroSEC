@@ -4,14 +4,21 @@
 \alias{fun_hairpin_trimming}
 \title{Adapter sequence trimming function}
 \usage{
-fun_hairpin_trimming(Hairpin_seq, mut_read_strand, ADAPTOR_SEQ)
+fun_hairpin_trimming(
+  Hairpin_seq,
+  mut_read_strand,
+  ADAPTER_SEQ_1,
+  ADAPTER_SEQ_2
+)
 }
 \arguments{
 \item{Hairpin_seq}{The sequence to be trimmed.}
 
 \item{mut_read_strand}{The strand of the sequence, "+" or "-".}
 
-\item{ADAPTOR_SEQ}{The adapter sequence of the library.}
+\item{ADAPTER_SEQ_1}{The Read 1 adapter sequence of the library.}
+
+\item{ADAPTER_SEQ_2}{The Read 2 adapter sequence of the library.}
 }
 \value{
 Adapter-trimmed Hairpin_seq

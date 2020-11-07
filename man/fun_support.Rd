@@ -8,7 +8,8 @@ fun_support(
   df_cigar,
   df_seq,
   mut_read_strand,
-  ADAPTOR_SEQ,
+  ADAPTER_SEQ_1,
+  ADAPTER_SEQ_2,
   mut_position,
   Alt_length,
   indel_status
@@ -21,7 +22,9 @@ fun_support(
 
 \item{mut_read_strand}{The strand of the sequence, "+" or "-".}
 
-\item{ADAPTOR_SEQ}{The adapter sequence of the library.}
+\item{ADAPTER_SEQ_1}{The Read 1 adapter sequence of the library.}
+
+\item{ADAPTER_SEQ_2}{The Read 2 adapter sequence of the library.}
 
 \item{mut_position}{The mutation position in the read.}
 

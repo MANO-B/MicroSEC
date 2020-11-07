@@ -36,9 +36,9 @@ This file should contain at least these contents:
 chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
   
 File 4: sample information tsv file  
-Seven columns are necessary.  
-[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse]
-PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGC	Human
+Seven or eight columns are necessary.  
+[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]
+PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
 
 This pipeline contains 8 filtering processes.  
 
@@ -52,7 +52,7 @@ Filter 3  : 3’-/5’-supporting lengths are too densely distributed to occur (
 Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
 Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
 Filter 3-3: <10% of bases are low quality (Quality score <18).  
-Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting adaptor sequence).  
+Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting adapter sequence).  
 Filter 5  : >=20% mutations were called by chimeric reads comprising two distant regions.  
 Filter 6  : Mutations locating at simple repeat sequences.  
 Filter 7  : C>T_g false positive calls in FFPE samples.  
@@ -90,7 +90,8 @@ Mut_depth = NULL
 # test data
 SAMPLE_NAME = "TEST"
 READ_length = 151
-ADAPTOR_SEQ = "AGATCGGAAGAGC"
+ADAPTER_SEQ_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+ADAPTER_SEQ_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
 GENOME = "Human"
 
 # load mutation information
@@ -110,7 +111,8 @@ result = fun_read_check(df_mutation = exampleMutation,
                         Chr_No = Chr_No,
                         SAMPLE_NAME = SAMPLE_NAME,
                         READ_length = READ_length,
-                        ADAPTOR_SEQ = ADAPTOR_SEQ,
+                        ADAPTER_SEQ_1 = ADAPTER_SEQ_1,
+                        ADAPTER_SEQ_2 = ADAPTER_SEQ_2,
                         Short_Homology_search_length = 4,
                         PROGRESS_BAR = PROGRESS_BAR)
 MSEC = rbind(MSEC, result[[1]])

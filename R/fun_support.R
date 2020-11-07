@@ -5,20 +5,19 @@
 #' @param df_cigar The CIGAR data of the read.
 #' @param df_seq The sequence to be checked.
 #' @param mut_read_strand The strand of the sequence, "+" or "-".
-#' @param ADAPTOR_SEQ The adapter sequence of the library.
+#' @param ADAPTER_SEQ_1 The Read 1 adapter sequence of the library.
+#' @param ADAPTER_SEQ_2 The Read 2 adapter sequence of the library.
 #' @param mut_position The mutation position in the read.
 #' @param Alt_length The length of altered bases.
 #' @importFrom stringr str_split
-#' @importFrom Biostrings trimLRPatterns
-#' @importFrom Biostrings DNAString
-#' @importFrom Biostrings reverseComplement
 #' @importFrom BiocGenerics as.data.frame
 #' @return list(Pre_support_length, Post_support_length, Soft_Clipped_read)
 #' @export
 fun_support = function(df_cigar,
                        df_seq,
                        mut_read_strand,
-                       ADAPTOR_SEQ,
+                       ADAPTER_SEQ_1,
+                       ADAPTER_SEQ_2,
                        mut_position,
                        Alt_length,
                        indel_status){
@@ -37,25 +36,10 @@ fun_support = function(df_cigar,
       tmp_pos = tmp_pos + cigar_num[k]
     }
     if(cigar_type[k] == "S"){
-      clipped_seq = df_seq[tmp_pos:(tmp_pos + cigar_num[k] - 1)]
-      if(mut_read_strand == "+"){
-        clipped_seq = trimLRPatterns(Rpattern = ADAPTOR_SEQ,
-                                     subject = clipped_seq)
-        clipped_seq = str_split(clipped_seq, ADAPTOR_SEQ)[[1]]
-        if(length(clipped_seq)> 1){
-          clipped_seq = clipped_seq[[1]]
-        }
-        clipped_seq = DNAString(clipped_seq)
-      } else{
-        clipped_seq = reverseComplement(clipped_seq)
-        clipped_seq = trimLRPatterns(Rpattern = ADAPTOR_SEQ,
-                                     subject = clipped_seq)
-        clipped_seq = str_split(clipped_seq, ADAPTOR_SEQ)[[1]]
-        if(length(clipped_seq)> 1){
-          clipped_seq = clipped_seq[[1]]
-        }
-        clipped_seq = DNAString(clipped_seq)
-      }
+      clipped_seq = fun_hairpin_trimming(
+        df_seq[tmp_pos:(tmp_pos + cigar_num[k] - 1)],
+        mut_read_strand,
+        ADAPTER_SEQ_1, ADAPTER_SEQ_2)
       if(length(clipped_seq) > 0){
         Soft_Clipped_read_tmp = 1
       }

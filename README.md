@@ -44,9 +44,9 @@ This file should contain at least these contents:
 chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
   
 - File 4: sample information tsv file  
-Seven columns are necessary.  
-[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse]  
-PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGC	Human  
+Seven or eight columns are necessary.  
+[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]
+PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
 
 This pipeline contains 8 filtering processes.  
 
@@ -60,7 +60,7 @@ This pipeline contains 8 filtering processes.
         Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
         Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
         Filter 3-3: <10% of bases are low quality (Quality score <18).  
-- Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting adaptor sequence).  
+- Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting adapter sequence).  
 - Filter 5  : >=20% mutations were called by chimeric reads comprising two distant regions.  
 - Filter 6  : Mutations locating at simple repeat sequences.  
 - Filter 7  : C>T_g false positive calls in FFPE samples.  
@@ -183,9 +183,14 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   BAM_FILE = SAMPLE_INFO[SAMPLE,3]
   MUTATION_SUPPORTING_READ_LIST = SAMPLE_INFO[SAMPLE,4]
   READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
-  ADAPTOR_SEQ = SAMPLE_INFO[SAMPLE,6]
-  GENOME = SAMPLE_INFO[SAMPLE,7]
-  
+  ADAPTER_SEQ_1 = SAMPLE_INFO[SAMPLE,6]
+  if(SAMPLE_INFO[SAMPLE,7] %in% c("Human", "Mouse")){
+    ADAPTER_SEQ_2 = ADAPTER_SEQ_1
+    GENOME = SAMPLE_INFO[SAMPLE,7]
+  } else{
+    ADAPTER_SEQ_2 = SAMPLE_INFO[SAMPLE,7]
+    GENOME = SAMPLE_INFO[SAMPLE,8]
+  }  
   # load mutation information
   df_mutation = fun_load_mutation(MUTATION_FILE)
   df_BAM = fun_load_BAM(BAM_FILE)
@@ -203,7 +208,8 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           Chr_No = Chr_No,
                           SAMPLE_NAME = SAMPLE_NAME,
                           READ_length = READ_length,
-                          ADAPTOR_SEQ = ADAPTOR_SEQ,
+                          ADAPTER_SEQ_1 = ADAPTER_SEQ_1,
+                          ADAPTER_SEQ_2 = ADAPTER_SEQ_2,
                           Short_Homology_search_length = 4,
                           PROGRESS_BAR = "Y")
   MSEC = rbind(MSEC, result[[1]])
@@ -249,7 +255,7 @@ MicroSEC_PC9.tsv
 
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
 - Confirm the read length in the platform
-- Confirm the adaptor sequence; Todai Onco Panel ("AGATCGGAAGAGC")
+- Confirm the adapter sequence; Todai Onco Panel ("AGATCGGAAGAGCACACGTCTGAACTCCAGTCA" and "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT")
 - If you want to know the progress visually, [progress bar Y/N] should be Y.
 
 # Reproducibility

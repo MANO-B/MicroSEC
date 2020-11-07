@@ -12,7 +12,8 @@ fun_read_check(
   Chr_No,
   SAMPLE_NAME,
   READ_length,
-  ADAPTOR_SEQ,
+  ADAPTER_SEQ_1,
+  ADAPTER_SEQ_2,
   Short_Homology_search_length,
   PROGRESS_BAR
 )
@@ -32,7 +33,9 @@ fun_read_check(
 
 \item{READ_length}{The read length in the sequence.}
 
-\item{ADAPTOR_SEQ}{The adapter sequence of the library.}
+\item{ADAPTER_SEQ_1}{The Read 1 adapter sequence of the library.}
+
+\item{ADAPTER_SEQ_2}{The Read 2 adapter sequence of the library.}
 
 \item{Short_Homology_search_length}{Small sequence for homology search.}
 

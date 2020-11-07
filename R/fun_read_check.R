@@ -9,7 +9,8 @@
 #' @param Chr_No Chromosome number.
 #' @param SAMPLE_NAME Sample name (character)
 #' @param READ_length The read length in the sequence.
-#' @param ADAPTOR_SEQ The adapter sequence of the library.
+#' @param ADAPTER_SEQ_1 The Read 1 adapter sequence of the library.
+#' @param ADAPTER_SEQ_2 The Read 2 adapter sequence of the library.
 #' @param Short_Homology_search_length Small sequence for homology search.
 #' @param PROGRESS_BAR "Y": You can see the progress visually.
 #' @return list(MSEC, Homology_search)
@@ -36,7 +37,8 @@ fun_read_check = function(df_mutation,
                           Chr_No,
                           SAMPLE_NAME,
                           READ_length,
-                          ADAPTOR_SEQ,
+                          ADAPTER_SEQ_1,
+                          ADAPTER_SEQ_2,
                           Short_Homology_search_length,
                           PROGRESS_BAR){
   if(length(df_mutation[,1]) > 0){
@@ -436,7 +438,7 @@ fun_read_check = function(df_mutation,
                                  min(length(df_seq),
                                      (mut_position + FLAG_2 + Alt_length - 1))],
                           mut_read_strand[[j]],
-                          ADAPTOR_SEQ)
+                          ADAPTER_SEQ_1, ADAPTER_SEQ_2)
               if(Minimum_Hairpin_length < length(Hairpin_seq)){
                 for(hair in Minimum_Hairpin_length:length(Hairpin_seq)){
                   if(check_hairpin == 1){
@@ -458,7 +460,7 @@ fun_read_check = function(df_mutation,
                   min(length(df_seq),
                      (mut_position + Minimum_Hairpin_length + Alt_length - 1))],
                   mut_read_strand[[j]],
-                  ADAPTOR_SEQ)
+                  ADAPTER_SEQ_1, ADAPTER_SEQ_2)
                 if(Minimum_Hairpin_length < length(Hairpin_seq)){
                   for(hair in Minimum_Hairpin_length:length(Hairpin_seq)){
                     if(check_hairpin == 1){
@@ -488,7 +490,7 @@ fun_read_check = function(df_mutation,
               support_status = fun_support(df_cigar,
                                      df_seq,
                                      mut_read_strand[[j]],
-                                     ADAPTOR_SEQ,
+                                     ADAPTER_SEQ_1, ADAPTER_SEQ_2,
                                      mut_position,
                                      Alt_length,
                                      indel_status)
@@ -529,14 +531,14 @@ fun_read_check = function(df_mutation,
                   Pre_Homology_search_seq = fun_hairpin_trimming(
                     Pre_Homology_search_seq,
                     mut_read_strand[[j]],
-                    ADAPTOR_SEQ)
+                    ADAPTER_SEQ_1, ADAPTER_SEQ_2)
                   Pre_Homology_search_seq = 
                     reverseComplement(Pre_Homology_search_seq)
                 } else{
                   Post_Homology_search_seq = fun_hairpin_trimming(
                     Post_Homology_search_seq,
                     mut_read_strand[[j]],
-                    ADAPTOR_SEQ)
+                    ADAPTER_SEQ_1, ADAPTER_SEQ_2)
                   Post_Homology_search_seq =
                     reverseComplement(Post_Homology_search_seq)
                 }
