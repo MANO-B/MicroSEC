@@ -1,5 +1,6 @@
 # MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples
 #
+# Version 1.0.7: Adapter trimming modified (Nov. 3, 2020) 
 # Version 1.0.6: probability calculation considering coverage depth around mutations (Nov. 3, 2020) 
 # Version 1.0.5: save function modified (Nov. 2, 2020)
 # Version 1.0.4: package install via github (Nov. 1, 2020)

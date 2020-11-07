@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2020-11-06" />
+<meta name="date" content="2020-11-07" />
 
 <title>MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples</title>
 
@@ -367,7 +367,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2020-11-06</h4>
+<h4 class="date">2020-11-07</h4>
 
 
 
@@ -392,8 +392,8 @@ This file should contain at least these contents:<br />
 Chr Pos Ref Alt Mut_ID Mut<br />
 chr1 2561609 T A _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r .;A;N#</p>
 <p>File 4: sample information tsv file<br />
-Seven columns are necessary.<br />
-[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adaptor sequence] [sample type: Human or Mouse] PC9 ./source/CCLE.xlsx ./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam ./source/PC9_Cell_line 127 AGATCGGAAGAGC Human</p>
+Seven or eight columns are necessary.<br />
+[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse] PC9 ./source/CCLE.xlsx ./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam ./source/PC9_Cell_line 127 AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human</p>
 <p>This pipeline contains 8 filtering processes.</p>
 <p>Filter 1 : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).<br />
 Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).<br />
@@ -404,7 +404,7 @@ Filter 3 : 3’-/5’-supporting lengths are too densely distributed to occur (3
 Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).<br />
 Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.<br />
 Filter 3-3: &lt;10% of bases are low quality (Quality score &lt;18).<br />
-Filter 4 : &gt;=90% mutation-supporting reads are soft-clipped (after cutting adaptor sequence).<br />
+Filter 4 : &gt;=90% mutation-supporting reads are soft-clipped (after cutting adapter sequence).<br />
 Filter 5 : &gt;=20% mutations were called by chimeric reads comprising two distant regions.<br />
 Filter 6 : Mutations locating at simple repeat sequences.<br />
 Filter 7 : C&gt;T_g false positive calls in FFPE samples.<br />
@@ -437,55 +437,57 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb3-6"><a href="#cb3-6"></a><span class="co"># test data</span></span>
 <span id="cb3-7"><a href="#cb3-7"></a>SAMPLE_NAME =<span class="st"> &quot;TEST&quot;</span></span>
 <span id="cb3-8"><a href="#cb3-8"></a>READ_length =<span class="st"> </span><span class="dv">151</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a>ADAPTOR_SEQ =<span class="st"> &quot;AGATCGGAAGAGC&quot;</span></span>
-<span id="cb3-10"><a href="#cb3-10"></a>GENOME =<span class="st"> &quot;Human&quot;</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a></span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="co"># load mutation information</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a><span class="kw">data</span>(exampleMutation)</span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="kw">data</span>(exampleBAM)</span>
-<span id="cb3-15"><a href="#cb3-15"></a><span class="kw">data</span>(exampleMutCall)</span>
-<span id="cb3-16"><a href="#cb3-16"></a></span>
-<span id="cb3-17"><a href="#cb3-17"></a><span class="co"># load genomic sequence</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a>genome =<span class="st"> </span><span class="kw">fun_load_genome</span>(GENOME)</span>
-<span id="cb3-19"><a href="#cb3-19"></a>Chr_No =<span class="st"> </span><span class="kw">fun_load_chr_no</span>(GENOME)</span>
-<span id="cb3-20"><a href="#cb3-20"></a></span>
-<span id="cb3-21"><a href="#cb3-21"></a><span class="co"># analysis</span></span>
-<span id="cb3-22"><a href="#cb3-22"></a>result =<span class="st"> </span><span class="kw">fun_read_check</span>(<span class="dt">df_mutation =</span> exampleMutation,</span>
-<span id="cb3-23"><a href="#cb3-23"></a>                        <span class="dt">df_BAM =</span> exampleBAM,</span>
-<span id="cb3-24"><a href="#cb3-24"></a>                        <span class="dt">df_mut_call =</span> exampleMutCall,</span>
-<span id="cb3-25"><a href="#cb3-25"></a>                        <span class="dt">genome =</span> genome,</span>
-<span id="cb3-26"><a href="#cb3-26"></a>                        <span class="dt">Chr_No =</span> Chr_No,</span>
-<span id="cb3-27"><a href="#cb3-27"></a>                        <span class="dt">SAMPLE_NAME =</span> SAMPLE_NAME,</span>
-<span id="cb3-28"><a href="#cb3-28"></a>                        <span class="dt">READ_length =</span> READ_length,</span>
-<span id="cb3-29"><a href="#cb3-29"></a>                        <span class="dt">ADAPTOR_SEQ =</span> ADAPTOR_SEQ,</span>
-<span id="cb3-30"><a href="#cb3-30"></a>                        <span class="dt">Short_Homology_search_length =</span> <span class="dv">4</span>,</span>
-<span id="cb3-31"><a href="#cb3-31"></a>                        <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
-<span id="cb3-32"><a href="#cb3-32"></a>MSEC =<span class="st"> </span><span class="kw">rbind</span>(MSEC, result[[<span class="dv">1</span>]])</span>
-<span id="cb3-33"><a href="#cb3-33"></a>Homology_search =<span class="st"> </span><span class="kw">rbind</span>(Homology_search, result[[<span class="dv">2</span>]])</span>
-<span id="cb3-34"><a href="#cb3-34"></a>Mut_depth =<span class="st"> </span><span class="kw">rbind</span>(Mut_depth, result[[<span class="dv">3</span>]])</span>
-<span id="cb3-35"><a href="#cb3-35"></a></span>
-<span id="cb3-36"><a href="#cb3-36"></a><span class="co"># search homologous sequences</span></span>
-<span id="cb3-37"><a href="#cb3-37"></a>MSEC =<span class="st"> </span><span class="kw">fun_homology</span>(MSEC,</span>
-<span id="cb3-38"><a href="#cb3-38"></a>                    Homology_search,</span>
-<span id="cb3-39"><a href="#cb3-39"></a>                    <span class="dt">Minimum_Homology_search_length =</span> <span class="dv">40</span>,</span>
-<span id="cb3-40"><a href="#cb3-40"></a>                    <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
-<span id="cb3-41"><a href="#cb3-41"></a></span>
-<span id="cb3-42"><a href="#cb3-42"></a><span class="co"># statistical analysis</span></span>
-<span id="cb3-43"><a href="#cb3-43"></a>MSEC =<span class="st"> </span><span class="kw">fun_summary</span>(MSEC)</span>
-<span id="cb3-44"><a href="#cb3-44"></a>MSEC =<span class="st"> </span><span class="kw">fun_analysis</span>(MSEC,</span>
-<span id="cb3-45"><a href="#cb3-45"></a>                    Mut_depth,</span>
-<span id="cb3-46"><a href="#cb3-46"></a>                    <span class="dt">Short_Homology_search_length =</span> <span class="dv">4</span>,</span>
-<span id="cb3-47"><a href="#cb3-47"></a>                    <span class="dt">Minimum_Homology_search_length =</span> <span class="dv">40</span>,</span>
-<span id="cb3-48"><a href="#cb3-48"></a>                    <span class="dt">threshold_p =</span> <span class="dv">10</span><span class="op">^</span>(<span class="op">-</span><span class="dv">6</span>),</span>
-<span id="cb3-49"><a href="#cb3-49"></a>                    <span class="dt">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
-<span id="cb3-50"><a href="#cb3-50"></a>                    <span class="dt">threshold_soft_clip_ratio =</span> <span class="fl">0.90</span>,</span>
-<span id="cb3-51"><a href="#cb3-51"></a>                    <span class="dt">threshold_short_length =</span> <span class="fl">0.8</span>,</span>
-<span id="cb3-52"><a href="#cb3-52"></a>                    <span class="dt">threshold_distant_homology =</span> <span class="fl">0.2</span>,</span>
-<span id="cb3-53"><a href="#cb3-53"></a>                    <span class="dt">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
-<span id="cb3-54"><a href="#cb3-54"></a>                    <span class="dt">Homopolymer_length =</span> <span class="dv">15</span>)</span>
-<span id="cb3-55"><a href="#cb3-55"></a></span>
-<span id="cb3-56"><a href="#cb3-56"></a><span class="co"># save the results</span></span>
-<span id="cb3-57"><a href="#cb3-57"></a><span class="kw">fun_save</span>(MSEC, wd)</span></code></pre></div>
+<span id="cb3-9"><a href="#cb3-9"></a>ADAPTER_SEQ_<span class="dv">1</span> =<span class="st"> &quot;AGATCGGAAGAGCACACGTCTGAACTCCAGTCA&quot;</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>ADAPTER_SEQ_<span class="dv">2</span> =<span class="st"> &quot;AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>GENOME =<span class="st"> &quot;Human&quot;</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># load mutation information</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="kw">data</span>(exampleMutation)</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="kw">data</span>(exampleBAM)</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="kw">data</span>(exampleMutCall)</span>
+<span id="cb3-17"><a href="#cb3-17"></a></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co"># load genomic sequence</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>genome =<span class="st"> </span><span class="kw">fun_load_genome</span>(GENOME)</span>
+<span id="cb3-20"><a href="#cb3-20"></a>Chr_No =<span class="st"> </span><span class="kw">fun_load_chr_no</span>(GENOME)</span>
+<span id="cb3-21"><a href="#cb3-21"></a></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co"># analysis</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>result =<span class="st"> </span><span class="kw">fun_read_check</span>(<span class="dt">df_mutation =</span> exampleMutation,</span>
+<span id="cb3-24"><a href="#cb3-24"></a>                        <span class="dt">df_BAM =</span> exampleBAM,</span>
+<span id="cb3-25"><a href="#cb3-25"></a>                        <span class="dt">df_mut_call =</span> exampleMutCall,</span>
+<span id="cb3-26"><a href="#cb3-26"></a>                        <span class="dt">genome =</span> genome,</span>
+<span id="cb3-27"><a href="#cb3-27"></a>                        <span class="dt">Chr_No =</span> Chr_No,</span>
+<span id="cb3-28"><a href="#cb3-28"></a>                        <span class="dt">SAMPLE_NAME =</span> SAMPLE_NAME,</span>
+<span id="cb3-29"><a href="#cb3-29"></a>                        <span class="dt">READ_length =</span> READ_length,</span>
+<span id="cb3-30"><a href="#cb3-30"></a>                        <span class="dt">ADAPTER_SEQ_1 =</span> ADAPTER_SEQ_<span class="dv">1</span>,</span>
+<span id="cb3-31"><a href="#cb3-31"></a>                        <span class="dt">ADAPTER_SEQ_2 =</span> ADAPTER_SEQ_<span class="dv">2</span>,</span>
+<span id="cb3-32"><a href="#cb3-32"></a>                        <span class="dt">Short_Homology_search_length =</span> <span class="dv">4</span>,</span>
+<span id="cb3-33"><a href="#cb3-33"></a>                        <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
+<span id="cb3-34"><a href="#cb3-34"></a>MSEC =<span class="st"> </span><span class="kw">rbind</span>(MSEC, result[[<span class="dv">1</span>]])</span>
+<span id="cb3-35"><a href="#cb3-35"></a>Homology_search =<span class="st"> </span><span class="kw">rbind</span>(Homology_search, result[[<span class="dv">2</span>]])</span>
+<span id="cb3-36"><a href="#cb3-36"></a>Mut_depth =<span class="st"> </span><span class="kw">rbind</span>(Mut_depth, result[[<span class="dv">3</span>]])</span>
+<span id="cb3-37"><a href="#cb3-37"></a></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co"># search homologous sequences</span></span>
+<span id="cb3-39"><a href="#cb3-39"></a>MSEC =<span class="st"> </span><span class="kw">fun_homology</span>(MSEC,</span>
+<span id="cb3-40"><a href="#cb3-40"></a>                    Homology_search,</span>
+<span id="cb3-41"><a href="#cb3-41"></a>                    <span class="dt">Minimum_Homology_search_length =</span> <span class="dv">40</span>,</span>
+<span id="cb3-42"><a href="#cb3-42"></a>                    <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
+<span id="cb3-43"><a href="#cb3-43"></a></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co"># statistical analysis</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a>MSEC =<span class="st"> </span><span class="kw">fun_summary</span>(MSEC)</span>
+<span id="cb3-46"><a href="#cb3-46"></a>MSEC =<span class="st"> </span><span class="kw">fun_analysis</span>(MSEC,</span>
+<span id="cb3-47"><a href="#cb3-47"></a>                    Mut_depth,</span>
+<span id="cb3-48"><a href="#cb3-48"></a>                    <span class="dt">Short_Homology_search_length =</span> <span class="dv">4</span>,</span>
+<span id="cb3-49"><a href="#cb3-49"></a>                    <span class="dt">Minimum_Homology_search_length =</span> <span class="dv">40</span>,</span>
+<span id="cb3-50"><a href="#cb3-50"></a>                    <span class="dt">threshold_p =</span> <span class="dv">10</span><span class="op">^</span>(<span class="op">-</span><span class="dv">6</span>),</span>
+<span id="cb3-51"><a href="#cb3-51"></a>                    <span class="dt">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
+<span id="cb3-52"><a href="#cb3-52"></a>                    <span class="dt">threshold_soft_clip_ratio =</span> <span class="fl">0.90</span>,</span>
+<span id="cb3-53"><a href="#cb3-53"></a>                    <span class="dt">threshold_short_length =</span> <span class="fl">0.8</span>,</span>
+<span id="cb3-54"><a href="#cb3-54"></a>                    <span class="dt">threshold_distant_homology =</span> <span class="fl">0.2</span>,</span>
+<span id="cb3-55"><a href="#cb3-55"></a>                    <span class="dt">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
+<span id="cb3-56"><a href="#cb3-56"></a>                    <span class="dt">Homopolymer_length =</span> <span class="dv">15</span>)</span>
+<span id="cb3-57"><a href="#cb3-57"></a></span>
+<span id="cb3-58"><a href="#cb3-58"></a><span class="co"># save the results</span></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="kw">fun_save</span>(MSEC, wd)</span></code></pre></div>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
@@ -518,14 +520,14 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; 7 CAAGATCACAGATTTTGGGCGGGCCAAACTGCTGGGTGCGG         NA         151        140</span></span>
 <span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; 8 CTCTCTGGTATGAAATCTCTGTCTCTCTCTCTCTCAAGCTG         NA         151         16</span></span>
 <span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;   Soft_Clipped_read FLAG_Hairpin Pre_support_length Post_support_length</span></span>
-<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt; 1                11           10                132                 137</span></span>
-<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; 2                12           10                133                 136</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt; 1                10           10                132                 137</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; 2                11           10                133                 136</span></span>
 <span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt; 3                14           16                140                 134</span></span>
 <span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt; 4                14           16                143                 131</span></span>
 <span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt; 5                 9            0                130                 130</span></span>
-<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt; 6                10            0                144                 131</span></span>
-<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt; 7                37            0                147                 135</span></span>
-<span id="cb4-37"><a href="#cb4-37"></a><span class="co">#&gt; 8                 2            0                 97                 144</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt; 6                 7            0                144                 131</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt; 7                29            0                147                 135</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co">#&gt; 8                 3            0                 97                 144</span></span>
 <span id="cb4-38"><a href="#cb4-38"></a><span class="co">#&gt;   short_support_length distant_homology_rate prob_Filter_1 prob_Filter_3_pre</span></span>
 <span id="cb4-39"><a href="#cb4-39"></a><span class="co">#&gt; 1                   11                     0  2.794410e-11      0.5101794659</span></span>
 <span id="cb4-40"><a href="#cb4-40"></a><span class="co">#&gt; 2                   10                     0  1.138642e-16      0.4120721277</span></span>
