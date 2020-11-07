@@ -10,10 +10,10 @@
 #' fun_load_chr_no("Human")
 #' @export
 fun_load_chr_no = function(GENOME){
-  if(GENOME == "Human"){
+  if(GENOME %in% c("Human", "hg19", "hg38")){
     return(24)
   }
-  if(GENOME == "Mouse"){
+  if(GENOME %in% c("Mouse", "mm10")){
     return(21)
   }
 }
