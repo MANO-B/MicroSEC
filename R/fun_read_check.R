@@ -212,7 +212,8 @@ fun_read_check = function(df_mutation,
           pb = txtProgressBar(min = 0, 
                               max = max(1, length(mut_read_ID)),
                               width = 20,
-                              style = 2)
+                              style = 3)
+          pb_t = ceiling(length(mut_read_ID) / 100)
         }
         # analyze each mutation supporting read
         for(j in 1:length(mut_read_ID)){
@@ -233,8 +234,10 @@ fun_read_check = function(df_mutation,
           FLAG_2 = Pre_search_length
           # progress bar
           if(PROGRESS_BAR == "Y"){
-            cat(paste(" Mutation:", i, "/",length(df_mutation[,1])))
             setTxtProgressBar(pb, j)
+            if((j - 1) %% pb_t == 0){
+              cat(paste(" Mutation:", i, "/",length(df_mutation[,1])))
+            }
           }
           # specific read selection
           ID_No = df_BAM_qname == mut_read_ID[[j]]
