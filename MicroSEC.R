@@ -38,6 +38,8 @@
 # [sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]
 # PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
 #
+# Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
+
 # This pipeline contains 8 filtering processes.
 #
 # Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
@@ -99,7 +101,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   MUTATION_SUPPORTING_READ_LIST = SAMPLE_INFO[SAMPLE,4]
   READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
   ADAPTER_SEQ_1 = SAMPLE_INFO[SAMPLE,6]
-  if(SAMPLE_INFO[SAMPLE,7] %in% c("Human", "Mouse")){
+  if(SAMPLE_INFO[SAMPLE,7] %in% c("Human", "Mouse", "hg19", "hg38", "mm10")){
     ADAPTER_SEQ_2 = ADAPTER_SEQ_1
     GENOME = SAMPLE_INFO[SAMPLE,7]
   } else{

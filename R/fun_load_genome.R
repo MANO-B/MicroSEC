@@ -4,17 +4,16 @@
 #'
 #' @param GENOME Human or Mouse genome.
 #' @return genome
-#' @import BSgenome.Hsapiens.UCSC.hg38
-#' @import BSgenome.Mmusculus.UCSC.mm10
 #' @examples
 #' fun_load_genome("Human")
 #' @export
 fun_load_genome = function(GENOME){
-  if(GENOME == "Human"){
-    return(BSgenome.Hsapiens.UCSC.hg38)
-  }
-  if(GENOME == "Mouse"){
-    return(BSgenome.Mmusculus.UCSC.mm10)
+  if(GENOME %in% c("Human", "hg38")){
+    return(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
+  } else if(GENOME %in% c("Mouse", "mm10")){
+    return(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
+  } else if(GENOME %in% c("hg19")){
+    return(BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19)
   }
 }
 

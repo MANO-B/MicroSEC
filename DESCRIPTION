@@ -30,11 +30,12 @@ Imports:
   gtools,
   Biostrings,
   BSgenome.Hsapiens.UCSC.hg38,
-  BSgenome.Mmusculus.UCSC.mm10,
   GenomicAlignments,
   Rsamtools,
   GenomeInfoDb
 Suggests: 
+  BSgenome.Mmusculus.UCSC.mm10,
+  BSgenome.Hsapiens.UCSC.hg19,
   testthat,
   knitr,
   rmarkdown
