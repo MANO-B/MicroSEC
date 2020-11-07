@@ -234,7 +234,10 @@ fun_read_check = function(df_mutation,
           # progress bar
           if(PROGRESS_BAR == "Y"){
             setTxtProgressBar(pb, j)
-            cat(paste(" Mutation:", i, "/", length(df_mutation[,1])))
+            cat(paste(" Mutation:", 
+                      as.character(i), 
+                      "/",
+                      as.character(length(df_mutation[,1]))))
           }
           # specific read selection
           ID_No = df_BAM_qname == mut_read_ID[[j]]
