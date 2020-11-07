@@ -204,19 +204,22 @@ fun_analysis = function(MSEC,
              Caution)
   )
 MSEC = MSEC %>% mutate(
-    MSEC_filter_1234 = 
+    MSEC_filter_1234 = ifelse(
       Filter_1_mutation_intra_hairpin_loop |
       Filter_2_hairpin_structure | 
       Filter_3_microhomology_induced_mutation | 
       Filter_4_soft_clipping,
-    MSEC_filter_12345 = 
+      "Artifact suspicious", ""),
+    MSEC_filter_12345 = ifelse(
       MSEC_filter_1234 | 
       Filter_5_highly_homologous_region,
-    MSEC_filter_all = 
+      "Artifact suspicious", ""),
+    MSEC_filter_all = ifelse(
       MSEC_filter_12345 | 
       Filter_6_simple_repeat |
       Filter_7_C_to_T_artifact |
       Filter_8_mutation_at_homopolymer,
+      "Artifact suspicious", ""),
     Comment = Caution
   )
 MSEC = MSEC %>% select(-mut_type, -Alt_length, -Hairpin_length, 
