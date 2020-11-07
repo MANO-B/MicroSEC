@@ -56,7 +56,7 @@ fun_homology = function(MicroSEC,
   for(seqname in 1:Chr_No){
     if(PROGRESS_BAR == "Y"){
       setTxtProgressBar(pb, seqname)
-      cat(paste(" Chromosome screening:", seqname, "/", Chr_No))
+      cat(paste(" Chromosome screening:", seqname, "/", Chr_No, "  "))
    }
     
     target = genome[[seqnames(genome)[[seqname]]]]
@@ -75,7 +75,7 @@ fun_homology = function(MicroSEC,
     if(PROGRESS_BAR == "Y"){
       setTxtProgressBar(pb, i)
       if((i - 1) %% pb_t == 0){
-        cat(paste(" Homologous region counting:", i, "/", MAX_No))
+        cat(paste(" Homologous region counting:", i, "/", MAX_No, "        "))
       }
     }
     if(dim(df_distant[df_distant$Number == i,])[1] == 1){

@@ -236,7 +236,7 @@ fun_read_check = function(df_mutation,
           if(PROGRESS_BAR == "Y"){
             setTxtProgressBar(pb, j)
             if((j - 1) %% pb_t == 0){
-              cat(paste(" Mutation:", i, "/",length(df_mutation[,1])))
+              cat(paste(" Mutation:", i, "/",length(df_mutation[,1]), "      "))
             }
           }
           # specific read selection
