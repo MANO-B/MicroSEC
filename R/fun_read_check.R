@@ -233,8 +233,8 @@ fun_read_check = function(df_mutation,
           FLAG_2 = Pre_search_length
           # progress bar
           if(PROGRESS_BAR == "Y"){
-            setTxtProgressBar(pb, j)
             cat(paste(" Mutation:", i, "/",length(df_mutation[,1])))
+            setTxtProgressBar(pb, j)
           }
           # specific read selection
           ID_No = df_BAM_qname == mut_read_ID[[j]]
