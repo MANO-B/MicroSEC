@@ -254,10 +254,11 @@ MicroSEC_PC9.tsv
 ```
 
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
-- Confirm the read length in the platform
-- Confirm the adapter sequence; Todai Onco Panel ("AGATCGGAAGAGCACACGTCTGAACTCCAGTCA" and "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT")
+- Confirm the read length in the platform.
+- Confirm the adapter sequence; Todai Onco Panel ("AGATCGGAAGAGCACACGTCTGAACTCCAGTCA" and "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT").
+- If you input only one adapter sequence, the sequence will be used for read 1 and read 2. 
 - If you want to know the progress visually, [progress bar Y/N] should be Y.
 
 # Reproducibility
 
-The source code is available in MicroSEC.R. Source data is available (check our paper). Each filtering process takes about 20–30 minutes per sample on a recommended machine.
+The source code is available in MicroSEC.R. Source data will be available at the Japanese Genotype-Phenotype Archive (http://trace.ddbj.nig.ac.jp/jga), which is hosted by the DNA Data Bank of Japan (the accession number is written in our paper). Each filtering process takes about 5–30 minutes per sample on a recommended machine,according to the depth and mutation amount of the sample.
