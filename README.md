@@ -54,7 +54,7 @@ This file should contain at least these contents:
 ```
 Chr  Pos       Ref Alt        Mut_ID                                                                                                Mut
 chr1 2561609   T   A          _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N
-chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212r;ID004-1:991476r,ID004-2:516896f;ID002-1:670026f   .;.+ACAC;-ACAC;N
+chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212r;ID004-1:991476r,ID004-2:516896f;ID002-1:670026f   .;.+ACACACAC;-ACAC;N
 ```
 - Mut_ID  
     _;AAA,BBB,CCC;DDD,EEE,FFF represents the ID list corresponding to the Mut column.  
