@@ -46,14 +46,24 @@ SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 10813
     - Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
   
 ### File 2: BAM file  
+This file should contain at least these contents:  
+- QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, and QUAL  
   
-### File 3: mutation supporting read ID information file  
+### File 3: mutation supporting read ID information tsv file  
 This file should contain at least these contents:  
 ```
 Chr  Pos       Ref Alt  Mut_ID                                                                                                Mut  
 chr1 2561609   T   A    _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
 ```
-
+- Mut_ID  
+    _;AAA,BBB,CCC;DDD,EEE,FFF represents the ID list corresponding to the Mut column.  
+    Read ID is "QNAME in the BAM file" + "mapped strand information".  
+    Strand information can be extracted from the FLAG column in the BAM file.
+    ID001-1:579185f represents that the read ID is ID001-1:579185 and the read was mapped to the forward strand.  
+    ID008-1:1953407r represents that the read ID is ID008-1:1953407 and the read was mapped to the reverse strand.  
+- Mut  
+    ".;A;N#" reapresents the mutation pattern: "reference base";"altered to A";"other alterations"  
+  
 ### File 4: sample information tsv file  
 Seven or eight columns are necessary.  
 The file contains no header.
@@ -61,7 +71,7 @@ The file contains no header.
 [sample name] [mutation information excel file] [BAM file]          [read ID information directory] [read length] [adapter sequence read 1]         [optional: adapter sequence read 2] [reference genome]  
 PC9           /mnt/source/CCLE.xlsx             /mnt/source/PC9.bam /mnt/source/PC9_Cell_line       127           AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT   hg38  
 ```
-
+  
 - Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
   
 ## Filtering detail
@@ -282,6 +292,8 @@ MicroSEC_PC9.tsv
   
   
 ### Conversion of mutation information files
+MicroSEC utilizes a mutation information file. The format of the file is written differently from common HGSV nomenclature.  
+A conversion function is prepared.
 ```
 # Conversion example
 # Set column names correctly.
@@ -296,14 +308,20 @@ MicroSEC_PC9.tsv
 # Sample Gene     Chr   Pos          Mut_type  Ref   Alt HGVS.p       Neighborhood_sequence
 # LS411N BRAF     7     140453136    1-snv     A     T   p.V600E      ACCCACTCCATCGAGATTTCTCTGTAGCTAGACCAAAATCA
 # LS411N CELSR1   22    46931226     1-del     GC    G   p.G615fs     TCTTAGGCCCAGCGCTGCCGCCCCCAGAAAGGTGGAGGCC
-# LS411N APC      5     112175950    1-ins     G     GA  p.E1554fs    AAAACCAAGAGAAAGAGGCAGAAAAAAACTATTGATTCTGAA    
+# LS411N APC      5     112175951    1-ins     G     GA  p.E1554fs    AAAACCAAGAGAAAGAGGCAGAAAAAAACTATTGATTCTGAA    
 
-MUTATION_FILE = "/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/TOP315_summary.xlsx"
+library(openxlsx)
+library(MicroSEC)
+
+MUTATION_FILE = "/mnt/HDD8TB/MicroSEC/mutation.xlsx"
 GENOME = "hg19"
 
 df_mutation = fun_convert(MUTATION_FILE = MUTATION_FILE,
                           GENOME = GENOME)
+
+write.xlsx(df_mutation, "/mnt/HDD8TB/MicroSEC/mutation_modified.xlsx")
 ```
+
 ### Reproducibility
 
 The source code is available in MicroSEC.R. Source data will be available at the Japanese Genotype-Phenotype Archive (http://trace.ddbj.nig.ac.jp/jga), which is hosted by the DNA Data Bank of Japan (the accession number is written in our paper). Each filtering process takes about 5–30 minutes per sample on a recommended machine,according to the depth and mutation amount of the sample.
