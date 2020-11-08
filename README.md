@@ -129,7 +129,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
 install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'tcltk', 'gtools', 'devtools'))
-BiocManager::install(c("Rsamtools", "Biostrings", "BSgenome.Hsapiens.UCSC.hg38", "BSgenome.Mmusculus.UCSC.mm10", "GenomicAlignments", "GenomeInfoDb"))
+BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"))
 
 # install necessary genomes
 BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
