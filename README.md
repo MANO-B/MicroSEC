@@ -301,7 +301,7 @@ A conversion function is prepared.
 # Set column names correctly.
 #
 # Before (hg19)
-# Sample Hugo_Symbol    Chr   Start_Position   End_position Variant_Type Reference Tumor_Seq Protein_Change
+# Sample Hugo_Symbol    Chr   Start_Position   End_Position Variant_Type Reference Tumor_Seq Protein_Change
 # LS411N BRAF           7     140453136        140453136    SNP          A         T         p.V600E
 # LS411N CELSR1         22    46931227         46931227     DEL          C         -         p.G615fs
 # LS411N APC            5     112175951        112175952    INS          -         A         p.E1554fs
