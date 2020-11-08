@@ -128,7 +128,7 @@ Users should install the following packages prior to use the scripts, from an `R
 if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
-install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'tcltk', 'gtools', 'devtools'))
+install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'gtools', 'devtools'))
 BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"))
 
 # install necessary genomes
@@ -170,8 +170,6 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 [1] ‘1.22.1’
 > packageVersion("Rsamtools")
 [1] ‘2.0.3’
-> packageVersion("tcltk")
-[1] ‘3.6.3’
 > packageVersion("gtools")
 [1] ‘3.8.2’
 > packageVersion("devtools")
