@@ -3,6 +3,7 @@
 #' This function attempts to load the mutation information file.
 #'
 #' @param MUTATION_FILE Path of the mutation information file.
+#' @param SAMPLE_NAME Sample name.
 #' @return df_mutation
 #' @importFrom openxlsx read.xlsx
 #' @importFrom dplyr %>%
@@ -12,19 +13,31 @@
 #' @examples
 #' fun_load_mutation("./source/CCLE.xlsx")
 #' @export
-fun_load_mutation = function(MUTATION_FILE){
+fun_load_mutation = function(MUTATION_FILE,
+                             SAMPLE_NAME){
   # load somatic mutation list
   df_mutation = read.xlsx(MUTATION_FILE, sheet = 1)
   # data formatting
-  if("Transition" %in% colnames(df_mutation)){
-    df_mutation = df_mutation %>%
-      select(Sample, Gene, HGVS.c, HGVS.p, Mut_type, `Total_QV>=20`, `%Alt`, Chr, Pos, Ref, Alt, SimpleRepeat_TRF, Neighborhood_sequence, Transition)
+  if(!"HGVS.c" %in% colnames(df_mutation)){
+    df_mutation$HGVS.c = "NA"
+  }
+  if(!"HGVS.p" %in% colnames(df_mutation)){
+    df_mutation$HGVS.p = "NA"
+  }
+  if(!"HGVS.c" %in% colnames(df_mutation)){
+    df_mutation$`Total_QV>=20` = "NA"
+  }
+  if(!"%Alt" %in% colnames(df_mutation)){
+    df_mutation$`%Alt` = "NA"
+  }
+  if(!"SimpleRepeat_TRF" %in% colnames(df_mutation)){
+    df_mutation$SimpleRepeat_TRF = "NA"
   }
   if(!"Transition" %in% colnames(df_mutation)){
-    df_mutation = df_mutation %>%
-      select(Sample, Gene, HGVS.c, HGVS.p, Mut_type, `Total_QV>=20`, `%Alt`, Chr, Pos, Ref, Alt, SimpleRepeat_TRF, Neighborhood_sequence)
     df_mutation$Transition = "NA"
   }
+  df_mutation = df_mutation %>%
+    select(Sample, Gene, HGVS.c, HGVS.p, Mut_type, `Total_QV>=20`, `%Alt`, Chr, Pos, Ref, Alt, SimpleRepeat_TRF, Neighborhood_sequence, Transition)
   df_mutation$Pos = as.integer(df_mutation$Pos)
   df_mutation = df_mutation %>%
     filter(Sample == SAMPLE_NAME) %>%

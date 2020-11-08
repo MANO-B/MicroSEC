@@ -111,7 +111,7 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
   }  
   
   # load mutation information
-  df_mutation = fun_load_mutation(MUTATION_FILE)
+  df_mutation = fun_load_mutation(MUTATION_FILE, SAMPLE_NAME)
   df_BAM = fun_load_BAM(BAM_FILE)
   df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
   
