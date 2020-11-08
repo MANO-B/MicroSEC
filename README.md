@@ -8,55 +8,62 @@ paper:
 "MicroSEC: Sequence error filtering pipeline for formalin-fixed and 
 paraffin-embedded samples"  
 
-# Supplementary Code
+## Supplementary Code
 > M. Ikegami et al., "MicroSEC: Sequence error filtering pipeline for 
 formalin-fixed and paraffin-embedded samples", in preparation.
 
 ## Contents
 
 - [Overview](#overview)
+- [Filtering detail](#filtering-detail)
 - [System Requirements](#system-requirements)
 - [Instructions for Use](#instructions-for-use)
 
-# Overview
+## Overview
 
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
 Four files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
   
-- File 1: mutation information file  
+### File 1: mutation information file  
 This excel file should contain at least these contents:  
-       Sample     Gene HGVS.c  HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition  
- SL_1010-N6-B SLC25A24    _    _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t  
+```
+Sample       Gene       HGVS.c  HGVS.p Mut_type Total_QV>=20   %Alt   Chr  Pos         Ref Alt SimpleRepeat_TRF Neighborhood_sequence                      Transition  
+SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 108130741   C   T   N                CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t
+```  
+- Notation:  
+    - Mut_type: [altered bases]-[mutation type (snv, ins, or del)]. 1-snv, 3-snv, 3-del, 1-ins, etc.  
+    - Total_QV>=20: The read number with total Q-value >=20.  
+    - Chr: chr1-22, chrX, and chrY for hg38. 1-22, X, and Y for hg19.  
+    - Pos/Ref/Alt: There are some difference from HGVS nomenclature as follows:  
+          - 131C>T -> Pos/Ref/Alt 131/C/T.  
+          - 514_515insC and 514A -> Pos/Ref/Alt 514/A/AC  
+          - 244delC and 243A -> Pos/Ref/Alt 243/AC/A  
+    - SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
+    - Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
+    - Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
+    - Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
+    - Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
   
-    Mut_type: [altered bases]-[mutation type (snv, ins, or del)]. 1-snv, 3-snv, 3-del, 1-ins, etc.  
-    Total_QV>=20: The read number with total Q-value >=20.  
-    Chr: chr1-22, chrX, and chrY for hg38. 1-22, X, and Y for hg19.  
-    Pos/Ref/Alt: There are some difference from HGVS nomenclature as follows:
-    - 131C>T -> Pos/Ref/Alt 131/C/T.
-    - 514_515insC and 514A -> Pos/Ref/Alt 514/A/AC  
-    - 244delC and 243A -> Pos/Ref/Alt 243/AC/A  
-
-    SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
-    Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
-    Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
-    Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
-    Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
+### File 2: BAM file  
   
-- File 2: BAM file  
-  
-- File 3: mutation supporting read ID information file  
+### File 3: mutation supporting read ID information file  
 This file should contain at least these contents:  
- Chr     Pos Ref Alt                                                                                                Mut_ID     Mut  
-chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
-  
-- File 4: sample information tsv file  
+```
+Chr  Pos       Ref Alt  Mut_ID                                                                                                Mut  
+chr1 2561609   T   A    _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#  
+```
+
+### File 4: sample information tsv file  
 Seven or eight columns are necessary.  
+```
 [sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [reference genome]  
 PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38  
-  
-    Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
+```
 
+- Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
+  
+## Filtering detail
 This pipeline contains 8 filtering processes.  
 
 - Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
@@ -82,9 +89,9 @@ The explatation of the results is written in detail in the second sheet of the e
 
 github url: https://github.com/MANO-B/MicroSEC
 
-# System Requirements
+## System Requirements
 
-## Hardware Requirements
+### Hardware Requirements
 
 The scripts requires only a standard computer with enough RAM to support the operations defined by a user. For minimal performance, this will be a computer with about 8 GB of RAM. For optimal performance, we recommend a computer with the following specs:
 
@@ -93,7 +100,7 @@ CPU: 4+ cores, 4.2+ GHz/core
 
 The runtimes below are generated using a computer with the recommended specs (32 GB RAM, 4 cores@4.2 GHz) and internet of speed 100 Mbps.
 
-## Software Requirements
+### Software Requirements
 
 ### R language
 
@@ -153,7 +160,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 [1] ‘1.22.1’
 ```
 
-# Instructions for Use
+## Instructions for Use
 - How to install
 ```
 # recent stable version
@@ -298,6 +305,6 @@ df_mutation = fun_convert(MUTATION_FILE = MUTATION_FILE, # path of the mutation 
                           NEIGHBOR = "Y",  # if "Y", Neighborhood_sequence will be added.
                           GENOME = GENOME)
 ```
-# Reproducibility
+### Reproducibility
 
 The source code is available in MicroSEC.R. Source data will be available at the Japanese Genotype-Phenotype Archive (http://trace.ddbj.nig.ac.jp/jga), which is hosted by the DNA Data Bank of Japan (the accession number is written in our paper). Each filtering process takes about 5–30 minutes per sample on a recommended machine,according to the depth and mutation amount of the sample.
