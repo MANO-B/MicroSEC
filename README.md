@@ -301,9 +301,7 @@ MicroSEC_PC9.tsv
 MUTATION_FILE = "/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/TOP315_summary.xlsx"
 GENOME = "hg19"
 
-df_mutation = fun_convert(MUTATION_FILE = MUTATION_FILE, # path of the mutation information Excel file
-                          POSITION = "N", # if "Y", position conversion will be performed.
-                          NEIGHBOR = "Y",  # if "Y", Neighborhood_sequence will be added.
+df_mutation = fun_convert(MUTATION_FILE = MUTATION_FILE,
                           GENOME = GENOME)
 ```
 ### Reproducibility
