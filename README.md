@@ -64,7 +64,7 @@ chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212
     ID008-1:1953407r represents that the read ID is ID008-1:1953407 and the read was mapped to the reverse strand.  
 - Mut  
     ".;A;N#" reapresents the mutation pattern: "reference base";"altered to A";"other alterations"  
-    ".;.+ACAC;-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACAC";"deletion ACAC";"other alterations"  
+    ".;.+ACACACAC;-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
   
 ### File 4: sample information tsv file  
 Seven or eight columns are necessary.  
