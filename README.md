@@ -149,6 +149,10 @@ packageVersion("GenomeInfoDb")
 # Instructions for Use
 - How to install
 ```
+# recent stable version
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref = "v1.0.7")  
+
+# development version
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")  
 ```
 - How to use in command line
