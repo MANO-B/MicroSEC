@@ -29,7 +29,14 @@ This excel file should contain at least these contents:
        Sample     Gene HGVS.c  HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition  
  SL_1010-N6-B SLC25A24    _    _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t  
   
+    Mut_type: [altered bases]-[mutation type (snv, ins, or del)]. 1-snv, 3-snv, 3-del, 1-ins, etc.  
     Total_QV>=20: The read number with total Q-value >=20.  
+    Chr: chr1-22, chrX, and chrY for hg38. 1-22, X, and Y for hg19.  
+    Pos/Ref/Alt: There are some difference from HGVS nomenclature as follows:
+    - 131C>T -> Pos/Ref/Alt 131/C/T.
+    - 514_515insC and 514A -> Pos/Ref/Alt 514/A/AC  
+    - 244delC and 243A -> Pos/Ref/Alt 243/AC/A  
+
     SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
     Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
     Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
@@ -264,7 +271,33 @@ MicroSEC_PC9.tsv
 - Confirm the adapter sequence; Todai Onco Panel ("AGATCGGAAGAGCACACGTCTGAACTCCAGTCA" and "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT").
 - If you input only one adapter sequence, the sequence will be used for read 1 and read 2. 
 - If you want to know the progress visually, [progress bar Y/N] should be Y.
+  
+  
+- Conversion of mutation information files
+```
+# Conversion example
+# Set column names correctly.
+#
+# Before (hg19)
+# Sample Hugo_Symbol    Chr   Start_Position   End_position Variant_Type Reference Tumor_Seq Protein_Change
+# LS411N BRAF           7     140453136        140453136    SNP          A         T         p.V600E
+# LS411N CELSR1         22    46931227         46931227     DEL          C         -         p.G615fs
+# LS411N APC            5     112175951        112175952    INS          -         A         p.E1554fs
+#
+# After
+# Sample Gene     Chr   Pos          Mut_type  Ref   Alt HGVS.p       Neighborhood_sequence
+# LS411N BRAF     7     140453136    1-snv     A     T   p.V600E      ACCCACTCCATCGAGATTTCTCTGTAGCTAGACCAAAATCA
+# LS411N CELSR1   22    46931226     1-del     GC    G   p.G615fs     TCTTAGGCCCAGCGCTGCCGCCCCCAGAAAGGTGGAGGCC
+# LS411N APC      5     112175950    1-ins     G     GA  p.E1554fs    AAAACCAAGAGAAAGAGGCAGAAAAAAACTATTGATTCTGAA    
 
+MUTATION_FILE = "/mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/TOP315_summary.xlsx"
+GENOME = "hg19"
+
+df_mutation = fun_convert(MUTATION_FILE = MUTATION_FILE, # path of the mutation information Excel file
+                          POSITION = "N", # if "Y", position conversion will be performed.
+                          NEIGHBOR = "Y",  # if "Y", Neighborhood_sequence will be added.
+                          GENOME = GENOME)
+```
 # Reproducibility
 
 The source code is available in MicroSEC.R. Source data will be available at the Japanese Genotype-Phenotype Archive (http://trace.ddbj.nig.ac.jp/jga), which is hosted by the DNA Data Bank of Japan (the accession number is written in our paper). Each filtering process takes about 5–30 minutes per sample on a recommended machine,according to the depth and mutation amount of the sample.
