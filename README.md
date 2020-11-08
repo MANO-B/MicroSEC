@@ -67,15 +67,15 @@ PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./
 This pipeline contains 8 filtering processes.  
 
 - Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
-        Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).  
-        Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.  
+        - Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).  
+        - Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.  
 - Filter 2  : Hairpin-structure induced error detection (2-1 or 2-2).  
-        Filter 2-1: Palindromic sequences exist within 150 bases.  
-        Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
+        - Filter 2-1: Palindromic sequences exist within 150 bases.  
+        - Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
 - Filter 3  : 3’-/5’-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
-        Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
-        Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
-        Filter 3-3: <10% of bases are low quality (Quality score <18).  
+        - Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
+        - Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
+        - Filter 3-3: <10% of bases are low quality (Quality score <18).  
 - Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting adapter sequence).  
 - Filter 5  : >=20% mutations were called by chimeric reads comprising two distant regions.  
 - Filter 6  : Mutations locating at simple repeat sequences.  
@@ -267,12 +267,12 @@ fun_save(MSEC, wd)
 MicroSEC-result_[Sample name]_[Date].xlsx
 MicroSEC_[Sample name].tsv
 ```
-  like following:
+  like following:  
 ```
 MicroSEC-result_PC9_2020-11-05.xlsx
 MicroSEC_PC9.tsv
 ```
-
+  
 - Sample name is set to the sample of interest in the Sample column of the mutation information file.
 - Confirm the read length in the platform.
 - Confirm the adapter sequence; Todai Onco Panel ("AGATCGGAAGAGCACACGTCTGAACTCCAGTCA" and "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT").
@@ -280,7 +280,7 @@ MicroSEC_PC9.tsv
 - If you want to know the progress visually, [progress bar Y/N] should be Y.
   
   
-- Conversion of mutation information files
+### Conversion of mutation information files
 ```
 # Conversion example
 # Set column names correctly.
