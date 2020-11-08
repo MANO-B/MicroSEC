@@ -14,9 +14,7 @@
 fun_save = function(MSEC, wd){
   # explanation
   MSEC_explain = data.frame(
-    Alt_length  = "The length of altered sequence",
     Total_read = "The number of reads supporting the mutation: [Total_read >= 10] filtering is strongly recommended",
-    mut_type = "Type of the mutation",
     Soft_Clipped_read = "The number of soft-clipped reads",
     FLAG_Hairpin = "The number of reads containing a reverse complementary sequence of the opposite strand consisting >= 15 bases",
     Pre_support_length = "The longest mapped length of reads of the 5' sequence of the mutation",
