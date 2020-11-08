@@ -183,10 +183,6 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 ## Instructions for Use
 - How to install
 ```
-# recent stable version
-devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref = "v1.0.8")  
-
-# development version
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")  
 ```
 - How to use in command line
