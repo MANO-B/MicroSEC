@@ -130,6 +130,11 @@ if (!requireNamespace("BiocManager", quietly = TRUE)){
 }
 install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'tcltk', 'gtools', 'devtools'))
 BiocManager::install(c("Rsamtools", "Biostrings", "BSgenome.Hsapiens.UCSC.hg38", "BSgenome.Mmusculus.UCSC.mm10", "GenomicAlignments", "GenomeInfoDb"))
+
+# install necessary genomes
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+BiocManager::install("BSgenome.Mmusculus.UCSC.mm10")
 ```
 
 which will install in about 30 minutes on a recommended machine.
@@ -157,6 +162,8 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 [1] ‘2.54.0’
 > packageVersion("BSgenome.Hsapiens.UCSC.hg38")
 [1] ‘1.4.1’
+> packageVersion("BSgenome.Hsapiens.UCSC.hg19")
+[1] ‘1.4.0’
 > packageVersion("BSgenome.Mmusculus.UCSC.mm10")
 [1] ‘1.4.0’
 > packageVersion("GenomicAlignments")
@@ -177,7 +184,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 - How to install
 ```
 # recent stable version
-devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref = "v1.0.7")  
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref = "v1.0.8")  
 
 # development version
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")  

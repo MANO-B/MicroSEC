@@ -1,6 +1,6 @@
 Package: MicroSEC
 Title: MicroSEC sequence error filtering pipeline for FFPE samples
-Version: 1.0.7
+Version: 1.0.8
 Authors@R: 
     person(given = "Masachika",
            family = "Ikegami",
@@ -29,13 +29,13 @@ Imports:
   dplyr,
   gtools,
   Biostrings,
-  BSgenome.Hsapiens.UCSC.hg38,
   GenomicAlignments,
   Rsamtools,
   GenomeInfoDb
 Suggests: 
-  BSgenome.Mmusculus.UCSC.mm10,
+  BSgenome.Hsapiens.UCSC.hg38,
   BSgenome.Hsapiens.UCSC.hg19,
+  BSgenome.Mmusculus.UCSC.mm10,
   testthat,
   knitr,
   rmarkdown
