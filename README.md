@@ -64,7 +64,7 @@ chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212
     ID008-1:1953407r represents that the read ID is ID008-1:1953407 and the read was mapped to the reverse strand.  
 - Mut  
     ".;A;N#" reapresents the mutation pattern: "reference base";"altered to A";"other alterations"  
-    ".;.+ACAC;-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACAC";"deletion ACAC";"other alterations"  
+    ".;.+ACACACAC;-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
   
 ### File 4: sample information tsv file  
 Seven or eight columns are necessary.  
@@ -129,12 +129,12 @@ if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
 install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'gtools', 'devtools'), dependencies = TRUE)
-BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"))
+BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"), update=FALSE)
 
 # install necessary genomes
-BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
-BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
-BiocManager::install("BSgenome.Mmusculus.UCSC.mm10")
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update=FALSE)
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19", update=FALSE)
+BiocManager::install("BSgenome.Mmusculus.UCSC.mm10", update=FALSE)
 ```
 
 which will install in about 30 minutes on a recommended machine.
@@ -185,6 +185,9 @@ devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 ```
 - How to use in command line
 ```
+# download only once
+wget https://github.com/MANO-B/MicroSEC/MicroSEC.R
+
 Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]  
 ```  
 - Example
