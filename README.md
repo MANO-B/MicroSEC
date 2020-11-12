@@ -185,6 +185,9 @@ devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 ```
 - How to use in command line
 ```
+# download only once
+wget https://github.com/MANO-B/MicroSEC/MicroSEC.R
+
 Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]  
 ```  
 - Example
