@@ -129,12 +129,12 @@ if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
 install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'gtools', 'devtools'), dependencies = TRUE)
-BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"))
+BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"), update=FALSE)
 
 # install necessary genomes
-BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
-BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
-BiocManager::install("BSgenome.Mmusculus.UCSC.mm10")
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update=FALSE)
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19", update=FALSE)
+BiocManager::install("BSgenome.Mmusculus.UCSC.mm10", update=FALSE)
 ```
 
 which will install in about 30 minutes on a recommended machine.
