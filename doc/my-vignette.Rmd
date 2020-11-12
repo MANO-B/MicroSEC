@@ -76,20 +76,6 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 ## Necessary packages
 ```{r packages, eval=FALSE}
-library(tidyr)
-library(openxlsx)
-library(data.table)
-library(R.utils)
-library(stringr)
-library(magrittr)
-library(dplyr)
-library(Biostrings)
-library(BSgenome.Hsapiens.UCSC.hg38)
-library(BSgenome.Mmusculus.UCSC.mm10)
-library(GenomicAlignments)
-library(Rsamtools)
-library(tcltk)
-library(gtools)
 library(MicroSEC)
 ```
 

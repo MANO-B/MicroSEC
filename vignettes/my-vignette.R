@@ -4,7 +4,7 @@ knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE,
                       warning=FALSE, message=TRUE, comment = "#>")
 knitr::opts_knit$set(root.dir = wd)
 options(rmarkdown.html_vignette.check_title = FALSE)
-PROGRESS_BAR = "Y"
+PROGRESS_BAR = "N"
 
 ## ----packages-----------------------------------------------------------------
 library(MicroSEC)
@@ -16,7 +16,7 @@ Homology_search = NULL
 Mut_depth = NULL
 
 # test data
-SAMPLE_NAME = "TEST"
+SAMPLE_NAME = "H15-11943-1-T_TDv3"
 READ_length = 151
 ADAPTER_SEQ_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
 ADAPTER_SEQ_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
