@@ -4,8 +4,6 @@
 #'
 #' @param GENOME Human or Mouse genome.
 #' @return Chr_No
-#' @importFrom BSgenome.Hsapiens.UCSC.hg38 BSgenome.Hsapiens.UCSC.hg38
-#' @importFrom BSgenome.Mmusculus.UCSC.mm10 BSgenome.Mmusculus.UCSC.mm10
 #' @examples
 #' fun_load_chr_no("Human")
 #' @export
