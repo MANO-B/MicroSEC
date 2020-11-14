@@ -54,17 +54,17 @@ This file should contain at least these contents:
 ```
 Chr  Pos       Ref Alt        Mut_ID                                                                                                Mut
 chr1 2561609   T   A          _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N
-chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212r;ID004-1:991476r,ID004-2:516896f;ID002-1:670026f   .;.+ACACACAC;-ACAC;N
+chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212r;ID004-1:991476r,ID004-2:516896f;ID002-1:670026f   .;.+ACACACAC;.-ACAC;N
 ```
 - Mut_ID  
-    _;AAA,BBB,CCC;DDD,EEE,FFF represents the ID list corresponding to the Mut column.  
+    _;AAA,BBB,CCC;DDD,EEE,FFF represents the ID list corresponding to the Mut column separated by semicolons.  
     Read ID is "QNAME in the BAM file" + "mapped strand information".  
     Strand information can be extracted from the FLAG column in the BAM file.  
     ID001-1:579185f represents that the read ID is ID001-1:579185 and the read was mapped to the forward strand.  
     ID008-1:1953407r represents that the read ID is ID008-1:1953407 and the read was mapped to the reverse strand.  
 - Mut  
     ".;A;N#" reapresents the mutation pattern: "reference base";"altered to A";"other alterations"  
-    ".;.+ACACACAC;-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
+    ".;.+ACACACAC;.-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
   
 ### File 4: sample information tsv file  
 Seven or eight columns are necessary.  
