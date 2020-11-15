@@ -24,8 +24,8 @@ fun_homology = function(MicroSEC,
                         Minimum_Homology_search_length,
                         PROGRESS_BAR){
   # initialize
-  MicroSEC$distant_homology = 0
   if(!is.null(df_distant)){
+    MicroSEC$distant_homology = 0
     df_distant = df_distant %>% dplyr::mutate(
       Seq = as.character(Seq))
     df_distant = df_distant %>% dplyr::mutate(
