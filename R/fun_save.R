@@ -3,6 +3,7 @@
 #' This function attempts to save the filtering results.
 #'
 #' @param MSEC Mutation filtering information.
+#' @param SAMPLE_INFO The sample information file.
 #' @param wd The directory to save.
 #' @importFrom openxlsx createWorkbook
 #' @importFrom openxlsx addWorksheet
@@ -11,7 +12,7 @@
 #' @importFrom openxlsx setColWidths
 #' @importFrom openxlsx saveWorkbook
 #' @export
-fun_save = function(MSEC, wd){
+fun_save = function(MSEC, SAMPLE_INFO, wd){
   # explanation
   MSEC_explain = data.frame(
     Total_read = "The number of reads supporting the mutation: [Total_read >= 10] filtering is strongly recommended",
@@ -35,39 +36,39 @@ fun_save = function(MSEC, wd){
     MSEC_filter_1234 = "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",
     MSEC_filter_12345 = "One or more filters of Fitler 1, 2, 3, 4, or 5 are TRUE",
     MSEC_filter_all= "One or more filters are TRUE"
-    )
-    MSEC_explain = data.frame(t(MSEC_explain))
-    colnames(MSEC_explain) = c("Explanation")
-    MSEC_explain_Name = data.frame(rownames(MSEC_explain))
-    colnames(MSEC_explain_Name) = c("Name")
-    MSEC_explain = cbind(MSEC_explain_Name, MSEC_explain)
-    colnames(MSEC_explain) = c("Name", "Explanation")
-    
-    # save the results
-    NewWb = createWorkbook()
-    addWorksheet(wb = NewWb, sheetName = "MicroSEC_results", gridLines = TRUE)
-    addWorksheet(wb = NewWb, sheetName = "MicroSEC_explanation", gridLines = TRUE)
-    if(!is.null(MSEC)){
-      writeData(wb = NewWb, sheet = "MicroSEC_results", x = MSEC,
-                xy = c(1,1), borders = "all", withFilter=TRUE)
-    } else{
-      writeData(wb = NewWb, sheet = "MicroSEC_results", x = "",
-                xy = c(1,1), borders = "all", withFilter=TRUE)
-    }
-    writeData(wb = NewWb, sheet = "MicroSEC_explanation", x = MSEC_explain,
-              xy = c(1,1), borders = "all")
-    freezePane(wb = NewWb, sheet = "MicroSEC_results", firstActiveRow = 2)
-    if(!is.null(MSEC)){
-      setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
-    }
-    setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
-    
-    saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", MSEC$Sample[[1]], "_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE, returnValue = FALSE)
-    if(!is.null(MSEC)){
-      write.table(MSEC, file=paste(wd, "/MicroSEC_", MSEC$Sample[[1]], ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
-    } else{
-      write.table("", file=paste(wd, "/MicroSEC_", MSEC$Sample[[1]], ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
-    }
+  )
+  MSEC_explain = data.frame(t(MSEC_explain))
+  colnames(MSEC_explain) = c("Explanation")
+  MSEC_explain_Name = data.frame(rownames(MSEC_explain))
+  colnames(MSEC_explain_Name) = c("Name")
+  MSEC_explain = cbind(MSEC_explain_Name, MSEC_explain)
+  colnames(MSEC_explain) = c("Name", "Explanation")
+  
+  # save the results
+  NewWb = createWorkbook()
+  addWorksheet(wb = NewWb, sheetName = "MicroSEC_results", gridLines = TRUE)
+  addWorksheet(wb = NewWb, sheetName = "MicroSEC_explanation", gridLines = TRUE)
+  if(!is.null(MSEC)){
+    writeData(wb = NewWb, sheet = "MicroSEC_results", x = MSEC,
+              xy = c(1,1), borders = "all", withFilter=TRUE)
+  } else{
+    writeData(wb = NewWb, sheet = "MicroSEC_results", x = "",
+              xy = c(1,1), borders = "all", withFilter=TRUE)
+  }
+  writeData(wb = NewWb, sheet = "MicroSEC_explanation", x = MSEC_explain,
+            xy = c(1,1), borders = "all")
+  freezePane(wb = NewWb, sheet = "MicroSEC_results", firstActiveRow = 2)
+  if(!is.null(MSEC)){
+    setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
+  }
+  setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
+  
+  saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", SAMPLE_INFO[1,1], "_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE, returnValue = FALSE)
+  if(!is.null(MSEC)){
+    write.table(MSEC, file=paste(wd, "/MicroSEC_", SAMPLE_INFO[1,1], ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  } else{
+    write.table("", file=paste(wd, "/MicroSEC_", SAMPLE_INFO[1,1], "_NULL.txt", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  }
 }
 
 

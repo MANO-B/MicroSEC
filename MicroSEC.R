@@ -156,4 +156,4 @@ MSEC = fun_analysis(MSEC,
                     Homopolymer_length = 15)
   
 # save the results
-fun_save(MSEC, wd)
+fun_save(MSEC, SAMPLE_INFO, wd)
