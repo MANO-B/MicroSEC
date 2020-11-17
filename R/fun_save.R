@@ -3,7 +3,7 @@
 #' This function attempts to save the filtering results.
 #'
 #' @param MSEC Mutation filtering information.
-#' @param SAMPLE_INFO The sample information file.
+#' @param SAMPLE_INFO The sample name.
 #' @param wd The directory to save.
 #' @importFrom openxlsx createWorkbook
 #' @importFrom openxlsx addWorksheet
@@ -63,11 +63,11 @@ fun_save = function(MSEC, SAMPLE_INFO, wd){
   }
   setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
   
-  saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", SAMPLE_INFO[1,1], "_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE, returnValue = FALSE)
+  saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", SAMPLE_INFO, "_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE, returnValue = FALSE)
   if(!is.null(MSEC)){
-    write.table(MSEC, file=paste(wd, "/MicroSEC_", SAMPLE_INFO[1,1], ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
+    write.table(MSEC, file=paste(wd, "/MicroSEC_", SAMPLE_INFO, ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
   } else{
-    write.table("", file=paste(wd, "/MicroSEC_", SAMPLE_INFO[1,1], "_NULL.txt", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
+    write.table("", file=paste(wd, "/MicroSEC_", SAMPLE_INFO, "_NULL.txt", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
   }
 }
 

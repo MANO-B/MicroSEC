@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2020-11-12" />
+<meta name="date" content="2020-11-17" />
 
 <title>MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples</title>
 
@@ -367,7 +367,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2020-11-12</h4>
+<h4 class="date">2020-11-17</h4>
 
 
 
@@ -487,7 +487,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb3-56"><a href="#cb3-56"></a>                    <span class="dt">Homopolymer_length =</span> <span class="dv">15</span>)</span>
 <span id="cb3-57"><a href="#cb3-57"></a></span>
 <span id="cb3-58"><a href="#cb3-58"></a><span class="co"># save the results</span></span>
-<span id="cb3-59"><a href="#cb3-59"></a><span class="kw">fun_save</span>(MSEC, wd)</span></code></pre></div>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="kw">fun_save</span>(MSEC, SAMPLE_NAME, wd)</span></code></pre></div>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
@@ -618,50 +618,49 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; [1] MicroSEC_1.0.8</span></span>
 <span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; </span></span>
 <span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt;  [1] Biobase_2.46.0                     pkgload_1.1.0                     </span></span>
-<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt;  [3] tidyr_1.1.2                        R.utils_2.10.1                    </span></span>
-<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;  [5] gtools_3.8.2                       assertthat_0.2.1                  </span></span>
-<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;  [7] stats4_3.6.3                       BSgenome_1.54.0                   </span></span>
-<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;  [9] GenomeInfoDbData_1.2.2             Rsamtools_2.2.3                   </span></span>
-<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt; [11] yaml_2.2.1                         remotes_2.2.0                     </span></span>
-<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt; [13] sessioninfo_1.1.1                  pillar_1.4.6                      </span></span>
-<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt; [15] backports_1.1.10                   lattice_0.20-41                   </span></span>
-<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt; [17] glue_1.4.2                         digest_0.6.27                     </span></span>
-<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt; [19] GenomicRanges_1.38.0               XVector_0.26.0                    </span></span>
-<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt; [21] htmltools_0.5.0                    Matrix_1.2-18                     </span></span>
-<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt; [23] R.oo_1.24.0                        XML_4.0-0                         </span></span>
-<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt; [25] pkgconfig_2.0.3                    devtools_2.3.2                    </span></span>
-<span id="cb5-38"><a href="#cb5-38"></a><span class="co">#&gt; [27] zlibbioc_1.32.0                    purrr_0.3.4                       </span></span>
-<span id="cb5-39"><a href="#cb5-39"></a><span class="co">#&gt; [29] processx_3.4.4                     openxlsx_4.2.3                    </span></span>
-<span id="cb5-40"><a href="#cb5-40"></a><span class="co">#&gt; [31] BiocParallel_1.20.1                tibble_3.0.4                      </span></span>
-<span id="cb5-41"><a href="#cb5-41"></a><span class="co">#&gt; [33] generics_0.0.2                     IRanges_2.20.2                    </span></span>
-<span id="cb5-42"><a href="#cb5-42"></a><span class="co">#&gt; [35] usethis_1.6.3                      ellipsis_0.3.1                    </span></span>
-<span id="cb5-43"><a href="#cb5-43"></a><span class="co">#&gt; [37] withr_2.3.0                        SummarizedExperiment_1.16.1       </span></span>
-<span id="cb5-44"><a href="#cb5-44"></a><span class="co">#&gt; [39] BiocGenerics_0.32.0                cli_2.1.0                         </span></span>
-<span id="cb5-45"><a href="#cb5-45"></a><span class="co">#&gt; [41] magrittr_1.5                       crayon_1.3.4                      </span></span>
-<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#&gt; [43] evaluate_0.14                      memoise_1.1.0                     </span></span>
-<span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt; [45] ps_1.4.0                           R.methodsS3_1.8.1                 </span></span>
-<span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt; [47] fs_1.5.0                           fansi_0.4.1                       </span></span>
-<span id="cb5-49"><a href="#cb5-49"></a><span class="co">#&gt; [49] xml2_1.3.2                         pkgbuild_1.1.0                    </span></span>
-<span id="cb5-50"><a href="#cb5-50"></a><span class="co">#&gt; [51] tools_3.6.3                        data.table_1.13.2                 </span></span>
-<span id="cb5-51"><a href="#cb5-51"></a><span class="co">#&gt; [53] prettyunits_1.1.1                  lifecycle_0.2.0                   </span></span>
-<span id="cb5-52"><a href="#cb5-52"></a><span class="co">#&gt; [55] matrixStats_0.57.0                 stringr_1.4.0                     </span></span>
-<span id="cb5-53"><a href="#cb5-53"></a><span class="co">#&gt; [57] S4Vectors_0.24.4                   zip_2.1.1                         </span></span>
-<span id="cb5-54"><a href="#cb5-54"></a><span class="co">#&gt; [59] DelayedArray_0.12.3                callr_3.5.1                       </span></span>
-<span id="cb5-55"><a href="#cb5-55"></a><span class="co">#&gt; [61] Biostrings_2.54.0                  compiler_3.6.3                    </span></span>
-<span id="cb5-56"><a href="#cb5-56"></a><span class="co">#&gt; [63] GenomeInfoDb_1.22.1                rlang_0.4.8                       </span></span>
-<span id="cb5-57"><a href="#cb5-57"></a><span class="co">#&gt; [65] grid_3.6.3                         RCurl_1.98-1.2                    </span></span>
-<span id="cb5-58"><a href="#cb5-58"></a><span class="co">#&gt; [67] rstudioapi_0.11                    rmarkdown_2.5                     </span></span>
-<span id="cb5-59"><a href="#cb5-59"></a><span class="co">#&gt; [69] bitops_1.0-6                       testthat_2.3.2                    </span></span>
-<span id="cb5-60"><a href="#cb5-60"></a><span class="co">#&gt; [71] roxygen2_7.1.1                     R6_2.4.1                          </span></span>
-<span id="cb5-61"><a href="#cb5-61"></a><span class="co">#&gt; [73] GenomicAlignments_1.22.1           knitr_1.30                        </span></span>
-<span id="cb5-62"><a href="#cb5-62"></a><span class="co">#&gt; [75] dplyr_1.0.2                        rtracklayer_1.46.0                </span></span>
-<span id="cb5-63"><a href="#cb5-63"></a><span class="co">#&gt; [77] commonmark_1.7                     rprojroot_1.3-2                   </span></span>
-<span id="cb5-64"><a href="#cb5-64"></a><span class="co">#&gt; [79] desc_1.2.0                         stringi_1.5.3                     </span></span>
-<span id="cb5-65"><a href="#cb5-65"></a><span class="co">#&gt; [81] parallel_3.6.3                     BSgenome.Mmusculus.UCSC.mm10_1.4.0</span></span>
-<span id="cb5-66"><a href="#cb5-66"></a><span class="co">#&gt; [83] Rcpp_1.0.5                         vctrs_0.3.4                       </span></span>
-<span id="cb5-67"><a href="#cb5-67"></a><span class="co">#&gt; [85] tidyselect_1.1.0                   xfun_0.18                         </span></span>
-<span id="cb5-68"><a href="#cb5-68"></a><span class="co">#&gt; [87] BSgenome.Hsapiens.UCSC.hg38_1.4.1</span></span></code></pre></div>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt;  [1] Biobase_2.46.0                    pkgload_1.1.0                    </span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt;  [3] tidyr_1.1.2                       R.utils_2.10.1                   </span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;  [5] gtools_3.8.2                      assertthat_0.2.1                 </span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;  [7] stats4_3.6.3                      BSgenome_1.54.0                  </span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;  [9] GenomeInfoDbData_1.2.2            Rsamtools_2.2.3                  </span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt; [11] yaml_2.2.1                        remotes_2.2.0                    </span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt; [13] sessioninfo_1.1.1                 pillar_1.4.6                     </span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt; [15] backports_1.1.10                  lattice_0.20-41                  </span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt; [17] glue_1.4.2                        digest_0.6.27                    </span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt; [19] GenomicRanges_1.38.0              XVector_0.26.0                   </span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt; [21] htmltools_0.5.0                   Matrix_1.2-18                    </span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt; [23] R.oo_1.24.0                       XML_4.0-0                        </span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt; [25] pkgconfig_2.0.3                   devtools_2.3.2                   </span></span>
+<span id="cb5-38"><a href="#cb5-38"></a><span class="co">#&gt; [27] zlibbioc_1.32.0                   purrr_0.3.4                      </span></span>
+<span id="cb5-39"><a href="#cb5-39"></a><span class="co">#&gt; [29] processx_3.4.4                    openxlsx_4.2.3                   </span></span>
+<span id="cb5-40"><a href="#cb5-40"></a><span class="co">#&gt; [31] BiocParallel_1.20.1               tibble_3.0.4                     </span></span>
+<span id="cb5-41"><a href="#cb5-41"></a><span class="co">#&gt; [33] generics_0.0.2                    IRanges_2.20.2                   </span></span>
+<span id="cb5-42"><a href="#cb5-42"></a><span class="co">#&gt; [35] usethis_1.6.3                     ellipsis_0.3.1                   </span></span>
+<span id="cb5-43"><a href="#cb5-43"></a><span class="co">#&gt; [37] withr_2.3.0                       SummarizedExperiment_1.16.1      </span></span>
+<span id="cb5-44"><a href="#cb5-44"></a><span class="co">#&gt; [39] BiocGenerics_0.32.0               cli_2.1.0                        </span></span>
+<span id="cb5-45"><a href="#cb5-45"></a><span class="co">#&gt; [41] magrittr_1.5                      crayon_1.3.4                     </span></span>
+<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#&gt; [43] memoise_1.1.0                     evaluate_0.14                    </span></span>
+<span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt; [45] ps_1.4.0                          R.methodsS3_1.8.1                </span></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt; [47] fs_1.5.0                          fansi_0.4.1                      </span></span>
+<span id="cb5-49"><a href="#cb5-49"></a><span class="co">#&gt; [49] xml2_1.3.2                        pkgbuild_1.1.0                   </span></span>
+<span id="cb5-50"><a href="#cb5-50"></a><span class="co">#&gt; [51] tools_3.6.3                       data.table_1.13.2                </span></span>
+<span id="cb5-51"><a href="#cb5-51"></a><span class="co">#&gt; [53] prettyunits_1.1.1                 lifecycle_0.2.0                  </span></span>
+<span id="cb5-52"><a href="#cb5-52"></a><span class="co">#&gt; [55] matrixStats_0.57.0                stringr_1.4.0                    </span></span>
+<span id="cb5-53"><a href="#cb5-53"></a><span class="co">#&gt; [57] S4Vectors_0.24.4                  zip_2.1.1                        </span></span>
+<span id="cb5-54"><a href="#cb5-54"></a><span class="co">#&gt; [59] DelayedArray_0.12.3               callr_3.5.1                      </span></span>
+<span id="cb5-55"><a href="#cb5-55"></a><span class="co">#&gt; [61] Biostrings_2.54.0                 compiler_3.6.3                   </span></span>
+<span id="cb5-56"><a href="#cb5-56"></a><span class="co">#&gt; [63] GenomeInfoDb_1.22.1               rlang_0.4.8                      </span></span>
+<span id="cb5-57"><a href="#cb5-57"></a><span class="co">#&gt; [65] grid_3.6.3                        RCurl_1.98-1.2                   </span></span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="co">#&gt; [67] rstudioapi_0.11                   bitops_1.0-6                     </span></span>
+<span id="cb5-59"><a href="#cb5-59"></a><span class="co">#&gt; [69] rmarkdown_2.5                     testthat_2.3.2                   </span></span>
+<span id="cb5-60"><a href="#cb5-60"></a><span class="co">#&gt; [71] roxygen2_7.1.1                    R6_2.4.1                         </span></span>
+<span id="cb5-61"><a href="#cb5-61"></a><span class="co">#&gt; [73] GenomicAlignments_1.22.1          rtracklayer_1.46.0               </span></span>
+<span id="cb5-62"><a href="#cb5-62"></a><span class="co">#&gt; [75] knitr_1.30                        dplyr_1.0.2                      </span></span>
+<span id="cb5-63"><a href="#cb5-63"></a><span class="co">#&gt; [77] commonmark_1.7                    rprojroot_1.3-2                  </span></span>
+<span id="cb5-64"><a href="#cb5-64"></a><span class="co">#&gt; [79] desc_1.2.0                        stringi_1.5.3                    </span></span>
+<span id="cb5-65"><a href="#cb5-65"></a><span class="co">#&gt; [81] parallel_3.6.3                    Rcpp_1.0.5                       </span></span>
+<span id="cb5-66"><a href="#cb5-66"></a><span class="co">#&gt; [83] vctrs_0.3.4                       BSgenome.Hsapiens.UCSC.hg38_1.4.1</span></span>
+<span id="cb5-67"><a href="#cb5-67"></a><span class="co">#&gt; [85] tidyselect_1.1.0                  xfun_0.18</span></span></code></pre></div>
 </div>
 
 

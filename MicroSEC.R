@@ -1,5 +1,6 @@
 # MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples
 #
+# Version 1.0.9: Input style modified (Nov. 16, 2020) 
 # Version 1.0.8: Mutation information conversion function added (Nov. 8, 2020) 
 # Version 1.0.7: Adapter trimming modified (Nov. 3, 2020) 
 # Version 1.0.6: probability calculation considering coverage depth around mutations (Nov. 3, 2020) 
@@ -40,7 +41,7 @@
 # PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
 #
 # Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
-
+#
 # This pipeline contains 8 filtering processes.
 #
 # Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
@@ -62,11 +63,16 @@
 # Supporting lengths are adjusted considering small repeat sequences around the mutations.
 #
 # How to use
+# Style 1
 # Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]
+# 
+# Style 2 (for pipeline use)
+# Rscript MicroSEC.R [output filename] [sample name] [mutation information tsv.gz] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [adapter sequence read 2] [sample type: Human or Mouse]
 #
 # Example
 # Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list_test.txt N
 # Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info_test.tsv N
+# Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz /mnt/result/mutation/SAMPLE.gz /mnt/result/mutation/SAMPLE.gz /mnt/result/BAM/SAMPLE.bam /mnt/result/ID 150 	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38
 #
 # If you want to know the progress visually, [progress bar Y/N] should be Y.
 #
@@ -78,40 +84,101 @@ library(MicroSEC)
 
 # set arguments
 args = commandArgs(trailingOnly = T)
-wd = args[1]
-SAMPLE_LIST = args[2]
-PROGRESS_BAR = args[3]
 
-setwd(wd)
+if(args[3] == "N" | args[3] == "Y"){
+  wd = args[1]
+  SAMPLE_LIST = args[2]
+  PROGRESS_BAR = args[3]
   
-# load sample information tsv file
-SAMPLE_INFO = read.csv(SAMPLE_LIST,
-                       header=FALSE,
-                       stringsAsFactors=FALSE,
-                       sep="\t")
-
-# initialize
-MSEC = NULL
-Homology_search = NULL
-Mut_depth = NULL
-
-for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
-  SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
-  MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
-  BAM_FILE = SAMPLE_INFO[SAMPLE,3]
-  MUTATION_SUPPORTING_READ_LIST = SAMPLE_INFO[SAMPLE,4]
-  READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
-  ADAPTER_SEQ_1 = SAMPLE_INFO[SAMPLE,6]
-  if(SAMPLE_INFO[SAMPLE,7] %in% c("Human", "Mouse", "hg19", "hg38", "mm10")){
-    ADAPTER_SEQ_2 = ADAPTER_SEQ_1
-    GENOME = SAMPLE_INFO[SAMPLE,7]
-  } else{
-    ADAPTER_SEQ_2 = SAMPLE_INFO[SAMPLE,7]
-    GENOME = SAMPLE_INFO[SAMPLE,8]
-  }  
+  setwd(wd)
+  
+  # load sample information tsv file
+  SAMPLE_INFO = read.csv(SAMPLE_LIST,
+                         header=FALSE,
+                         stringsAsFactors=FALSE,
+                         sep="\t")
+  
+  # initialize
+  MSEC = NULL
+  Homology_search = NULL
+  Mut_depth = NULL
+  
+  for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
+    SAMPLE_NAME = SAMPLE_INFO[SAMPLE,1]
+    MUTATION_FILE = SAMPLE_INFO[SAMPLE,2]
+    BAM_FILE = SAMPLE_INFO[SAMPLE,3]
+    MUTATION_SUPPORTING_READ_LIST = SAMPLE_INFO[SAMPLE,4]
+    READ_length = as.integer(SAMPLE_INFO[SAMPLE,5])
+    ADAPTER_SEQ_1 = SAMPLE_INFO[SAMPLE,6]
+    if(SAMPLE_INFO[SAMPLE,7] %in% c("Human", "Mouse", "hg19", "hg38", "mm10")){
+      ADAPTER_SEQ_2 = ADAPTER_SEQ_1
+      GENOME = SAMPLE_INFO[SAMPLE,7]
+    } else{
+      ADAPTER_SEQ_2 = SAMPLE_INFO[SAMPLE,7]
+      GENOME = SAMPLE_INFO[SAMPLE,8]
+    }
+    
+    # load mutation information
+    df_mutation = fun_load_mutation(MUTATION_FILE, SAMPLE_NAME)
+    df_BAM = fun_load_BAM(BAM_FILE)
+    df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
+    
+    # load genomic sequence
+    genome = fun_load_genome(GENOME)
+    Chr_No = fun_load_chr_no(GENOME)
+    
+    # analysis
+    result = fun_read_check(df_mutation = df_mutation,
+                            df_BAM =  df_BAM,
+                            df_mut_call = df_mut_call,
+                            genome = genome,
+                            Chr_No = Chr_No,
+                            SAMPLE_NAME = SAMPLE_NAME,
+                            READ_length = READ_length,
+                            ADAPTER_SEQ_1 = ADAPTER_SEQ_1,
+                            ADAPTER_SEQ_2 = ADAPTER_SEQ_2,
+                            Short_Homology_search_length = 4,
+                            PROGRESS_BAR = PROGRESS_BAR)
+    MSEC = rbind(MSEC, result[[1]])
+    Homology_search = rbind(Homology_search, result[[2]])
+    Mut_depth = rbind(Mut_depth, result[[3]])
+  }
+  # search homologous sequences
+  MSEC = fun_homology(MSEC,
+                      Homology_search,
+                      Minimum_Homology_search_length = 40,
+                      PROGRESS_BAR = PROGRESS_BAR)
+  
+  # statistical analysis
+  MSEC = fun_summary(MSEC)
+  MSEC = fun_analysis(MSEC,
+                      Mut_depth,
+                      Short_Homology_search_length = 4,
+                      Minimum_Homology_search_length = 40,
+                      threshold_p = 10^(-6),
+                      threshold_hairpin_ratio = 0.50,
+                      threshold_soft_clip_ratio = 0.90,
+                      threshold_short_length = 0.8,
+                      threshold_distant_homology = 0.2,
+                      threshold_low_quality_rate = 0.1,
+                      Homopolymer_length = 15)
+  
+  # save the results
+  fun_save(MSEC, SAMPLE_INFO[1,1], wd)
+}else {
+  OUTPUT = args[1]
+  SAMPLE_NAME = args[2]
+  MUTATION_FILE = args[3]
+  BAM_FILE = args[4]
+  MUTATION_SUPPORTING_READ_LIST = args[5]
+  READ_length = args[6]
+  ADAPTER_SEQ_1 = args[7]
+  ADAPTER_SEQ_2 = args[8]
+  GENOME = args[9]
+  PROGRESS_BAR = "N"
   
   # load mutation information
-  df_mutation = fun_load_mutation(MUTATION_FILE, SAMPLE_NAME)
+  df_mutation = fun_load_mutation_gz(MUTATION_FILE)
   df_BAM = fun_load_BAM(BAM_FILE)
   df_mut_call = fun_load_ID(MUTATION_SUPPORTING_READ_LIST)
   
@@ -131,29 +198,31 @@ for(SAMPLE in 1:dim(SAMPLE_INFO)[1]){
                           ADAPTER_SEQ_2 = ADAPTER_SEQ_2,
                           Short_Homology_search_length = 4,
                           PROGRESS_BAR = PROGRESS_BAR)
-  MSEC = rbind(MSEC, result[[1]])
-  Homology_search = rbind(Homology_search, result[[2]])
-  Mut_depth = rbind(Mut_depth, result[[3]])
+  MSEC = result[[1]]
+  Homology_search = result[[2]]
+  Mut_depth = result[[3]]
+  
+  # search homologous sequences
+  MSEC = fun_homology(MSEC,
+                      Homology_search,
+                      Minimum_Homology_search_length = 40,
+                      PROGRESS_BAR = PROGRESS_BAR)
+  
+  # statistical analysis
+  MSEC = fun_summary(MSEC)
+  MSEC = fun_analysis(MSEC,
+                      Mut_depth,
+                      Short_Homology_search_length = 4,
+                      Minimum_Homology_search_length = 40,
+                      threshold_p = 10^(-6),
+                      threshold_hairpin_ratio = 0.50,
+                      threshold_soft_clip_ratio = 0.90,
+                      threshold_short_length = 0.8,
+                      threshold_distant_homology = 0.2,
+                      threshold_low_quality_rate = 0.1,
+                      Homopolymer_length = 15)
+  
+  # save the results
+  fun_save_gz(MSEC, OUTPUT)
 }
-# search homologous sequences
-MSEC = fun_homology(MSEC,
-                    Homology_search,
-                    Minimum_Homology_search_length = 40,
-                    PROGRESS_BAR = PROGRESS_BAR)
-  
-# statistical analysis
-MSEC = fun_summary(MSEC)
-MSEC = fun_analysis(MSEC,
-                    Mut_depth,
-                    Short_Homology_search_length = 4,
-                    Minimum_Homology_search_length = 40,
-                    threshold_p = 10^(-6),
-                    threshold_hairpin_ratio = 0.50,
-                    threshold_soft_clip_ratio = 0.90,
-                    threshold_short_length = 0.8,
-                    threshold_distant_homology = 0.2,
-                    threshold_low_quality_rate = 0.1,
-                    Homopolymer_length = 15)
-  
-# save the results
-fun_save(MSEC, SAMPLE_INFO, wd)
+
