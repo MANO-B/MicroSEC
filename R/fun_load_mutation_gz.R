@@ -3,9 +3,7 @@
 #' This function attempts to load the mutation information file.
 #'
 #' @param MUTATION_FILE Path of the mutation information file.
-#' @param SAMPLE_NAME Sample name.
 #' @return df_mutation
-#' @importFrom openxlsx read.xlsx
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
@@ -15,7 +13,7 @@
 #' @export
 fun_load_mutation_gz = function(MUTATION_FILE){
   # load somatic mutation list
-  df_mutation = data.table::fread(MUTATION_FILE, stringsAsFactors=FALSE, header=TRUE, sep="\t")
+  df_mutation = read.csv(MUTATION_FILE, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
   # data formatting
   if(!"SimpleRepeat_TRF" %in% colnames(df_mutation)){
     df_mutation$SimpleRepeat_TRF = "NA"

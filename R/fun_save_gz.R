@@ -8,9 +8,13 @@
 fun_save_gz = function(MSEC, OUTPUT){
   # save the results
   if(!is.null(MSEC)){
-    data.table::fwrite(MSEC, file=OUTPUT, sep = "\t")
+    gz1 <- gzfile(OUTPUT, "w")
+    write.table(MSEC, gz1, sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
+    close(gz1)
   } else{
-    data.table::fwrite("", file=OUTPUT, sep = "\t")
+    gz1 <- gzfile(OUTPUT, "w")
+    write.table("", gz1, sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
+    close(gz1)
   }
 }
 
