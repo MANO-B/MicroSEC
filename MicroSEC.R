@@ -171,7 +171,7 @@ if(args[3] == "N" | args[3] == "Y"){
   MUTATION_FILE = args[3]
   BAM_FILE = args[4]
   MUTATION_SUPPORTING_READ_LIST = args[5]
-  READ_length = args[6]
+  READ_length = as.integer(args[6])
   ADAPTER_SEQ_1 = args[7]
   ADAPTER_SEQ_2 = args[8]
   GENOME = args[9]
