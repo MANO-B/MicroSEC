@@ -188,11 +188,16 @@ devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 # download only once
 wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.R
 
-Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]  
+# Style 1
+Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]
+ 
+# Style 2 (for pipeline use)
+Rscript MicroSEC.R [output filename] [sample name] [mutation information tsv.gz] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [adapter sequence read 2] [sample type: Human or Mouse]
 ```  
 - Example
 ```
 Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list.txt Y  
+Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz /mnt/result/mutation/SAMPLE.gz /mnt/result/mutation/SAMPLE.gz /mnt/result/BAM/SAMPLE.bam /mnt/result/ID 150 	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38
 ```  
 - How to use in R Console
 ```
@@ -274,7 +279,7 @@ MSEC = fun_analysis(MSEC,
                     Homopolymer_length = 15)
   
 # save the results
-fun_save(MSEC, wd)
+fun_save(MSEC, SAMPLE_INFO[1,1], wd)
 
 ```
 
