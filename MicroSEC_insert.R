@@ -28,7 +28,7 @@ if(args[3] == "N" | args[3] == "Y"){
     # load mutation information
     insert_length = fun_insert_length(BAM_FILE)
     tmp = data.frame(SAMPLE_NAME, insert_length)
-    colnames(tmp) = c(Sample, Insert_length)
+    colnames(tmp) = c("Sample", "Insert_length")
     INSERT = rbind(INSERT, tmp)
   }
   # save the results
@@ -39,7 +39,7 @@ if(args[3] == "N" | args[3] == "Y"){
 
   insert_length = fun_insert_length(BAM_FILE)
   tmp = data.frame(SAMPLE_NAME, insert_length)
-  colnames(tmp) = c(Sample, Insert_length)
+  colnames(tmp) = c("Sample", "Insert_length")
 
   # save the results
   write.table(tmp, file=paste("Insert_size_", SAMPLE_NAME, ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
