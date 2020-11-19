@@ -8,8 +8,6 @@ fun_load_mutation_gz(MUTATION_FILE)
 }
 \arguments{
 \item{MUTATION_FILE}{Path of the mutation information file.}
-
-\item{SAMPLE_NAME}{Sample name.}
 }
 \value{
 df_mutation
