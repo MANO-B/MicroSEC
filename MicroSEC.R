@@ -1,5 +1,6 @@
 # MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples
 #
+# Version 1.0.10: Prevent from overfiltering mutations with co-mutations in neighbor (Nov. 21, 2020) 
 # Version 1.0.9: Input style modified (Nov. 16, 2020) 
 # Version 1.0.8: Mutation information conversion function added (Nov. 8, 2020) 
 # Version 1.0.7: Adapter trimming modified (Nov. 3, 2020) 
