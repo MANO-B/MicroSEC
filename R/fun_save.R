@@ -22,6 +22,7 @@ fun_save = function(MSEC, SAMPLE_INFO, wd){
     Post_support_length = "The longest mapped length of reads of the 3' sequence of the mutation",
     short_support_length = "The longest length of the shorter mapped length around the mutation of all mutation-supporting reads",
     distant_homology_rate = "The rate of chimeric reads comprising two distant regions",
+    Low_quality_base_rate_under_Q18 = "The rate of low quality bases in the mutation supporting reads", 
     prob_Filter_1 = "The probability of the occurence of the shorter-supporting lengths distribution (threshold_p: 10^(-6))",
     prob_Filter_3_pre = "The probability of the occurence of the pre-supporting lengths distribution (threshold_p: 10^(-6))",
     prob_Filter_3_post = "The probability of the occurence of the post-supporting lengths distribution (threshold_p: 10^(-6))",
@@ -48,27 +49,16 @@ fun_save = function(MSEC, SAMPLE_INFO, wd){
   NewWb = createWorkbook()
   addWorksheet(wb = NewWb, sheetName = "MicroSEC_results", gridLines = TRUE)
   addWorksheet(wb = NewWb, sheetName = "MicroSEC_explanation", gridLines = TRUE)
-  if(!is.null(MSEC)){
-    writeData(wb = NewWb, sheet = "MicroSEC_results", x = MSEC,
-              xy = c(1,1), borders = "all", withFilter=TRUE)
-  } else{
-    writeData(wb = NewWb, sheet = "MicroSEC_results", x = "",
-              xy = c(1,1), borders = "all", withFilter=TRUE)
-  }
+  writeData(wb = NewWb, sheet = "MicroSEC_results", x = MSEC,
+            xy = c(1,1), borders = "all", withFilter=TRUE)
   writeData(wb = NewWb, sheet = "MicroSEC_explanation", x = MSEC_explain,
             xy = c(1,1), borders = "all")
   freezePane(wb = NewWb, sheet = "MicroSEC_results", firstActiveRow = 2)
-  if(!is.null(MSEC)){
-    setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
-  }
+  setColWidths(wb = NewWb, sheet = "MicroSEC_results", cols = 1:ncol(MSEC), widths = "auto")
   setColWidths(wb = NewWb, sheet = "MicroSEC_explanation", cols = 1:ncol(MSEC_explain), widths = "auto")
   
   saveWorkbook(wb = NewWb, file = paste(wd, "/MicroSEC-result_", SAMPLE_INFO, "_", Sys.Date(), ".xlsx", sep=""), overwrite = TRUE, returnValue = FALSE)
-  if(!is.null(MSEC)){
-    write.table(MSEC, file=paste(wd, "/MicroSEC_", SAMPLE_INFO, ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  } else{
-    write.table("", file=paste(wd, "/MicroSEC_", SAMPLE_INFO, "_NULL.txt", sep=""), sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
-  }
+  write.table(MSEC, file=paste(wd, "/MicroSEC_", SAMPLE_INFO, ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
 }
 
 

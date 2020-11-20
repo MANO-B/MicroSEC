@@ -191,7 +191,8 @@ fun_analysis = function(MSEC,
     MSEC = MSEC %>% mutate(
       Caution = 
         ifelse((prob_Filter_1 < threshold_p &
-                !Filter_1_mutation_intra_hairpin_loop),
+                  (!Short_short_support |
+                     !Short_short_support_sum)),
                paste(Caution,
                      "Filter 1: p is small, but supported enough long,"),
                Caution)
@@ -200,9 +201,20 @@ fun_analysis = function(MSEC,
       Caution = 
         ifelse(((prob_Filter_3_pre < threshold_p |
                   prob_Filter_3_post < threshold_p) &
-                  !Filter_3_microhomology_induced_mutation),
+                  !Filter_3_microhomology_induced_mutation &
+                  High_rate_Q18),
                paste(Caution, 
                      "Filter 3: p is small, but supported enough long,"), 
+               Caution)
+    )
+    MSEC = MSEC %>% mutate(
+      Caution = 
+        ifelse(((prob_Filter_3_pre < threshold_p |
+                   prob_Filter_3_post < threshold_p) &
+                  !Filter_3_microhomology_induced_mutation &
+                  !High_rate_Q18),
+               paste(Caution, 
+                     "Filter 3: p is small, but reads are low quality,"), 
                Caution)
     )
     MSEC = MSEC %>% mutate(
@@ -233,7 +245,7 @@ fun_analysis = function(MSEC,
       )
     MSEC = MSEC %>% select(-mut_type, -Alt_length, -Hairpin_length, 
             -Pre_Minimum_length, -Post_Minimum_length,
-            -Low_quality_base_rate_under_Q18, -Pre_rep_status, -Post_rep_status, 
+            -Pre_rep_status, -Post_rep_status, 
             -Homopolymer_status, -indel_status, -indel_length, -penalty_Pre,
             -penalty_Post, -Caution, -Pre_Minimum_length_adjust, -Half_length,
             -Post_Minimum_length_adjust, -Pre_support_length_adjust,

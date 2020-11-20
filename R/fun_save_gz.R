@@ -7,15 +7,9 @@
 #' @export
 fun_save_gz = function(MSEC, OUTPUT){
   # save the results
-  if(!is.null(MSEC)){
-    gz1 <- gzfile(OUTPUT, "w")
-    write.table(MSEC, gz1, sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
-    close(gz1)
-  } else{
-    gz1 <- gzfile(OUTPUT, "w")
-    write.table("", gz1, sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
-    close(gz1)
-  }
+  gz1 <- gzfile(OUTPUT, "w")
+  write.table(MSEC, gz1, sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
+  close(gz1)
 }
 
 

@@ -71,6 +71,11 @@ fun_read_check = function(df_mutation,
       Co_mut_Post = 3
       penalty_Pre = 0
       penalty_Post = 0
+      penalty_Post = 0
+      near_indel_Pre = 0
+      near_indel_Pre_candidate = 0
+      near_indel_Post = 0
+      near_indel_Post_candidate = 0
       Mut_depth_tmp = rep(0, 160)
       Caution = ""
       # extract mutation supporting reads
@@ -361,6 +366,36 @@ fun_read_check = function(df_mutation,
               check_hairpin = 1
               
               # search co-mutations on neighbor
+              if(mut_position > 10){
+                near_indel_Pre_candidate = near_indel_Pre_candidate + 1
+                Co_mut_Pre_tmp = length(
+                  matchPattern(
+                    df_seq[(mut_position - 10):mut_position],
+                    Ref_indel[(Width - 9):(Width + 1)],
+                    max.mismatch=0, 
+                    min.mismatch=3,
+                    with.indels=FALSE, 
+                    fixed=TRUE))
+                if(Co_mut_Pre_tmp == 0){
+                  near_indel_Pre = near_indel_Pre + 1
+                }
+              }
+              
+              if(mut_position < length(df_seq) - 10){
+                near_indel_Post_candidate = near_indel_Post_candidate + 1
+                Co_mut_Post_tmp = length(
+                  matchPattern(
+                    df_seq[mut_position:(mut_position + 10)],
+                    Ref_indel[(Width + 1):(Width + 11)],
+                    max.mismatch=0, 
+                    min.mismatch=3,
+                    with.indels=FALSE, 
+                    fixed=TRUE))
+                if(Co_mut_Post_tmp == 0){
+                  near_indel_Post = near_indel_Post + 1
+                }
+              }
+
               if(indel_status == 1){
                 comut_FLAG = TRUE
                 for(comut in 0:3){
@@ -397,41 +432,48 @@ fun_read_check = function(df_mutation,
                         min.mismatch=comut,
                         with.indels=FALSE, 
                         fixed=TRUE))
-                  if(Co_mut_Pre_tmp > 0){
+                  if(Co_mut_Post_tmp > 0){
                     Co_mut_Post = min(Co_mut_Post, comut)
                     comut_FLAG = FALSE
                   }
                 }
               } else{
                 if((mut_position - max(1, Alt_length * 4 - 5)) > 0){
-                  Co_mut_Pre_tmp = length(
-                    matchPattern(df_seq[
-                        (mut_position - max(1, Alt_length * 4 - 5)):
-                          mut_position],
-                      Ref_indel[(Width - max(1, Alt_length * 4 - 5) + 1):
-                                  (Width + 1)],
-                      max.mismatch=0, 
-                      min.mismatch=0,
-                      with.indels=FALSE, 
-                      fixed=TRUE))
-                  if(Co_mut_Pre_tmp > 0){
-                    Co_mut_Pre = 0
+                  comut_FLAG = TRUE
+                  for(comut in 0:3){
+                    if(comut_FLAG == TRUE)
+                      Co_mut_Pre_tmp = length(
+                        matchPattern(df_seq[
+                          (mut_position - max(1, Alt_length * 4 - 5)):
+                            mut_position],
+                          Ref_indel[(Width - max(1, Alt_length * 4 - 5) + 1):
+                                      (Width + 1)],
+                          max.mismatch=comut, 
+                          min.mismatch=comut,
+                          with.indels=FALSE, 
+                          fixed=TRUE))
+                    if(Co_mut_Pre_tmp > 0){
+                      Co_mut_Pre = min(Co_mut_Pre, comut)
+                      comut_FLAG = FALSE
+                    }
                   }
-                }
-                if((mut_position + max(1, Alt_length * 4 - 5)) <=
-                   length(df_seq)){
-                  Co_mut_Post_tmp = length(
-                    matchPattern(df_seq[
-                      mut_position:
-                          (mut_position + max(1, Alt_length * 4 - 5))],
-                      Ref_indel[(Width + 1):
-                          (Width + max(1, Alt_length * 4 - 5) + 1)],
-                      max.mismatch=0, 
-                      min.mismatch=0,
-                      with.indels=FALSE, 
-                      fixed=TRUE))
-                  if(Co_mut_Post_tmp > 0){
-                    Co_mut_Post = 0
+                  comut_FLAG = TRUE
+                  for(comut in 0:3){
+                    if(comut_FLAG == TRUE)
+                      Co_mut_Post_tmp = length(
+                        matchPattern(df_seq[
+                          mut_position:
+                            (mut_position + max(1, Alt_length * 4 - 5))],
+                          Ref_indel[(Width + 1):
+                                      (Width + max(1, Alt_length * 4 - 5) + 1)],
+                          max.mismatch=comut, 
+                          min.mismatch=comut,
+                          with.indels=FALSE,
+                          fixed=TRUE))
+                    if(Co_mut_Post_tmp > 0){
+                      Co_mut_Post = min(Co_mut_Post, comut)
+                      comut_FLAG = FALSE
+                    }
                   }
                 }
               }
@@ -583,25 +625,26 @@ fun_read_check = function(df_mutation,
         if(indel_status == 1){
           penalty_Pre = 5 * Co_mut_Pre
           penalty_Post = 5 * Co_mut_Post
-          if(Co_mut_Pre > 0 | Co_mut_Post > 0){
-            Caution = paste(Caution, 
-                            "another co-mutation may exist in neighbor,")
-          }
         } else{
-          penalty_Pre = max(0, 4 * Alt_length - 5)
-          penalty_Post = max(0, 4 * Alt_length - 5)
-          if(Co_mut_Pre > 0 & 
-             Pre_support_length >= max(1, Alt_length * 4 - 5)){
-              penalty_Pre = penalty_Pre + 4
-              Caution = paste(Caution, 
-                              "another co-mutation may exist in neighbor,")
-          }
-          if(Co_mut_Post > 0 &
-             Post_support_length >= max(1, Alt_length * 4 - 5)){
-              penalty_Post = penalty_Post + 4
-              Caution = paste(Caution,
-                              "another co-mutation may exist in neighbor,")
-          }
+          penalty_Pre = max(0, 4 * Alt_length - 5) + 5 * Co_mut_Pre
+          penalty_Post = max(0, 4 * Alt_length - 5) + 5 * Co_mut_Post
+        }
+        near_indel_Pre = 0
+        near_indel_Pre_candidate = 0
+        near_indel_Post = 0
+        near_indel_Post_candidate = 0
+        
+        
+        if(fun_zero(near_indel_Pre, near_indel_Pre_candidate) == 1){
+          Pre_Minimum_length = 0
+          Caution = paste(Caution, 
+                          "Pre_Minimum_length are set to be 0 because of neighbor co-mutations,")
+          
+        }
+        if(fun_zero(near_indel_Post, near_indel_Post_candidate) == 1){
+          Post_Minimum_length = 0
+          Caution = paste(Caution, 
+                          "Post_Minimum_length are set to be 0 because of neighbor co-mutations,")
         }
         
         # data formatting
@@ -666,7 +709,7 @@ fun_read_check = function(df_mutation,
     }
     return(list(MSEC, Homology_search, Mut_depth))
   } else{
-    return(list(NULL, NULL, NULL))
+    return(list(df_mutation, NULL, NULL))
   }
 }
 

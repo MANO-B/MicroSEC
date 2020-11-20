@@ -4,15 +4,10 @@
 \alias{fun_homology}
 \title{Homology check function.}
 \usage{
-fun_homology(
-  MicroSEC,
-  df_distant,
-  Minimum_Homology_search_length,
-  PROGRESS_BAR
-)
+fun_homology(MSEC, df_distant, Minimum_Homology_search_length, PROGRESS_BAR)
 }
 \arguments{
-\item{MicroSEC}{Mutation filtering information.}
+\item{MSEC}{Mutation filtering information.}
 
 \item{df_distant}{Sequences to be checked.}
 
@@ -21,7 +16,7 @@ fun_homology(
 \item{PROGRESS_BAR}{"Y": You can see the progress visually.}
 }
 \value{
-MicroSEC
+MSEC
 }
 \description{
 This function attempts to search the homologous regions.

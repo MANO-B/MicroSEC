@@ -80,6 +80,14 @@ fun_summary = function(MSEC){
         (indel_length + penalty_Pre + 1)
     )
     MSEC = MSEC %>% mutate(
+      shortest_support_length_adjust =
+        max(0, shortest_support_length_adjust),
+      Pre_Minimum_length_adjust = 
+        max(0, Pre_Minimum_length_adjust),
+      Post_Minimum_length_adjust = 
+        max(0, Post_Minimum_length_adjust)
+    )
+    MSEC = MSEC %>% mutate(
       minimum_length_1 = ifelse(indel_status == 1, minimum_length_1, 0),
       minimum_length_2 = ifelse(indel_status == 1, minimum_length_2, 0)
     )

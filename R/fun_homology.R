@@ -2,11 +2,11 @@
 #'
 #' This function attempts to search the homologous regions.
 #'
-#' @param MicroSEC Mutation filtering information.
+#' @param MSEC Mutation filtering information.
 #' @param df_distant Sequences to be checked.
 #' @param Minimum_Homology_search_length Minimum length to define "homologous".
 #' @param PROGRESS_BAR "Y": You can see the progress visually.
-#' @return MicroSEC
+#' @return MSEC
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom stringr str_sub
@@ -19,13 +19,13 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom GenomeInfoDb seqnames
 #' @export
-fun_homology = function(MicroSEC,
+fun_homology = function(MSEC,
                         df_distant,
                         Minimum_Homology_search_length,
                         PROGRESS_BAR){
   # initialize
   if(!is.null(df_distant)){
-    MicroSEC$distant_homology = 0
+    MSEC$distant_homology = 0
     df_distant = df_distant %>% dplyr::mutate(
       Seq = as.character(Seq))
     df_distant = df_distant %>% dplyr::mutate(
@@ -82,37 +82,37 @@ fun_homology = function(MicroSEC,
       if(dim(df_distant[df_distant$Number == i,])[1] == 1){
         tmp_distant = df_distant[df_distant$Number == i,][1,]
         if(tmp_distant$distant_homology > 0){
-          MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME & 
-                     MicroSEC$Chr == tmp_distant$Chr & 
-                     MicroSEC$Pos == tmp_distant$Pos & 
-                     MicroSEC$Ref == tmp_distant$Ref & 
-                     MicroSEC$Alt == tmp_distant$Alt,]$distant_homology =  
-          MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME & 
-                     MicroSEC$Chr == tmp_distant$Chr & 
-                     MicroSEC$Pos == tmp_distant$Pos & 
-                     MicroSEC$Ref == tmp_distant$Ref & 
-                     MicroSEC$Alt == tmp_distant$Alt,]$distant_homology + 1
+          MSEC[MSEC$Sample == tmp_distant$SAMPLE_NAME & 
+                     MSEC$Chr == tmp_distant$Chr & 
+                     MSEC$Pos == tmp_distant$Pos & 
+                     MSEC$Ref == tmp_distant$Ref & 
+                     MSEC$Alt == tmp_distant$Alt,]$distant_homology =  
+          MSEC[MSEC$Sample == tmp_distant$SAMPLE_NAME & 
+                     MSEC$Chr == tmp_distant$Chr & 
+                     MSEC$Pos == tmp_distant$Pos & 
+                     MSEC$Ref == tmp_distant$Ref & 
+                     MSEC$Alt == tmp_distant$Alt,]$distant_homology + 1
         }
       }
       if(dim(df_distant[df_distant$Number == i,])[1] == 2){
         tmp_distant = df_distant[df_distant$Number == i,][1,]
         tmp_distant_2 = df_distant[df_distant$Number == i,][2,]
         if(tmp_distant$distant_homology > 0 | tmp_distant_2$distant_homology > 0){
-          MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME & 
-                     MicroSEC$Chr == tmp_distant$Chr &
-                     MicroSEC$Pos == tmp_distant$Pos &
-                     MicroSEC$Ref == tmp_distant$Ref & 
-                     MicroSEC$Alt == tmp_distant$Alt,]$distant_homology = 
-          MicroSEC[MicroSEC$Sample == tmp_distant$SAMPLE_NAME &
-                     MicroSEC$Chr == tmp_distant$Chr &
-                     MicroSEC$Pos == tmp_distant$Pos &
-                     MicroSEC$Ref == tmp_distant$Ref & 
-                     MicroSEC$Alt == tmp_distant$Alt,]$distant_homology + 1
+          MSEC[MSEC$Sample == tmp_distant$SAMPLE_NAME & 
+                     MSEC$Chr == tmp_distant$Chr &
+                     MSEC$Pos == tmp_distant$Pos &
+                     MSEC$Ref == tmp_distant$Ref & 
+                     MSEC$Alt == tmp_distant$Alt,]$distant_homology = 
+          MSEC[MSEC$Sample == tmp_distant$SAMPLE_NAME &
+                     MSEC$Chr == tmp_distant$Chr &
+                     MSEC$Pos == tmp_distant$Pos &
+                     MSEC$Ref == tmp_distant$Ref & 
+                     MSEC$Alt == tmp_distant$Alt,]$distant_homology + 1
         }
       }
     }
   }
-  return(MicroSEC)
+  return(MSEC)
 }
 
 # The following block is used by usethis to automatically manage
