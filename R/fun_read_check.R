@@ -381,7 +381,7 @@ fun_read_check = function(df_mutation,
                 }
               }
               
-              if(mut_position < length(df_seq) - 10){
+              if(mut_position < (length(df_seq) - 10)){
                 near_indel_Post_candidate = near_indel_Post_candidate + 1
                 Co_mut_Post_tmp = length(
                   matchPattern(
@@ -444,7 +444,7 @@ fun_read_check = function(df_mutation,
                     if(comut_FLAG == TRUE)
                       Co_mut_Pre_tmp = length(
                         matchPattern(df_seq[
-                          (mut_position - max(1, Alt_length * 4 - 5)):
+                          max(1,(mut_position - max(1, Alt_length * 4 - 5))):
                             mut_position],
                           Ref_indel[(Width - max(1, Alt_length * 4 - 5) + 1):
                                       (Width + 1)],
@@ -463,7 +463,8 @@ fun_read_check = function(df_mutation,
                       Co_mut_Post_tmp = length(
                         matchPattern(df_seq[
                           mut_position:
-                            (mut_position + max(1, Alt_length * 4 - 5))],
+                            min(length(df_seq),
+                                (mut_position + max(1, Alt_length * 4 - 5)))],
                           Ref_indel[(Width + 1):
                                       (Width + max(1, Alt_length * 4 - 5) + 1)],
                           max.mismatch=comut, 
