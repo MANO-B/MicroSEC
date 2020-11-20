@@ -372,8 +372,8 @@ fun_read_check = function(df_mutation,
                   matchPattern(
                     df_seq[(mut_position - 10):mut_position],
                     Ref_indel[(Width - 9):(Width + 1)],
-                    max.mismatch=0, 
-                    min.mismatch=3,
+                    max.mismatch=3, 
+                    min.mismatch=0,
                     with.indels=FALSE, 
                     fixed=TRUE))
                 if(Co_mut_Pre_tmp == 0){
@@ -387,8 +387,8 @@ fun_read_check = function(df_mutation,
                   matchPattern(
                     df_seq[mut_position:(mut_position + 10)],
                     Ref_indel[(Width + 1):(Width + 11)],
-                    max.mismatch=0, 
-                    min.mismatch=3,
+                    max.mismatch=3, 
+                    min.mismatch=0,
                     with.indels=FALSE, 
                     fixed=TRUE))
                 if(Co_mut_Post_tmp == 0){
