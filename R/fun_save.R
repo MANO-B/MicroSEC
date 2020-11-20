@@ -67,7 +67,7 @@ fun_save = function(MSEC, SAMPLE_INFO, wd){
   if(!is.null(MSEC)){
     write.table(MSEC, file=paste(wd, "/MicroSEC_", SAMPLE_INFO, ".tsv", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
   } else{
-    write.table("", file=paste(wd, "/MicroSEC_", SAMPLE_INFO, "_NULL.txt", sep=""), sep = "\t", na="", row.names=FALSE, col.names=FALSE, quote=FALSE)
+    write.table("", file=paste(wd, "/MicroSEC_", SAMPLE_INFO, "_NULL.txt", sep=""), sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
   }
 }
 
