@@ -91,11 +91,17 @@ fun_summary = function(MSEC){
     )
     MSEC = MSEC %>% mutate(
       shortest_support_length_adjust =
-        max(minimum_length, shortest_support_length_adjust),
+        ((minimum_length - shortest_support_length_adjust) +
+        abs(minimum_length - shortest_support_length_adjust)) / 2 +
+        shortest_support_length_adjust,
       Pre_Minimum_length_adjust = 
-        max(minimum_length_1, Pre_Minimum_length_adjust),
+        ((minimum_length_1 - Pre_Minimum_length_adjust) +
+           abs(minimum_length_1 - Pre_Minimum_length_adjust)) / 2 +
+        Pre_Minimum_length_adjust,
       Post_Minimum_length_adjust = 
-        max(minimum_length_2, Post_Minimum_length_adjust)
+        ((minimum_length_2 - Post_Minimum_length_adjust) +
+           abs(minimum_length_2 - Post_Minimum_length_adjust)) / 2 +
+        Post_Minimum_length_adjust
     )
     MSEC = MSEC %>% mutate(
       short_support_length_adjust =
