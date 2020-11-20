@@ -629,12 +629,7 @@ fun_read_check = function(df_mutation,
           penalty_Pre = max(0, 4 * Alt_length - 5) + 5 * Co_mut_Pre
           penalty_Post = max(0, 4 * Alt_length - 5) + 5 * Co_mut_Post
         }
-        near_indel_Pre = 0
-        near_indel_Pre_candidate = 0
-        near_indel_Post = 0
-        near_indel_Post_candidate = 0
-        
-        
+
         if(fun_zero(near_indel_Pre, near_indel_Pre_candidate) == 1){
           Pre_Minimum_length = 0
           Caution = paste(Caution, 
