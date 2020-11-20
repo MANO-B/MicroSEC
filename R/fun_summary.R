@@ -80,14 +80,6 @@ fun_summary = function(MSEC){
         (indel_length + penalty_Pre + 1)
     )
     MSEC = MSEC %>% mutate(
-      shortest_support_length_adjust =
-        max(0, shortest_support_length_adjust),
-      Pre_Minimum_length_adjust = 
-        max(0, Pre_Minimum_length_adjust),
-      Post_Minimum_length_adjust = 
-        max(0, Post_Minimum_length_adjust)
-    )
-    MSEC = MSEC %>% mutate(
       minimum_length_1 = ifelse(indel_status == 1, minimum_length_1, 0),
       minimum_length_2 = ifelse(indel_status == 1, minimum_length_2, 0)
     )
@@ -96,6 +88,14 @@ fun_summary = function(MSEC){
         (((minimum_length_1 -  minimum_length_2) - 
             abs(minimum_length_1 -  minimum_length_2)) / 2) + 
         minimum_length_2
+    )
+    MSEC = MSEC %>% mutate(
+      shortest_support_length_adjust =
+        max(minimum_length, shortest_support_length_adjust),
+      Pre_Minimum_length_adjust = 
+        max(minimum_length_1, Pre_Minimum_length_adjust),
+      Post_Minimum_length_adjust = 
+        max(minimum_length_2, Post_Minimum_length_adjust)
     )
     MSEC = MSEC %>% mutate(
       short_support_length_adjust =
