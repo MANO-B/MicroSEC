@@ -24,5 +24,7 @@ list(pre_rep_status, post_rep_status, homopolymer_status)
 This function attempts to check the repetitive sequence around the mutation.
 }
 \examples{
+\dontrun{
 fun_repeat_check(DNAString("A"), DNAString("AAT"), DNAString("GAATC"), 1, 0)
+}
 }
