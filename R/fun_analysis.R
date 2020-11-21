@@ -206,7 +206,7 @@ fun_analysis <- function(msec,
                   prob_filter_1 < threshold_p),
                TRUE, FALSE),
       filter_2_hairpin_structure =
-        ifelse((fun_zero(FLAG_Hairpin, total_read) > threshold_hairpin_ratio),
+        ifelse((fun_zero(flag_hairpin, total_read) > threshold_hairpin_ratio),
                TRUE, FALSE),
       filter_3_microhomology_induced_mutation =
         ifelse((high_rate_q18 &
