@@ -431,7 +431,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb4-8"><a href="#cb4-8"></a>                      <span class="dt">comment =</span> <span class="st">&quot;#&gt;&quot;</span>)</span>
 <span id="cb4-9"><a href="#cb4-9"></a>knitr<span class="op">::</span>opts_knit<span class="op">$</span><span class="kw">set</span>(<span class="dt">root.dir =</span> wd)</span>
 <span id="cb4-10"><a href="#cb4-10"></a><span class="kw">options</span>(<span class="dt">rmarkdown.html_vignette.check_title =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb4-11"><a href="#cb4-11"></a>PROGRESS_BAR =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
+<span id="cb4-11"><a href="#cb4-11"></a>progress_bar =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
 </div>
 <div id="necessary-packages" class="section level2">
 <h2>Necessary packages</h2>
@@ -441,15 +441,15 @@ The explatation of the results is written in detail in the second sheet of the e
 <h2>Analysis</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># initialize</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>msec =<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a>Homology_search =<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>homology_search =<span class="st"> </span><span class="ot">NULL</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a>mut_depth =<span class="st"> </span><span class="ot">NULL</span></span>
 <span id="cb6-5"><a href="#cb6-5"></a></span>
 <span id="cb6-6"><a href="#cb6-6"></a><span class="co"># test data</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>SAMPLE_NAME =<span class="st"> &quot;H15-11943-1-T_TDv3&quot;</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a>READ_length =<span class="st"> </span><span class="dv">151</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a>ADAPTER_SEQ_<span class="dv">1</span> =<span class="st"> &quot;AGATCGGAAGAGCACACGTCTGAACTCCAGTCA&quot;</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a>ADAPTER_SEQ_<span class="dv">2</span> =<span class="st"> &quot;AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT&quot;</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a>GENOME =<span class="st"> &quot;hg38&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>sample_name =<span class="st"> &quot;H15-11943-1-T_TDv3&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>read_length =<span class="st"> </span><span class="dv">151</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>adapter_<span class="dv">1</span> =<span class="st"> &quot;AGATCGGAAGAGCACACGTCTGAACTCCAGTCA&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>adapter_<span class="dv">2</span> =<span class="st"> &quot;AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>organism =<span class="st"> &quot;hg38&quot;</span></span>
 <span id="cb6-12"><a href="#cb6-12"></a></span>
 <span id="cb6-13"><a href="#cb6-13"></a><span class="co"># load mutation information</span></span>
 <span id="cb6-14"><a href="#cb6-14"></a><span class="kw">data</span>(exampleMutation)</span>
@@ -457,31 +457,31 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb6-16"><a href="#cb6-16"></a><span class="kw">data</span>(exampleMutCall)</span>
 <span id="cb6-17"><a href="#cb6-17"></a></span>
 <span id="cb6-18"><a href="#cb6-18"></a><span class="co"># load genomic sequence</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a>genome =<span class="st"> </span><span class="kw">fun_load_genome</span>(GENOME)</span>
-<span id="cb6-20"><a href="#cb6-20"></a>chr_no =<span class="st"> </span><span class="kw">fun_load_chr_no</span>(GENOME)</span>
+<span id="cb6-19"><a href="#cb6-19"></a>ref_genome =<span class="st"> </span><span class="kw">fun_load_genome</span>(organism)</span>
+<span id="cb6-20"><a href="#cb6-20"></a>chr_no =<span class="st"> </span><span class="kw">fun_load_chr_no</span>(organism)</span>
 <span id="cb6-21"><a href="#cb6-21"></a></span>
 <span id="cb6-22"><a href="#cb6-22"></a><span class="co"># analysis</span></span>
 <span id="cb6-23"><a href="#cb6-23"></a>result =<span class="st"> </span><span class="kw">fun_read_check</span>(<span class="dt">df_mutation =</span> exampleMutation,</span>
 <span id="cb6-24"><a href="#cb6-24"></a>                        <span class="dt">df_bam =</span> exampleBAM,</span>
 <span id="cb6-25"><a href="#cb6-25"></a>                        <span class="dt">df_mut_call =</span> exampleMutCall,</span>
-<span id="cb6-26"><a href="#cb6-26"></a>                        <span class="dt">genome =</span> genome,</span>
-<span id="cb6-27"><a href="#cb6-27"></a>                        <span class="dt">SAMPLE_NAME =</span> SAMPLE_NAME,</span>
-<span id="cb6-28"><a href="#cb6-28"></a>                        <span class="dt">READ_length =</span> READ_length,</span>
-<span id="cb6-29"><a href="#cb6-29"></a>                        <span class="dt">ADAPTER_SEQ_1 =</span> ADAPTER_SEQ_<span class="dv">1</span>,</span>
-<span id="cb6-30"><a href="#cb6-30"></a>                        <span class="dt">ADAPTER_SEQ_2 =</span> ADAPTER_SEQ_<span class="dv">2</span>,</span>
+<span id="cb6-26"><a href="#cb6-26"></a>                        <span class="dt">ref_genome =</span> ref_genome,</span>
+<span id="cb6-27"><a href="#cb6-27"></a>                        <span class="dt">sample_name =</span> sample_name,</span>
+<span id="cb6-28"><a href="#cb6-28"></a>                        <span class="dt">read_length =</span> read_length,</span>
+<span id="cb6-29"><a href="#cb6-29"></a>                        <span class="dt">adapter_1 =</span> adapter_<span class="dv">1</span>,</span>
+<span id="cb6-30"><a href="#cb6-30"></a>                        <span class="dt">adapter_2 =</span> adapter_<span class="dv">2</span>,</span>
 <span id="cb6-31"><a href="#cb6-31"></a>                        <span class="dt">short_homology_search_length =</span> <span class="dv">4</span>,</span>
-<span id="cb6-32"><a href="#cb6-32"></a>                        <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
+<span id="cb6-32"><a href="#cb6-32"></a>                        <span class="dt">progress_bar =</span> progress_bar)</span>
 <span id="cb6-33"><a href="#cb6-33"></a>msec =<span class="st"> </span><span class="kw">rbind</span>(msec, result[[<span class="dv">1</span>]])</span>
-<span id="cb6-34"><a href="#cb6-34"></a>Homology_search =<span class="st"> </span><span class="kw">rbind</span>(Homology_search, result[[<span class="dv">2</span>]])</span>
+<span id="cb6-34"><a href="#cb6-34"></a>homology_search =<span class="st"> </span><span class="kw">rbind</span>(homology_search, result[[<span class="dv">2</span>]])</span>
 <span id="cb6-35"><a href="#cb6-35"></a>mut_depth =<span class="st"> </span><span class="kw">rbind</span>(mut_depth, result[[<span class="dv">3</span>]])</span>
 <span id="cb6-36"><a href="#cb6-36"></a></span>
 <span id="cb6-37"><a href="#cb6-37"></a><span class="co"># search homologous sequences</span></span>
 <span id="cb6-38"><a href="#cb6-38"></a>msec =<span class="st"> </span><span class="kw">fun_homology</span>(msec,</span>
-<span id="cb6-39"><a href="#cb6-39"></a>                    Homology_search,</span>
+<span id="cb6-39"><a href="#cb6-39"></a>                    homology_search,</span>
 <span id="cb6-40"><a href="#cb6-40"></a>                    <span class="dt">min_homology_search =</span> <span class="dv">40</span>,</span>
-<span id="cb6-41"><a href="#cb6-41"></a>                    genome,</span>
+<span id="cb6-41"><a href="#cb6-41"></a>                    ref_genome,</span>
 <span id="cb6-42"><a href="#cb6-42"></a>                    chr_no,</span>
-<span id="cb6-43"><a href="#cb6-43"></a>                    <span class="dt">PROGRESS_BAR =</span> PROGRESS_BAR)</span>
+<span id="cb6-43"><a href="#cb6-43"></a>                    <span class="dt">progress_bar =</span> progress_bar)</span>
 <span id="cb6-44"><a href="#cb6-44"></a></span>
 <span id="cb6-45"><a href="#cb6-45"></a><span class="co"># statistical analysis</span></span>
 <span id="cb6-46"><a href="#cb6-46"></a>msec =<span class="st"> </span><span class="kw">fun_summary</span>(msec)</span>
@@ -498,7 +498,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb6-57"><a href="#cb6-57"></a>                    <span class="dt">homopolymer_length =</span> <span class="dv">15</span>)</span>
 <span id="cb6-58"><a href="#cb6-58"></a></span>
 <span id="cb6-59"><a href="#cb6-59"></a><span class="co"># save the results</span></span>
-<span id="cb6-60"><a href="#cb6-60"></a><span class="kw">fun_save</span>(msec, SAMPLE_NAME, wd)</span></code></pre></div>
+<span id="cb6-60"><a href="#cb6-60"></a><span class="kw">fun_save</span>(msec, sample_name, wd)</span></code></pre></div>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
@@ -521,7 +521,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt; 6          185 27.56760  chr3 179234230   A   G                N</span></span>
 <span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt; 7          315 44.44440  chr7  55191822   T   G                N</span></span>
 <span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt; 8          231  6.92641  chr7  55201369 GTC   G                N</span></span>
-<span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt;                       Neighborhood_sequence Transition READ_length Total_read</span></span>
+<span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt;                       Neighborhood_sequence Transition read_length total_read</span></span>
 <span id="cb7-21"><a href="#cb7-21"></a><span class="co">#&gt; 1 AGGGTCACTGTCCCCTTTGGTACCAAAGGGGTACTCTAACT         NA         151         11</span></span>
 <span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt; 2 GGGTCACTGTCCCCTTTGGCGCCAAAGGGGTACTCTAACTC         NA         151         12</span></span>
 <span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt; 3 ACCCTTGTCCTTTCTGGAGCTTAAGCTCCAGCTCCAGGTAG         NA         151         16</span></span>
@@ -530,7 +530,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt; 6 ACATTGCATACATTCGAAAGGCCCTAGCCTTAGATAAAACT         NA         151         51</span></span>
 <span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt; 7 CAAGATCACAGATTTTGGGCGGGCCAAACTGCTGGGTGCGG         NA         151        140</span></span>
 <span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt; 8 CTCTCTGGTATGAAATCTCTGTCTCTCTCTCTCTCAAGCTG         NA         151         16</span></span>
-<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt;   Soft_Clipped_read FLAG_Hairpin Pre_support_length Post_support_length</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt;   soft_clipped_read flag_hairpin pre_support_length post_support_length</span></span>
 <span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt; 1                10           10                132                 137</span></span>
 <span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt; 2                11           10                133                 136</span></span>
 <span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt; 3                14           16                140                 134</span></span>
@@ -539,7 +539,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt; 6                 7            0                144                 131</span></span>
 <span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt; 7                29            0                147                 135</span></span>
 <span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt; 8                 3            0                 97                 144</span></span>
-<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt;   short_support_length Low_quality_base_rate_under_Q18 distant_homology_rate</span></span>
+<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt;   short_support_length low_quality_base_rate_under_q18 distant_homology_rate</span></span>
 <span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt; 1                   11                     0.059602649                     0</span></span>
 <span id="cb7-40"><a href="#cb7-40"></a><span class="co">#&gt; 2                   10                     0.071743929                     0</span></span>
 <span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt; 3                   10                     0.007036424                     0</span></span>
@@ -548,7 +548,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt; 6                   72                     0.014673419                     0</span></span>
 <span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt; 7                   68                     0.006196783                     0</span></span>
 <span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt; 8                   75                     0.011175497                     0</span></span>
-<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt;   prob_Filter_1 prob_Filter_3_pre prob_Filter_3_post</span></span>
+<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt;   prob_filter_1 prob_filter_3_pre prob_filter_3_post</span></span>
 <span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt; 1  2.794410e-11      0.5101794659       0.2681971521</span></span>
 <span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt; 2  5.248589e-17      0.4120721277       0.2379553368</span></span>
 <span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt; 3  2.254597e-19      0.1180670870       0.0519644737</span></span>
@@ -557,7 +557,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-53"><a href="#cb7-53"></a><span class="co">#&gt; 6  1.134132e-01      0.0115221008       0.0157100141</span></span>
 <span id="cb7-54"><a href="#cb7-54"></a><span class="co">#&gt; 7  8.203053e-06      0.0537795550       0.0001750834</span></span>
 <span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt; 8  1.000000e+00      0.0004783243       0.1146106607</span></span>
-<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt;   Filter_1_mutation_intra_hairpin_loop Filter_2_hairpin_structure</span></span>
+<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt;   filter_1_mutation_intra_hairpin_loop filter_2_hairpin_structure</span></span>
 <span id="cb7-57"><a href="#cb7-57"></a><span class="co">#&gt; 1                                 TRUE                       TRUE</span></span>
 <span id="cb7-58"><a href="#cb7-58"></a><span class="co">#&gt; 2                                 TRUE                       TRUE</span></span>
 <span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt; 3                                 TRUE                       TRUE</span></span>
@@ -566,7 +566,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt; 6                                FALSE                      FALSE</span></span>
 <span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt; 7                                FALSE                      FALSE</span></span>
 <span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt; 8                                FALSE                      FALSE</span></span>
-<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;   Filter_3_microhomology_induced_mutation Filter_4_soft_clipping</span></span>
+<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;   filter_3_microhomology_induced_mutation filter_4_soft_clipping</span></span>
 <span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt; 1                                   FALSE                   TRUE</span></span>
 <span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt; 2                                   FALSE                   TRUE</span></span>
 <span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt; 3                                   FALSE                  FALSE</span></span>
@@ -575,7 +575,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt; 6                                   FALSE                  FALSE</span></span>
 <span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt; 7                                   FALSE                  FALSE</span></span>
 <span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt; 8                                   FALSE                  FALSE</span></span>
-<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt;   Filter_5_highly_homologous_region Filter_6_simple_repeat</span></span>
+<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt;   filter_5_highly_homologous_region filter_6_simple_repeat</span></span>
 <span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt; 1                             FALSE                  FALSE</span></span>
 <span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt; 2                             FALSE                  FALSE</span></span>
 <span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; 3                             FALSE                  FALSE</span></span>
@@ -584,7 +584,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt; 6                             FALSE                  FALSE</span></span>
 <span id="cb7-81"><a href="#cb7-81"></a><span class="co">#&gt; 7                             FALSE                  FALSE</span></span>
 <span id="cb7-82"><a href="#cb7-82"></a><span class="co">#&gt; 8                             FALSE                  FALSE</span></span>
-<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt;   Filter_7_C_to_T_artifact Filter_8_mutation_at_homopolymer    msec_filter_1234</span></span>
+<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt;   filter_7_c_to_t_artifact filter_8_mutation_at_homopolymer    msec_filter_1234</span></span>
 <span id="cb7-84"><a href="#cb7-84"></a><span class="co">#&gt; 1                    FALSE                            FALSE Artifact suspicious</span></span>
 <span id="cb7-85"><a href="#cb7-85"></a><span class="co">#&gt; 2                    FALSE                            FALSE Artifact suspicious</span></span>
 <span id="cb7-86"><a href="#cb7-86"></a><span class="co">#&gt; 3                    FALSE                            FALSE Artifact suspicious</span></span>
@@ -593,7 +593,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-89"><a href="#cb7-89"></a><span class="co">#&gt; 6                    FALSE                            FALSE                    </span></span>
 <span id="cb7-90"><a href="#cb7-90"></a><span class="co">#&gt; 7                    FALSE                            FALSE                    </span></span>
 <span id="cb7-91"><a href="#cb7-91"></a><span class="co">#&gt; 8                    FALSE                            FALSE                    </span></span>
-<span id="cb7-92"><a href="#cb7-92"></a><span class="co">#&gt;     msec_filter_12345     msec_filter_all Comment</span></span>
+<span id="cb7-92"><a href="#cb7-92"></a><span class="co">#&gt;     msec_filter_12345     msec_filter_all comment</span></span>
 <span id="cb7-93"><a href="#cb7-93"></a><span class="co">#&gt; 1 Artifact suspicious Artifact suspicious        </span></span>
 <span id="cb7-94"><a href="#cb7-94"></a><span class="co">#&gt; 2 Artifact suspicious Artifact suspicious        </span></span>
 <span id="cb7-95"><a href="#cb7-95"></a><span class="co">#&gt; 3 Artifact suspicious Artifact suspicious        </span></span>
