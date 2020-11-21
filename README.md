@@ -340,4 +340,10 @@ write.xlsx(df_mutation, "/mnt/HDD8TB/MicroSEC/mutation_modified.xlsx")
 
 ### Reproducibility
 
-The source code is available in MicroSEC.R. Source data will be available at the Japanese Genotype-Phenotype Archive (http://trace.ddbj.nig.ac.jp/jga), which is hosted by the DNA Data Bank of Japan (the accession number is written in our paper). Each filtering process takes about 5–30 minutes per sample on a recommended machine,according to the depth and mutation amount of the sample.
+The source code is available in MicroSEC.R. 
+Source data will be available at the Japanese 
+Genotype-Phenotype Archive (http://trace.ddbj.nig.ac.jp/jga), 
+which is hosted by the DNA Data Bank of Japan (the accession 
+number is written in our paper). Each filtering process takes 
+about 5–120 minutes per sample on a recommended machine, 
+according to the depth and mutation amount of the sample.
