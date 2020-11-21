@@ -96,7 +96,7 @@ github url: https://github.com/MANO-B/MicroSEC
   
 ## Setting
 ```{r}
-wd = "./archive"
+wd = "./"
 knitr::opts_chunk$set(collapse = TRUE,
                       fig.width = 12,
                       fig.height = 8,
