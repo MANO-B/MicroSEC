@@ -36,7 +36,6 @@ Suggests:
   BSgenome.Hsapiens.UCSC.hg38,
   BSgenome.Hsapiens.UCSC.hg19,
   BSgenome.Mmusculus.UCSC.mm10,
-  testthat,
   knitr,
   rmarkdown
 VignetteBuilder: knitr
