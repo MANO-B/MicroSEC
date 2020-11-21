@@ -59,7 +59,7 @@ fun_analysis <- function(msec,
           return(mut_depth[x, y])
         },
         1:dim(msec)[1],
-        msec$READ_length -
+        msec$read_length -
           msec$altered_length + 2 -
           msec$shortest_support_length_adj
       ) -
@@ -68,7 +68,7 @@ fun_analysis <- function(msec,
           return(mut_depth[x, y])
         },
         1:dim(msec)[1],
-        msec$READ_length -
+        msec$read_length -
           msec$altered_length + 1 -
           msec$short_support_length_adj
       ) +
@@ -106,7 +106,7 @@ fun_analysis <- function(msec,
           return(mut_depth[x, y])
         },
         1:dim(msec)[1],
-        msec$READ_length -
+        msec$read_length -
           msec$altered_length + 2 -
           msec$post_minimum_length_adj
       ) -
@@ -115,7 +115,7 @@ fun_analysis <- function(msec,
           return(mut_depth[x, y])
         },
         1:dim(msec)[1],
-        msec$READ_length -
+        msec$read_length -
           msec$altered_length -
           msec$post_support_length_adj + 1
       )
@@ -125,7 +125,7 @@ fun_analysis <- function(msec,
           return(mut_depth[x, y])
         },
         1:dim(msec)[1],
-        msec$READ_length -
+        msec$read_length -
           msec$altered_length + 2 -
           msec$minimum_length
       ) -
@@ -134,7 +134,7 @@ fun_analysis <- function(msec,
           return(mut_depth[x, y])
         },
         1:dim(msec)[1],
-        msec$READ_length -
+        msec$read_length -
           msec$altered_length -
           msec$half_length + 1
       ) +
@@ -158,7 +158,7 @@ fun_analysis <- function(msec,
           return(mut_depth[x, y])
         },
         1:dim(msec)[1],
-        msec$READ_length -
+        msec$read_length -
           msec$altered_length + 2 -
           msec$minimum_length_2
       ) -

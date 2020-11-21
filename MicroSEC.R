@@ -1,5 +1,6 @@
 # MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples
 #
+# Version 1.1.0: formatted for CRAN (Nov. 21, 2020) 
 # Version 1.0.10: Prevent from overfiltering mutations with co-mutations in neighbor (Nov. 21, 2020) 
 # Version 1.0.9: Input style modified (Nov. 16, 2020) 
 # Version 1.0.8: Mutation information conversion function added (Nov. 8, 2020) 
@@ -88,13 +89,13 @@ args = commandArgs(trailingOnly = T)
 
 if (args[3] == "N" | args[3] == "Y") {
   wd = args[1]
-  SAMPLE_LIST = args[2]
+  sample_list = args[2]
   progress_bar = args[3]
   
   setwd(wd)
   
   # load sample information tsv file
-  SAMPLE_INFO = read.csv(SAMPLE_LIST,
+  sample_info = read.csv(sample_list,
                          header = FALSE,
                          stringsAsFactors = FALSE,
                          sep = "\t")
@@ -104,40 +105,40 @@ if (args[3] == "N" | args[3] == "Y") {
   homology_search = NULL
   mut_depth = NULL
   
-  for (SAMPLE in seq_len(dim(SAMPLE_INFO)[1])) {
-    SAMPLE_NAME = SAMPLE_INFO[SAMPLE, 1]
-    MUTATION_FILE = SAMPLE_INFO[SAMPLE, 2]
-    BAM_FILE = SAMPLE_INFO[SAMPLE, 3]
-    MUTATION_SUPPORTING_READ_LIST = SAMPLE_INFO[SAMPLE, 4]
-    READ_length = as.integer(SAMPLE_INFO[SAMPLE, 5])
-    ADAPTER_SEQ_1 = SAMPLE_INFO[SAMPLE, 6]
-    if (SAMPLE_INFO[SAMPLE, 7] %in%
+  for (sample in seq_len(dim(sample_info)[1])) {
+    sample_name = sample_info[sample, 1]
+    mutation_file = sample_info[sample, 2]
+    bam_file = sample_info[sample, 3]
+    read_list = sample_info[sample, 4]
+    read_length = as.integer(sample_info[sample, 5])
+    adapter_1 = sample_info[sample, 6]
+    if (sample_info[sample, 7] %in%
         c("Human", "Mouse", "hg19", "hg38", "mm10")) {
-      ADAPTER_SEQ_2 = ADAPTER_SEQ_1
-      GENOME = SAMPLE_INFO[SAMPLE, 7]
+      adapter_2 = adapter_1
+      organism = sample_info[sample, 7]
     } else{
-      ADAPTER_SEQ_2 = SAMPLE_INFO[SAMPLE, 7]
-      GENOME = SAMPLE_INFO[SAMPLE, 8]
+      adapter_2 = sample_info[sample, 7]
+      organism = sample_info[sample, 8]
     }
     
     # load mutation information
-    df_mutation = fun_load_mutation(MUTATION_FILE, SAMPLE_NAME)
-    df_bam = fun_load_bam(BAM_FILE)
-    df_mut_call = fun_load_id(MUTATION_SUPPORTING_READ_LIST)
+    df_mutation = fun_load_mutation(mutation_file, sample_name)
+    df_bam = fun_load_bam(bam_file)
+    df_mut_call = fun_load_id(read_list)
     
     # load genomic sequence
-    ref_genome = fun_load_genome(GENOME)
-    chr_no = fun_load_chr_no(GENOME)
+    ref_genome = fun_load_genome(organism)
+    chr_no = fun_load_chr_no(organism)
     
     # analysis
     result = fun_read_check(df_mutation = df_mutation,
                             df_bam =  df_bam,
                             df_mut_call = df_mut_call,
                             ref_genome = ref_genome,
-                            sample_name = SAMPLE_NAME,
-                            READ_length = READ_length,
-                            ADAPTER_SEQ_1 = ADAPTER_SEQ_1,
-                            ADAPTER_SEQ_2 = ADAPTER_SEQ_2,
+                            sample_name = sample_name,
+                            read_length = read_length,
+                            adapter_1 = adapter_1,
+                            adapter_2 = adapter_2,
                             short_homology_search_length = 4,
                             progress_bar = progress_bar)
     msec = rbind(msec, result[[1]])
@@ -167,37 +168,37 @@ if (args[3] == "N" | args[3] == "Y") {
                       homopolymer_length = 15)
   
   # save the results
-  fun_save(msec, SAMPLE_INFO[1,1], wd)
+  fun_save(msec, sample_info[1,1], wd)
 }else {
-  OUTPUT = args[1]
-  SAMPLE_NAME = args[2]
-  MUTATION_FILE = args[3]
-  BAM_FILE = args[4]
-  MUTATION_SUPPORTING_READ_LIST = args[5]
-  READ_length = as.integer(args[6])
-  ADAPTER_SEQ_1 = args[7]
-  ADAPTER_SEQ_2 = args[8]
-  GENOME = args[9]
+  output = args[1]
+  sample_name = args[2]
+  mutation_file = args[3]
+  bam_file = args[4]
+  read_list = args[5]
+  read_length = as.integer(args[6])
+  adapter_1 = args[7]
+  adapter_2 = args[8]
+  organism = args[9]
   progress_bar = "N"
   
   # load mutation information
-  df_mutation = fun_load_mutation_gz(MUTATION_FILE)
-  df_bam = fun_load_bam(BAM_FILE)
-  df_mut_call = fun_load_id(MUTATION_SUPPORTING_READ_LIST)
+  df_mutation = fun_load_mutation_gz(mutation_file)
+  df_bam = fun_load_bam(bam_file)
+  df_mut_call = fun_load_id(read_list)
   
   # load genomic sequence
-  ref_genome = fun_load_genome(GENOME)
-  chr_no = fun_load_chr_no(GENOME)
+  ref_genome = fun_load_genome(organism)
+  chr_no = fun_load_chr_no(organism)
   
   # analysis
   result = fun_read_check(df_mutation = df_mutation,
                           df_bam =  df_bam,
                           df_mut_call = df_mut_call,
                           ref_genome = ref_genome,
-                          sample_name = SAMPLE_NAME,
-                          read_length = READ_length,
-                          adapter_1 = ADAPTER_SEQ_1,
-                          adapter_2 = ADAPTER_SEQ_2,
+                          sample_name = sample_name,
+                          read_length = read_length,
+                          adapter_1 = adapter_1,
+                          adapter_2 = adapter_2,
                           short_homology_search_length = 4,
                           progress_bar = progress_bar)
   msec = result[[1]]
@@ -227,6 +228,6 @@ if (args[3] == "N" | args[3] == "Y") {
                       homopolymer_length = 15)
   
   # save the results
-  fun_save_gz(msec, OUTPUT)
+  fun_save_gz(msec, output)
 }
 
