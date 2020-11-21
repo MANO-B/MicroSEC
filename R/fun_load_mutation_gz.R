@@ -2,7 +2,7 @@
 #'
 #' This function attempts to load the mutation information file.
 #'
-#' @param MUTATION_FILE Path of the mutation information file.
+#' @param mutation_file Path of the mutation information file.
 #' @return df_mutation
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
@@ -11,29 +11,33 @@
 #' @examples
 #' fun_load_mutation_gz("./source/CCLE_SM.gz")
 #' @export
-fun_load_mutation_gz = function(MUTATION_FILE){
+fun_load_mutation_gz <- function(mutation_file) {
   # load somatic mutation list
-  df_mutation = read.csv(MUTATION_FILE, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+  df_mutation <- read.csv(mutation_file,
+                          stringsAsFactors = FALSE,
+                          header = TRUE,
+                          check.names = F,
+                          sep = "\t")
   # data formatting
-  if(dim(df_mutation)[1]>1){
-    if(!"SimpleRepeat_TRF" %in% colnames(df_mutation)){
-      df_mutation$SimpleRepeat_TRF = "NA"
+  if (dim(df_mutation)[1] > 1) {
+    if (!"SimpleRepeat_TRF" %in% colnames(df_mutation)) {
+      df_mutation$SimpleRepeat_TRF <- "NA"
     }
-    if(!"Transition" %in% colnames(df_mutation)){
-      df_mutation$Transition = "NA"
+    if (!"Transition" %in% colnames(df_mutation)) {
+      df_mutation$Transition <- "NA"
     }
-    df_mutation$Pos = as.integer(df_mutation$Pos)
-    df_mutation = df_mutation %>%
+    df_mutation$Pos <- as.integer(df_mutation$Pos)
+    df_mutation <- df_mutation %>%
       filter(Sample == SAMPLE_NAME) %>%
       mutate(Ref = toupper(Ref)) %>%
-      mutate(Alt = toupper(Alt)) %>% 
+      mutate(Alt = toupper(Alt)) %>%
       mutate(Neighborhood_sequence = toupper(Neighborhood_sequence))
-  } else{
-    if(!"SimpleRepeat_TRF" %in% colnames(df_mutation)){
-      df_mutation$SimpleRepeat_TRF = character(0)
+  } else {
+    if (!"SimpleRepeat_TRF" %in% colnames(df_mutation)) {
+      df_mutation$SimpleRepeat_TRF <- character(0)
     }
-    if(!"Transition" %in% colnames(df_mutation)){
-      df_mutation$Transition = character(0)
+    if (!"Transition" %in% colnames(df_mutation)) {
+      df_mutation$Transition <- character(0)
     }
   }
   return(df_mutation)

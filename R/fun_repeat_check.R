@@ -2,67 +2,72 @@
 #'
 #' This function attempts to check the repetitive sequence around the mutation.
 #'
-#' @param Rep_A The shorter sequence of [Ref] and [Alt].
-#' @param Rep_B The longer sequence of [Ref] and [Alt].
-#' @param Ref_seq Reference sequence around the mutation.
-#' @param Width Search length for Ref_seq.
-#' @param Del Insertion: 0, Deletion: 1
-#' @return list(Pre_rep_status, Post_rep_status, Homopolymer_status)
+#' @param rep_a The shorter sequence of [Ref] and [Alt].
+#' @param rep_b The longer sequence of [Ref] and [Alt].
+#' @param ref_seq Reference sequence around the mutation.
+#' @param ref_width Search length for ref_seq.
+#' @param del Insertion: 0, Deletion: 1
+#' @return list(pre_rep_status, post_rep_status, homopolymer_status)
 #' @importFrom Biostrings DNAString
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
-#' fun_repeat_check(DNAString("A"), DNAString("AATC"), DNAString("GGAAAAAAATCTCTCAACA"), 5, 0)
+#' fun_repeat_check(DNAString("A"), DNAString("AAT"), DNAString("GAATC"), 1, 0)
 #' @export
-fun_repeat_check = function(Rep_A, Rep_B, Ref_seq, Width, Del){
-  Pre_rep_status = 0
-  Post_rep_status = 0
-  Homopolymer_status = 0
-  Rep_B = Rep_B[2:length(Rep_B)]
-  homo_tmp_1 = 0
-  homo_tmp_2 = 0
-  for(q in 1:length(Rep_B)){
-    Rep_seq = Rep_B[q:length(Rep_B)]
-    check_rep = TRUE
-    Post_rep_status_tmp = 0
-    for(r in (1 + Del * length(Rep_B)):(Width - 1)){
-      if(check_rep &  Ref_seq[Width + r + 1] == Rep_seq[((r - 1) %% length(Rep_seq) + 1)]){
-        Post_rep_status_tmp = Post_rep_status_tmp + 1
+fun_repeat_check <- function(rep_a, rep_b, ref_seq, ref_width, del) {
+  pre_rep_status <- 0
+  post_rep_status <- 0
+  homopolymer_status <- 0
+  rep_b <- rep_b[2:length(rep_b)]
+  homo_tmp_1 <- 0
+  homo_tmp_2 <- 0
+  for (q in seq_len(length(rep_b))) {
+    rep_seq <- rep_b[q:length(rep_b)]
+    check_rep <- TRUE
+    post_rep_status_tmp <- 0
+    for (r in (1 + del * length(rep_b)):(ref_width - 1)) {
+      if (check_rep &
+          ref_seq[ref_width + r + 1] ==
+          rep_seq[((r - 1) %% length(rep_seq) + 1)]) {
+        post_rep_status_tmp <- post_rep_status_tmp + 1
       }
-      else{
-        check_rep = FALSE
-      }
-    }
-    if(Post_rep_status_tmp >= length(Rep_seq)){
-      Post_rep_status = max(Post_rep_status, Post_rep_status_tmp)
-      if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
-        homo_tmp_1 = Post_rep_status_tmp + length(Rep_seq)
+      else {
+        check_rep <- FALSE
       }
     }
-  }
-  for(q in 1:length(Rep_B)){
-    Rep_seq = Rep_B[1:q]
-    check_rep = TRUE
-    Pre_rep_status_tmp = 0
-    for(r in 1:(Width + 1)){
-      if(check_rep &  Ref_seq[Width + 2 - r] == Rep_seq[((length(Rep_seq) - r) %% length(Rep_seq) + 1)]){
-        Pre_rep_status_tmp = Pre_rep_status_tmp + 1
-      }
-      else{
-        check_rep = FALSE
-      }
-    }
-    if(Pre_rep_status_tmp >= length(Rep_seq)){
-      Pre_rep_status = max(Pre_rep_status, Pre_rep_status_tmp)
-      if(gsub(as.character(Rep_seq[1]), "", as.character(Rep_seq)) == ""){
-        homo_tmp_2 = Pre_rep_status_tmp + length(Rep_seq)
+    if (post_rep_status_tmp >= length(rep_seq)) {
+      post_rep_status <- max(post_rep_status, post_rep_status_tmp)
+      if (gsub(as.character(rep_seq[1]), "", as.character(rep_seq)) == "") {
+        homo_tmp_1 <- post_rep_status_tmp + length(rep_seq)
       }
     }
   }
-  Homopolymer_status = max(homo_tmp_1, homo_tmp_2)
-  if((Post_rep_status + Post_rep_status) > 0 & gsub(as.character(Rep_B[1]), "", as.character(Rep_B)) == ""){
-    Homopolymer_status = homo_tmp_1 + homo_tmp_2 - length(Rep_B)
+  for (q in seq_len(length(rep_b))) {
+    rep_seq <- rep_b[1:q]
+    check_rep <- TRUE
+    pre_rep_status_tmp <- 0
+    for (r in 1:(ref_width + 1)) {
+      if (check_rep &
+          ref_seq[ref_width + 2 - r] ==
+            rep_seq[((length(rep_seq) - r) %% length(rep_seq) + 1)]) {
+        pre_rep_status_tmp <- pre_rep_status_tmp + 1
+      }
+      else {
+        check_rep <- FALSE
+      }
+    }
+    if (pre_rep_status_tmp >= length(rep_seq)) {
+      pre_rep_status <- max(pre_rep_status, pre_rep_status_tmp)
+      if (gsub(as.character(rep_seq[1]), "", as.character(rep_seq)) == "") {
+        homo_tmp_2 <- pre_rep_status_tmp + length(rep_seq)
+      }
+    }
   }
-  return(list(Pre_rep_status, Post_rep_status, Homopolymer_status))
+  homopolymer_status <- max(homo_tmp_1, homo_tmp_2)
+  if ((post_rep_status + post_rep_status) > 0 &
+      gsub(as.character(rep_b[1]), "", as.character(rep_b)) == "") {
+    homopolymer_status <- homo_tmp_1 + homo_tmp_2 - length(rep_b)
+  }
+  return(list(pre_rep_status, post_rep_status, homopolymer_status))
 }
 
 # The following block is used by usethis to automatically manage

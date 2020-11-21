@@ -2,13 +2,14 @@
 #'
 #' This function attempts to save the filtering results.
 #'
-#' @param MSEC Mutation filtering information.
-#' @param OUTPUT Output file name (full path).
+#' @param msec Mutation filtering information.
+#' @param output output file name (full path).
 #' @export
-fun_save_gz = function(MSEC, OUTPUT){
+fun_save_gz <- function(msec, output) {
   # save the results
-  gz1 <- gzfile(OUTPUT, "w")
-  write.table(MSEC, gz1, sep = "\t", na="", row.names=FALSE, col.names=TRUE, quote=FALSE)
+  gz1 <- gzfile(output, "w")
+  write.table(msec, gz1, sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
   close(gz1)
 }
 

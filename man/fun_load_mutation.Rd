@@ -4,12 +4,12 @@
 \alias{fun_load_mutation}
 \title{Mutation data file loader}
 \usage{
-fun_load_mutation(MUTATION_FILE, SAMPLE_NAME)
+fun_load_mutation(mutation_file, sample_name)
 }
 \arguments{
-\item{MUTATION_FILE}{Path of the mutation information file.}
+\item{mutation_file}{Path of the mutation information file.}
 
-\item{SAMPLE_NAME}{Sample name.}
+\item{sample_name}{Sample name.}
 }
 \value{
 df_mutation

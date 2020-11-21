@@ -4,21 +4,22 @@
 \alias{fun_setting}
 \title{Mutated position search function.}
 \usage{
-fun_setting(PRE, POST, Neighbor_seq, neighbor_length, Alt_length)
+fun_setting(pre, post, neighbor_seq, neighbor_length, alt_length)
 }
 \arguments{
-\item{PRE}{The 5' side bases of the sequence for searching.}
+\item{pre}{The 5' side bases of the sequence for searching.}
 
-\item{POST}{The 3' side bases of the sequence for searching.}
+\item{post}{The 3' side bases of the sequence for searching.}
 
-\item{Neighbor_seq}{Short reference sequence around the mutation.}
+\item{neighbor_seq}{Short reference sequence around the mutation.}
 
-\item{neighbor_length}{The length from the mutation to the ends of the short reference sequence.}
+\item{neighbor_length}{The length from the mutation to the ends of the short
+reference sequence.}
 
-\item{Alt_length}{The length of altered bases.}
+\item{alt_length}{The length of altered bases.}
 }
 \value{
-list(Pre_search_length, Post_search_length, Peri_seq_1, Peri_seq_2)
+list(pre_search_length, post_search_length, peri_seq_1, peri_seq_2)
 }
 \description{
 This function attempts to find the mutated bases in each read.

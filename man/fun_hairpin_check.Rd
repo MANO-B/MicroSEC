@@ -4,23 +4,23 @@
 \alias{fun_hairpin_check}
 \title{Hairpin-structure sequence check function}
 \usage{
-fun_hairpin_check(Hairpin_seq_tmp, Ref_seq, Hairpin_length, hair)
+fun_hairpin_check(hairpin_seq_tmp, ref_seq, hairpin_length, hair)
 }
 \arguments{
-\item{Hairpin_seq_tmp}{The sequence to be checked.}
+\item{hairpin_seq_tmp}{The sequence to be checked.}
 
-\item{Ref_seq}{Reference sequence around the mutation.}
+\item{ref_seq}{Reference sequence around the mutation.}
 
-\item{Hairpin_length}{The temporal length of hairpin sequences.}
+\item{hairpin_length}{The temporal length of hairpin sequences.}
 
 \item{hair}{The length of sequences to be checked.}
 }
 \value{
-list(Hairpin_length, whether hairpin sequences exist or not)
+list(hairpin_length, whether hairpin sequences exist or not)
 }
 \description{
 This function attempts to find hairpin structure sequences.
 }
 \examples{
-fun_hairpin_check(DNAString("GGGGGGGGAAAAAAAA"), DNAString("GGGGGGGGAAAAAAAATATATATATTTTTTTTCCCCCCCC"), 15, 16)
+fun_hairpin_check(DNAString("GGGGAAAA"), DNAString("TGGGGAAAAC"), 8, 9)
 }

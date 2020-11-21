@@ -4,13 +4,13 @@
 \alias{fun_insert_length}
 \title{Insert length checker for BAM file}
 \usage{
-fun_insert_length(BAM_FILE)
+fun_insert_length(bam_file)
 }
 \arguments{
-\item{BAM_FILE}{Path of the BAM file.}
+\item{bam_file}{Path of the BAM file.}
 }
 \value{
-df_BAM
+df_bam
 }
 \description{
 This function attempts to check the insert length in BAM file.

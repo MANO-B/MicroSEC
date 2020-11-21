@@ -4,12 +4,12 @@
 \alias{fun_save_gz}
 \title{Save function.}
 \usage{
-fun_save_gz(MSEC, OUTPUT)
+fun_save_gz(msec, output)
 }
 \arguments{
-\item{MSEC}{Mutation filtering information.}
+\item{msec}{Mutation filtering information.}
 
-\item{OUTPUT}{Output file name (full path).}
+\item{output}{output file name (full path).}
 }
 \description{
 This function attempts to save the filtering results.

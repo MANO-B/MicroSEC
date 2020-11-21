@@ -6,43 +6,40 @@
 \usage{
 fun_read_check(
   df_mutation,
-  df_BAM,
+  df_bam,
   df_mut_call,
-  genome,
-  Chr_No,
-  SAMPLE_NAME,
-  READ_length,
-  ADAPTER_SEQ_1,
-  ADAPTER_SEQ_2,
-  Short_Homology_search_length,
-  PROGRESS_BAR
+  ref_genome,
+  sample_name,
+  read_length,
+  adapter_1,
+  adapter_2,
+  short_homology_search_length,
+  progress_bar
 )
 }
 \arguments{
 \item{df_mutation}{Mutation information.}
 
-\item{df_BAM}{Data from the BAM file.}
+\item{df_bam}{Data from the BAM file.}
 
 \item{df_mut_call}{Read ID list.}
 
-\item{genome}{Reference genome for the data.}
+\item{ref_genome}{Reference genome for the data.}
 
-\item{Chr_No}{Chromosome number.}
+\item{sample_name}{Sample name (character)}
 
-\item{SAMPLE_NAME}{Sample name (character)}
+\item{read_length}{The read length in the sequence.}
 
-\item{READ_length}{The read length in the sequence.}
+\item{adapter_1}{The Read 1 adapter sequence of the library.}
 
-\item{ADAPTER_SEQ_1}{The Read 1 adapter sequence of the library.}
+\item{adapter_2}{The Read 2 adapter sequence of the library.}
 
-\item{ADAPTER_SEQ_2}{The Read 2 adapter sequence of the library.}
+\item{short_homology_search_length}{Small sequence for homology search.}
 
-\item{Short_Homology_search_length}{Small sequence for homology search.}
-
-\item{PROGRESS_BAR}{"Y": You can see the progress visually.}
+\item{progress_bar}{"Y": You can see the progress visually.}
 }
 \value{
-list(MSEC, Homology_search)
+list(msec, homology_search)
 }
 \description{
 This function attempts to check the mutation profile in each read.

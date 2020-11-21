@@ -4,12 +4,12 @@
 \alias{fun_save}
 \title{Save function.}
 \usage{
-fun_save(MSEC, SAMPLE_INFO, wd)
+fun_save(msec, sample_info, wd)
 }
 \arguments{
-\item{MSEC}{Mutation filtering information.}
+\item{msec}{Mutation filtering information.}
 
-\item{SAMPLE_INFO}{The sample name.}
+\item{sample_info}{The sample name.}
 
 \item{wd}{The directory to save.}
 }

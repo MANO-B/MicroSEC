@@ -4,12 +4,12 @@
 \alias{fun_convert}
 \title{Mutation data file converter}
 \usage{
-fun_convert(MUTATION_FILE, GENOME)
+fun_convert(mutation_file, organism)
 }
 \arguments{
-\item{MUTATION_FILE}{Path of the mutation information file.}
+\item{mutation_file}{Path of the mutation information file.}
 
-\item{GENOME}{Human or Mouse genome.}
+\item{ref_genome}{Human or Mouse genome.}
 }
 \value{
 df_mutation

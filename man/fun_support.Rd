@@ -8,10 +8,10 @@ fun_support(
   df_cigar,
   df_seq,
   mut_read_strand,
-  ADAPTER_SEQ_1,
-  ADAPTER_SEQ_2,
+  adapter_1,
+  adapter_2,
   mut_position,
-  Alt_length,
+  alt_length,
   indel_status
 )
 }
@@ -22,13 +22,13 @@ fun_support(
 
 \item{mut_read_strand}{The strand of the sequence, "+" or "-".}
 
-\item{ADAPTER_SEQ_1}{The Read 1 adapter sequence of the library.}
+\item{adapter_1}{The Read 1 adapter sequence of the library.}
 
-\item{ADAPTER_SEQ_2}{The Read 2 adapter sequence of the library.}
+\item{adapter_2}{The Read 2 adapter sequence of the library.}
 
 \item{mut_position}{The mutation position in the read.}
 
-\item{Alt_length}{The length of altered bases.}
+\item{alt_length}{The length of altered bases.}
 }
 \value{
 list(Pre_support_length, Post_support_length, Soft_Clipped_read)

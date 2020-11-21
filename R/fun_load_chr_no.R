@@ -2,16 +2,16 @@
 #'
 #' This function attempts to load the chromosome number.
 #'
-#' @param GENOME Human or Mouse genome.
-#' @return Chr_No
+#' @param organism Human or Mouse genome.
+#' @return chr_no
 #' @examples
 #' fun_load_chr_no("Human")
 #' @export
-fun_load_chr_no = function(GENOME){
-  if(GENOME %in% c("Human", "hg19", "hg38")){
+fun_load_chr_no <- function(organism) {
+  if (organism %in% c("Human", "hg19", "hg38")) {
     return(24)
   }
-  if(GENOME %in% c("Mouse", "mm10")){
+  if (organism %in% c("Mouse", "mm10")) {
     return(21)
   }
 }

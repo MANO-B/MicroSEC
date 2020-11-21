@@ -4,19 +4,30 @@
 \alias{fun_homology}
 \title{Homology check function.}
 \usage{
-fun_homology(MSEC, df_distant, Minimum_Homology_search_length, PROGRESS_BAR)
+fun_homology(
+  msec,
+  df_distant,
+  min_homology_search,
+  ref_genome,
+  chr_no,
+  progress_bar
+)
 }
 \arguments{
-\item{MSEC}{Mutation filtering information.}
+\item{msec}{Mutation filtering information.}
 
 \item{df_distant}{Sequences to be checked.}
 
-\item{Minimum_Homology_search_length}{Minimum length to define "homologous".}
+\item{min_homology_search}{Minimum length to define "homologous".}
 
-\item{PROGRESS_BAR}{"Y": You can see the progress visually.}
+\item{ref_genome}{Reference genome.}
+
+\item{chr_no}{Chromosome number.}
+
+\item{progress_bar}{"Y": You can see the progress visually.}
 }
 \value{
-MSEC
+msec
 }
 \description{
 This function attempts to search the homologous regions.

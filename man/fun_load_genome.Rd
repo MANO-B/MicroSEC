@@ -4,13 +4,13 @@
 \alias{fun_load_genome}
 \title{Genome loading function.}
 \usage{
-fun_load_genome(GENOME)
+fun_load_genome(organism)
 }
 \arguments{
-\item{GENOME}{Human or Mouse genome.}
+\item{organism}{Human or Mouse genome.}
 }
 \value{
-genome
+ref_genome
 }
 \description{
 This function attempts to load the appropriate genome.

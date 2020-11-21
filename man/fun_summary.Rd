@@ -4,13 +4,13 @@
 \alias{fun_summary}
 \title{Summarizing function.}
 \usage{
-fun_summary(MSEC)
+fun_summary(msec)
 }
 \arguments{
-\item{MSEC}{Mutation filtering information.}
+\item{msec}{Mutation filtering information.}
 }
 \value{
-MSEC
+msec
 }
 \description{
 This function summarizes the filtering results.

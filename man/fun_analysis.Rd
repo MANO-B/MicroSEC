@@ -5,27 +5,27 @@
 \title{Analyzing function.}
 \usage{
 fun_analysis(
-  MSEC,
-  Mut_depth,
-  Short_Homology_search_length = 4,
-  Minimum_Homology_search_length = 40,
+  msec,
+  mut_depth,
+  short_homology_search_length = 4,
+  min_homology_search = 40,
   threshold_p = 10^(-6),
   threshold_hairpin_ratio = 0.5,
   threshold_soft_clip_ratio = 0.9,
   threshold_short_length = 0.8,
   threshold_distant_homology = 0.2,
   threshold_low_quality_rate = 0.1,
-  Homopolymer_length = 15
+  homopolymer_length = 15
 )
 }
 \arguments{
-\item{MSEC}{Mutation filtering information.}
+\item{msec}{Mutation filtering information.}
 
-\item{Mut_depth}{Mutation coverage data.}
+\item{mut_depth}{Mutation coverage data.}
 
-\item{Short_Homology_search_length}{Small sequence for homology search.}
+\item{short_homology_search_length}{Small sequence for homology search.}
 
-\item{Minimum_Homology_search_length}{The sequence length for homology
+\item{min_homology_search}{The sequence length for homology
 search.}
 
 \item{threshold_p}{The largest p value of significant errors.}
@@ -42,10 +42,10 @@ regions.}
 
 \item{threshold_low_quality_rate}{The smallest rate of low quality bases.}
 
-\item{Homopolymer_length}{The smallest length of homopolymers.}
+\item{homopolymer_length}{The smallest length of homopolymers.}
 }
 \value{
-MSEC
+msec
 }
 \description{
 This function analyzes the filtering results.

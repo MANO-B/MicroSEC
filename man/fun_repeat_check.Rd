@@ -4,25 +4,25 @@
 \alias{fun_repeat_check}
 \title{Repeat check function.}
 \usage{
-fun_repeat_check(Rep_A, Rep_B, Ref_seq, Width, Del)
+fun_repeat_check(rep_a, rep_b, ref_seq, ref_width, del)
 }
 \arguments{
-\item{Rep_A}{The shorter sequence of \link{Ref} and \link{Alt}.}
+\item{rep_a}{The shorter sequence of \link{Ref} and \link{Alt}.}
 
-\item{Rep_B}{The longer sequence of \link{Ref} and \link{Alt}.}
+\item{rep_b}{The longer sequence of \link{Ref} and \link{Alt}.}
 
-\item{Ref_seq}{Reference sequence around the mutation.}
+\item{ref_seq}{Reference sequence around the mutation.}
 
-\item{Width}{Search length for Ref_seq.}
+\item{ref_width}{Search length for ref_seq.}
 
-\item{Del}{Insertion: 0, Deletion: 1}
+\item{del}{Insertion: 0, Deletion: 1}
 }
 \value{
-list(Pre_rep_status, Post_rep_status, Homopolymer_status)
+list(pre_rep_status, post_rep_status, homopolymer_status)
 }
 \description{
 This function attempts to check the repetitive sequence around the mutation.
 }
 \examples{
-fun_repeat_check(DNAString("A"), DNAString("AATC"), DNAString("GGAAAAAAATCTCTCAACA"), 5, 0)
+fun_repeat_check(DNAString("A"), DNAString("AAT"), DNAString("GAATC"), 1, 0)
 }

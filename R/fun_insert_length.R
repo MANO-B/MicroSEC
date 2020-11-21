@@ -2,18 +2,20 @@
 #'
 #' This function attempts to check the insert length in BAM file.
 #'
-#' @param BAM_FILE Path of the BAM file.
-#' @return df_BAM
+#' @param bam_file Path of the BAM file.
+#' @return df_bam
 #' @importFrom Rsamtools BamFile
 #' @importFrom Rsamtools scanBam
 #' @importFrom Biostrings DNAStringSet
 #' @examples
 #' fun_insert_length("./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam")
 #' @export
-fun_insert_length = function(BAM_FILE){
-  file_BAM = BamFile(BAM_FILE)
-  df_BAM = scanBam(file_BAM)[[1]]
-  return(median(df_BAM$isize[df_BAM$isize > 0 & df_BAM$isize < 1000 & !is.na(df_BAM$isize)]))
+fun_insert_length <- function(bam_file) {
+  file_bam <- BamFile(bam_file)
+  df_bam <- scanBam(file_bam)[[1]]
+  return(median(df_bam$isize[df_bam$isize > 0 &
+                             df_bam$isize < 1000 &
+                             !is.na(df_bam$isize)]))
 }
 
 # The following block is used by usethis to automatically manage
