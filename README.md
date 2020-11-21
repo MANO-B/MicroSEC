@@ -201,22 +201,14 @@ Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz /mnt/result/mutation/SAMPLE
 ```  
 - How to use in R Console
 ```
-## Setting
-wd = "/mnt/HDD8TB/MicroSEC" # set your working/output directory
-setwd(wd)
-
 ## Necessary packages
 library(MicroSEC)
 
-# set arguments
-args = commandArgs(trailingOnly = T)
-
-if (args[3] == "N" | args[3] == "Y") {
-  wd = args[1]
-  sample_list = args[2]
-  progress_bar = args[3]
+wd = "/mnt/HDD8TB/MicroSEC" # set your working/output directory
+sample_list = "/mnt/HDD8TB/MicroSEC/source/Sample_list.txt"
+progress_bar = "Y"
   
-  setwd(wd)
+setwd(wd)
   
   # load sample information tsv file
   sample_info = read.csv(sample_list,
@@ -293,67 +285,6 @@ if (args[3] == "N" | args[3] == "Y") {
   
   # save the results
   fun_save(msec, sample_info[1,1], wd)
-}else {
-  output = args[1]
-  sample_name = args[2]
-  mutation_file = args[3]
-  bam_file = args[4]
-  read_list = args[5]
-  read_length = as.integer(args[6])
-  adapter_1 = args[7]
-  adapter_2 = args[8]
-  organism = args[9]
-  progress_bar = "N"
-  
-  # load mutation information
-  df_mutation = fun_load_mutation_gz(mutation_file)
-  df_bam = fun_load_bam(bam_file)
-  df_mut_call = fun_load_id(read_list)
-  
-  # load genomic sequence
-  ref_genome = fun_load_genome(organism)
-  chr_no = fun_load_chr_no(organism)
-  
-  # analysis
-  result = fun_read_check(df_mutation = df_mutation,
-                          df_bam =  df_bam,
-                          df_mut_call = df_mut_call,
-                          ref_genome = ref_genome,
-                          sample_name = sample_name,
-                          read_length = read_length,
-                          adapter_1 = adapter_1,
-                          adapter_2 = adapter_2,
-                          short_homology_search_length = 4,
-                          progress_bar = progress_bar)
-  msec = result[[1]]
-  homology_search = result[[2]]
-  mut_depth = result[[3]]
-  
-  # search homologous sequences
-  msec = fun_homology(msec,
-                      homology_search,
-                      min_homology_search = 40,
-                      ref_genome,
-                      chr_no,
-                      progress_bar = progress_bar)
-  
-  # statistical analysis
-  msec = fun_summary(msec)
-  msec = fun_analysis(msec,
-                      mut_depth,
-                      short_homology_search_length = 4,
-                      min_homology_search = 40,
-                      threshold_p = 10 ^ (-6),
-                      threshold_hairpin_ratio = 0.50,
-                      threshold_soft_clip_ratio = 0.90,
-                      threshold_short_length = 0.8,
-                      threshold_distant_homology = 0.2,
-                      threshold_low_quality_rate = 0.1,
-                      homopolymer_length = 15)
-  
-  # save the results
-  fun_save_gz(msec, output)
-}
 
 ```
 
