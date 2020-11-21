@@ -29,9 +29,11 @@ fun_support(
 \item{mut_position}{The mutation position in the read.}
 
 \item{alt_length}{The length of altered bases.}
+
+\item{indel_status}{The mutation is indel or not.}
 }
 \value{
-list(Pre_support_length, Post_support_length, Soft_Clipped_read)
+list(pre_support_length, post_support_length, soft_clipped_read)
 }
 \description{
 This function attempts to calculate supporting lengths of a read.

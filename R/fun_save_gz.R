@@ -8,7 +8,7 @@
 fun_save_gz <- function(msec, output) {
   # save the results
   gz1 <- gzfile(output, "w")
-  write.table(msec, gz1, sep = "\t", na = "",
+  utils::write.table(msec, gz1, sep = "\t", na = "",
               row.names = FALSE, col.names = TRUE, quote = FALSE)
   close(gz1)
 }

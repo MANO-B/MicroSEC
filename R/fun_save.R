@@ -35,19 +35,19 @@ fun_save <- function(msec, sample_info, wd) {
       "The rate of low quality bases in the mutation supporting reads",
     prob_filter_1 = paste(
       "The probability of the occurence of the shorter-supporting lengths",
-      "distribution (threshold_p: 10^(-6))"),
+      "distribution (threshold_p: 10 ^ (-6))"),
     prob_filter_3_pre = paste(
       "The probability of the occurence of the pre-supporting lengths",
-      "distribution (threshold_p: 10^(-6))"),
+      "distribution (threshold_p: 10 ^ (-6))"),
     prob_filter_3_post = paste(
       "The probability of the occurence of the post-supporting lengths",
-      "distribution (threshold_p: 10^(-6))"),
+      "distribution (threshold_p: 10 ^ (-6))"),
     filter_1_mutation_intra_hairpin_loop =
       "Shorter-supporting lengths are too short to occur",
     filter_2_hairpin_structure =
       "Palindromic sequences exist within 150 bases",
     filter_3_microhomology_induced_mutation =
-      "3’-/5’-supporting lengths are too densely distributed to occur.",
+      "3'-/5'-supporting lengths are too densely distributed to occur.",
     filter_4_soft_clipping = ">=90% mutation-supporting reads are soft-clipped",
     filter_5_highly_homologous_region = paste(
       ">=20% mutations were called by chimeric reads comprising two distant",
@@ -88,7 +88,7 @@ fun_save <- function(msec, sample_info, wd) {
                file = paste(wd, "/MicroSEC-result_", sample_info, "_",
                             Sys.Date(), ".xlsx", sep = ""),
                overwrite = TRUE, returnValue = FALSE)
-  write.table(msec,
+  utils::write.table(msec,
               file = paste(wd, "/MicroSEC_", sample_info, ".tsv", sep = ""),
               sep = "\t", na = "", row.names = FALSE, col.names = TRUE,
               quote = FALSE)

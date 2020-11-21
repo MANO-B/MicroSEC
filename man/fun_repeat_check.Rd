@@ -7,9 +7,9 @@
 fun_repeat_check(rep_a, rep_b, ref_seq, ref_width, del)
 }
 \arguments{
-\item{rep_a}{The shorter sequence of \link{Ref} and \link{Alt}.}
+\item{rep_a}{The shorter sequence of Ref and Alt.}
 
-\item{rep_b}{The longer sequence of \link{Ref} and \link{Alt}.}
+\item{rep_b}{The longer sequence of Ref and Alt.}
 
 \item{ref_seq}{Reference sequence around the mutation.}
 

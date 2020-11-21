@@ -9,9 +9,18 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @examples
+#' \dontrun{
 #' fun_load_id("./source/PC9_Cell_line")
+#' }
 #' @export
 fun_load_id <- function(read_list) {
+  Chr <- NULL
+  Pos <- NULL
+  Ref <- NULL
+  Alt <- NULL
+  Mut_ID <- NULL
+  Mut <- NULL
+
   # load mutation supporting read list
   files <- data.frame(file = list.files(read_list,
                                         pattern = ".gz",
@@ -19,7 +28,7 @@ fun_load_id <- function(read_list) {
   df_mut_call <- NULL
   for (i in files$file) {
     df_mut_call <- rbind(df_mut_call,
-                         read.csv(as.character(i),
+                         utils::read.csv(as.character(i),
                                   header = TRUE,
                                   stringsAsFactors = FALSE,
                                   sep = "\t"))

@@ -33,6 +33,67 @@ fun_analysis <- function(msec,
                         threshold_low_quality_rate = 0.1,
                         homopolymer_length = 15) {
   if (!is.null(msec)) {
+    short_support_length_total <- NULL
+    half_length_total <- NULL
+    pre_support_length_total <- NULL
+    total_length_total <- NULL
+    post_support_length_total <- NULL
+    low_quality_base_rate_under_q18 <- NULL
+    pre_rep_status <- NULL
+    post_rep_status <- NULL
+    alt_length <- NULL
+    short_support_length_adj_sum <- NULL
+    half_length_adj_sum <- NULL
+    pre_support_length_adj_sum <- NULL
+    total_length_adj_sum <- NULL
+    post_support_length_adj_sum <- NULL
+    total_read <- NULL
+    prob_filter_1 <- NULL
+    prob_filter_3_pre <- NULL
+    prob_filter_3_post <- NULL
+    short_short_support <- NULL
+    short_short_support_sum <- NULL
+    flag_hairpin <- NULL
+    high_rate_q18 <- NULL
+    short_pre_support <- NULL
+    short_pre_support_sum <- NULL
+    short_post_support <- NULL
+    short_post_support_sum <- NULL
+    soft_clipped_read <- NULL
+    distant_homology_rate <- NULL
+    not_long_repeat <- NULL
+    SimpleRepeat_TRF <- NULL
+    Transition <- NULL
+    homopolymer_status <- NULL
+    caution <- NULL
+    filter_1_mutation_intra_hairpin_loop <- NULL
+    filter_2_hairpin_structure <- NULL
+    filter_3_microhomology_induced_mutation <- NULL
+    filter_4_soft_clipping <- NULL
+    filter_5_highly_homologous_region <- NULL
+    filter_6_simple_repeat <- NULL
+    filter_7_c_to_t_artifact <- NULL
+    filter_8_mutation_at_homopolymer <- NULL
+    mut_type <- NULL
+    hairpin_length <- NULL
+    pre_minimum_length <- NULL
+    post_minimum_length<- NULL
+    indel_status <- NULL
+    indel_length <- NULL
+    penalty_pre <- NULL
+    penalty_post <- NULL
+    pre_minimum_length_adj <- NULL
+    half_length <- NULL
+    post_minimum_length_adj <- NULL
+    pre_support_length_adj <- NULL
+    post_support_length_adj <- NULL
+    shortest_support_length_adj <- NULL
+    minimum_length_1 <- NULL
+    minimum_length_2 <- NULL
+    minimum_length <- NULL
+    short_support_length_adj <- NULL
+    altered_length <- NULL
+    distant_homology <- NULL
     msec <- msec %>% mutate(
       short_short_support =
         (short_support_length_total <=

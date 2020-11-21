@@ -16,5 +16,7 @@ df_bam
 This function attempts to load the BAM file.
 }
 \examples{
+\dontrun{
 fun_load_bam("./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam")
+}
 }

@@ -11,10 +11,27 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @examples
+#' \dontrun{
 #' fun_load_mutation("./source/CCLE.xlsx", "PC9")
+#' }
 #' @export
 fun_load_mutation <- function(mutation_file,
                              sample_name) {
+  Sample <- NULL
+  Gene <- NULL
+  `HGVS.c` <- NULL
+  `HGVS.p` <- NULL
+  Mut_type <- NULL
+  `Total_QV>=20` <- NULL
+  `%Alt` <- NULL
+  Chr <- NULL
+  Pos <- NULL
+  Ref <- NULL
+  Alt <- NULL
+  SimpleRepeat_TRF <- NULL
+  Neighborhood_sequence <- NULL
+  Transition <- NULL
+  
   # load somatic mutation list
   df_mutation <- read.xlsx(mutation_file, sheet = 1)
   # data formatting

@@ -9,6 +9,34 @@
 #' @importFrom dplyr select
 #' @export
 fun_summary <- function(msec) {
+  distant_homology <- NULL
+  total_read <- NULL
+  indel_status <- NULL
+  pre_minimum_length <- NULL
+  indel_length <- NULL
+  penalty_pre <- NULL
+  post_minimum_length <- NULL
+  penalty_post <- NULL
+  pre_support_length <- NULL
+  read_length <- NULL
+  post_support_length <- NULL
+  pre_minimum_length_adj <- NULL
+  pre_rep_status <- NULL
+  post_minimum_length_adj <- NULL
+  post_rep_status <- NULL
+  pre_support_length_adj <- NULL
+  post_support_length_adj <- NULL
+  minimum_length_1 <- NULL
+  minimum_length_2 <- NULL
+  minimum_length <- NULL
+  shortest_support_length_adj <- NULL
+  short_support_length <- NULL
+  mut_type <- NULL
+  alt_length <- NULL
+  altered_length <- NULL
+  short_support_length_adj <- NULL
+  half_length <- NULL
+
   if (!is.null(msec)) {
     msec <- msec %>% mutate(
       distant_homology_rate = fun_zero(distant_homology, total_read)

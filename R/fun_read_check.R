@@ -39,6 +39,9 @@ fun_read_check <- function(df_mutation,
                           adapter_2,
                           short_homology_search_length,
                           progress_bar) {
+  Chr <- NULL
+  Pos <- NULL
+  
   if (length(df_mutation[, 1]) > 0) {
     # initialize
     msec <- NULL
@@ -217,7 +220,7 @@ fun_read_check <- function(df_mutation,
             sum(df_bam_pos == (df_mutation[i, "Pos"] + 1 - depth))
         }
         if (progress_bar == "Y") {
-          pb <- txtProgressBar(min = 0,
+          pb <- utils::txtProgressBar(min = 0,
                               max = max(1, length(mut_read_id)),
                               width = 20,
                               style = 3)
@@ -242,7 +245,7 @@ fun_read_check <- function(df_mutation,
           flag_2 <- pre_search_length
           # progress bar
           if (progress_bar == "Y") {
-            setTxtProgressBar(pb, j)
+            utils::setTxtProgressBar(pb, j)
             if ((j - 1) %% pb_t == 0) {
               cat(paste(" Mutation:", i, "/",
                         length(df_mutation[, 1]), "      "))

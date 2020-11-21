@@ -22,5 +22,7 @@ list(hairpin_length, whether hairpin sequences exist or not)
 This function attempts to find hairpin structure sequences.
 }
 \examples{
+\dontrun{
 fun_hairpin_check(DNAString("GGGGAAAA"), DNAString("TGGGGAAAAC"), 8, 9)
+}
 }

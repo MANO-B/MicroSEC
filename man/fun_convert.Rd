@@ -9,7 +9,7 @@ fun_convert(mutation_file, organism)
 \arguments{
 \item{mutation_file}{Path of the mutation information file.}
 
-\item{ref_genome}{Human or Mouse genome.}
+\item{organism}{Human or Mouse genome.}
 }
 \value{
 df_mutation
@@ -18,5 +18,7 @@ df_mutation
 This function attempts to convert the mutation information file.
 }
 \examples{
+\dontrun{
 fun_convert("/mnt/source/mutation.xlsx", "hg38")
+}  
 }

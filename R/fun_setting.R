@@ -10,7 +10,9 @@
 #' @param alt_length The length of altered bases.
 #' @return list(pre_search_length, post_search_length, peri_seq_1, peri_seq_2)
 #' @examples
+#' \dontrun{
 #' fun_setting(0, 20, "AGATCCT", 3, 1)
+#' }
 #' @export
 fun_setting <- function(pre, post, neighbor_seq, neighbor_length, alt_length) {
   peri_seq_1 <- substring(neighbor_seq,

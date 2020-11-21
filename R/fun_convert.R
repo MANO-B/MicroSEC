@@ -3,7 +3,7 @@
 #' This function attempts to convert the mutation information file.
 #'
 #' @param mutation_file Path of the mutation information file.
-#' @param ref_genome Human or Mouse genome.
+#' @param organism Human or Mouse genome.
 #' @return df_mutation
 #' @importFrom openxlsx read.xlsx
 #' @importFrom dplyr %>%
@@ -14,10 +14,47 @@
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_detect
 #' @examples
+#' \dontrun{
 #' fun_convert("/mnt/source/mutation.xlsx", "hg38")
+#' }  
 #' @export
 fun_convert <- function(mutation_file,
                        organism) {
+  Hugo_Symbol <- NULL
+  Protein_Change <- NULL
+  Start_Position <- NULL
+  End_Position <- NULL
+  Variant_Type <- NULL
+  Reference <- NULL
+  Tumor_Seq <- NULL
+  Mut_type <- NULL
+  Chr <- NULL
+  Start <- NULL
+  End <- NULL
+  Ref <- NULL
+  Alt <- NULL
+  Alt_length_1 <- NULL
+  Alt_length_2 <- NULL
+  PRE_ins <- NULL
+  PRE_del <- NULL
+  Alt_ins <- NULL
+  Alt_del <- NULL
+  Alt_snv <- NULL
+  Ref_ins <- NULL
+  Ref_del <- NULL
+  Ref_snv <- NULL
+  Neighbor_start_1 <- NULL
+  Neighbor_end_1 <- NULL
+  Neighbor_start_2 <- NULL
+  Neighbor_end_2 <- NULL
+  Pre_Neighbor <- NULL
+  Alt_indel <- NULL
+  POST_ins <- NULL
+  Post_Neighbor <- NULL
+  Alt_length <- NULL
+  Ref_indel <- NULL
+  Pos <- NULL
+  
   # load somatic mutation list
   df_mutation <- read.xlsx(mutation_file, sheet = 1)
   # load genomic sequence

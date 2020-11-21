@@ -13,7 +13,9 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom stringr str_split
 #' @examples
+#' \dontrun{
 #' fun_hairpin_trimming(DNAString("GGAAAAAAATCTCTCAACA"), "+", "AGATCC")
+#' }
 #' @export
 fun_hairpin_trimming <- function(hairpin_seq,
                                 mut_read_strand,

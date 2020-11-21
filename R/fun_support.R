@@ -9,9 +9,10 @@
 #' @param adapter_2 The Read 2 adapter sequence of the library.
 #' @param mut_position The mutation position in the read.
 #' @param alt_length The length of altered bases.
+#' @param indel_status The mutation is indel or not.
 #' @importFrom stringr str_split
 #' @importFrom BiocGenerics as.data.frame
-#' @return list(Pre_support_length, Post_support_length, Soft_Clipped_read)
+#' @return list(pre_support_length, post_support_length, soft_clipped_read)
 #' @export
 fun_support <- function(df_cigar,
                        df_seq,

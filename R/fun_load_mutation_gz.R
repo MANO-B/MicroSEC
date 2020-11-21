@@ -9,11 +9,17 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @examples
+#' \dontrun{
 #' fun_load_mutation_gz("./source/CCLE_SM.gz")
+#' }
 #' @export
 fun_load_mutation_gz <- function(mutation_file) {
+  Ref <- NULL
+  Alt <- NULL
+  Neighborhood_sequence <- NULL
+  
   # load somatic mutation list
-  df_mutation <- read.csv(mutation_file,
+  df_mutation <- utils::read.csv(mutation_file,
                           stringsAsFactors = FALSE,
                           header = TRUE,
                           check.names = F,
@@ -28,7 +34,6 @@ fun_load_mutation_gz <- function(mutation_file) {
     }
     df_mutation$Pos <- as.integer(df_mutation$Pos)
     df_mutation <- df_mutation %>%
-      filter(Sample == SAMPLE_NAME) %>%
       mutate(Ref = toupper(Ref)) %>%
       mutate(Alt = toupper(Alt)) %>%
       mutate(Neighborhood_sequence = toupper(Neighborhood_sequence))

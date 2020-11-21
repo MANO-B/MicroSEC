@@ -5,7 +5,9 @@
 #' @param organism Human or Mouse genome.
 #' @return chr_no
 #' @examples
+#' \dontrun{
 #' fun_load_chr_no("Human")
+#' }
 #' @export
 fun_load_chr_no <- function(organism) {
   if (organism %in% c("Human", "hg19", "hg38")) {

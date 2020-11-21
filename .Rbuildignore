@@ -10,3 +10,6 @@
 ^MicroSEC_logo\.png$
 ^doc$
 ^Meta$
+^MicroSEC_insert\.R$
+^archive$
+^cran-comments\.md$

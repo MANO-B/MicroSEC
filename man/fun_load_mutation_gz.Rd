@@ -16,5 +16,7 @@ df_mutation
 This function attempts to load the mutation information file.
 }
 \examples{
+\dontrun{
 fun_load_mutation_gz("./source/CCLE_SM.gz")
+}
 }

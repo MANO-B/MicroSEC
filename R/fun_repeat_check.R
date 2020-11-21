@@ -2,8 +2,8 @@
 #'
 #' This function attempts to check the repetitive sequence around the mutation.
 #'
-#' @param rep_a The shorter sequence of [Ref] and [Alt].
-#' @param rep_b The longer sequence of [Ref] and [Alt].
+#' @param rep_a The shorter sequence of Ref and Alt.
+#' @param rep_b The longer sequence of Ref and Alt.
 #' @param ref_seq Reference sequence around the mutation.
 #' @param ref_width Search length for ref_seq.
 #' @param del Insertion: 0, Deletion: 1

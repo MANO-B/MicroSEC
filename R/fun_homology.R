@@ -28,6 +28,11 @@ fun_homology <- function(msec,
                         chr_no,
                         progress_bar) {
   # initialize
+  Seq <- NULL
+  Direction <- NULL
+  fixed_seq_pre <- NULL
+  fixed_seq_post <- NULL
+
   if (!is.null(df_distant)) {
     msec$distant_homology <- 0
     df_distant <- df_distant %>% dplyr::mutate(
@@ -53,14 +58,14 @@ fun_homology <- function(msec,
     search_seq_r <- PDict(search_seq_r)
     distant_homology <- rep(0, length(search_seq_f))
     if (progress_bar == "Y") {
-      pb <- txtProgressBar(min = 0,
+      pb <- utils::txtProgressBar(min = 0,
                           max = chr_no,
                           width = 20,
                           style = 3)
     }
     for (seqname in 1:chr_no) {
       if (progress_bar == "Y") {
-        setTxtProgressBar(pb, seqname)
+        utils::setTxtProgressBar(pb, seqname)
         cat(paste(" Chromosome screening:", seqname, "/", chr_no, "  "))
      }
 
@@ -70,7 +75,7 @@ fun_homology <- function(msec,
     }
     df_distant$distant_homology <- distant_homology
     if (progress_bar == "Y") {
-      pb <- txtProgressBar(min = 0,
+      pb <- utils::txtProgressBar(min = 0,
                           max = max(1, dim(df_distant)[1]),
                           width = 20,
                           style = 3)
@@ -78,7 +83,7 @@ fun_homology <- function(msec,
     }
     for (i in 1:max_no) {
       if (progress_bar == "Y") {
-        setTxtProgressBar(pb, i)
+        utils::setTxtProgressBar(pb, i)
         if ((i - 1) %% pb_t == 0) {
           cat(paste(" Homology count:", i, "/", max_no, "      "))
         }

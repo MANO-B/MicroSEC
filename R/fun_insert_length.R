@@ -8,12 +8,14 @@
 #' @importFrom Rsamtools scanBam
 #' @importFrom Biostrings DNAStringSet
 #' @examples
+#' \dontrun{
 #' fun_insert_length("./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam")
+#' }
 #' @export
 fun_insert_length <- function(bam_file) {
   file_bam <- BamFile(bam_file)
   df_bam <- scanBam(file_bam)[[1]]
-  return(median(df_bam$isize[df_bam$isize > 0 &
+  return(stats::median(df_bam$isize[df_bam$isize > 0 &
                              df_bam$isize < 1000 &
                              !is.na(df_bam$isize)]))
 }

@@ -18,5 +18,7 @@ df_mutation
 This function attempts to load the mutation information file.
 }
 \examples{
+\dontrun{
 fun_load_mutation("./source/CCLE.xlsx", "PC9")
+}
 }
