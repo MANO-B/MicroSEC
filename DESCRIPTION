@@ -31,7 +31,8 @@ Imports:
   Biostrings,
   GenomicAlignments,
   Rsamtools,
-  GenomeInfoDb
+  GenomeInfoDb,
+  BiocGenerics
 Suggests: 
   BSgenome.Hsapiens.UCSC.hg38,
   BSgenome.Hsapiens.UCSC.hg19,
