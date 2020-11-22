@@ -11,6 +11,10 @@
 #' @importFrom openxlsx freezePane
 #' @importFrom openxlsx setColWidths
 #' @importFrom openxlsx saveWorkbook
+#' @examples
+#' \dontrun{
+#' fun_save(msec, sample_name, wd)
+#' }
 #' @export
 fun_save <- function(msec, sample_info, wd) {
   # explanation

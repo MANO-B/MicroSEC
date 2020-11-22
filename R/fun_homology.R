@@ -20,13 +20,21 @@
 #' @importFrom Biostrings countPDict
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom GenomeInfoDb seqnames
+#' \dontrun{
+#' msec = fun_homology(msec,
+#'                     homology_search,
+#'                     min_homology_search = 40,
+#'                     ref_genome,
+#'                     chr_no,
+#'                     progress_bar = progress_bar)
+#' }
 #' @export
 fun_homology <- function(msec,
-                        df_distant,
-                        min_homology_search,
-                        ref_genome,
-                        chr_no,
-                        progress_bar) {
+                         df_distant,
+                         min_homology_search,
+                         ref_genome,
+                         chr_no,
+                         progress_bar) {
   # initialize
   Seq <- NULL
   Direction <- NULL

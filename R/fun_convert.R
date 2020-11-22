@@ -19,7 +19,7 @@
 #' }  
 #' @export
 fun_convert <- function(mutation_file,
-                       organism) {
+                        organism) {
   Hugo_Symbol <- NULL
   Protein_Change <- NULL
   Start_Position <- NULL

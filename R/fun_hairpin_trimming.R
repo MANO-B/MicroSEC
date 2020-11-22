@@ -14,9 +14,13 @@
 #' @importFrom stringr str_split
 #' @examples
 #' \dontrun{
-#' fun_hairpin_trimming(DNAString("GGAAAAAAATCTCTCAACA"), "+", "AGATCC")
+#' fun_hairpin_trimming(
+#'   Biostrings::DNAString("GGAAAAAAATCTCTCAACA"),
+#'   "+",
+#'   "AACATG",
+#'   "AGATCC"
+#' )
 #' }
-#' @export
 fun_hairpin_trimming <- function(hairpin_seq,
                                 mut_read_strand,
                                 adapter_1,

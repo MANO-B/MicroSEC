@@ -13,7 +13,19 @@
 #' @importFrom stringr str_split
 #' @importFrom BiocGenerics as.data.frame
 #' @return list(pre_support_length, post_support_length, soft_clipped_read)
-#' @export
+#' @examples
+#' \dontrun{
+#' support_status <- fun_support(
+#'   df_cigar,
+#'   df_seq,
+#'   mut_read_strand,
+#'   adapter_1,
+#'   adapter_2,
+#'   mut_position,
+#'   alt_length,
+#'   indel_status
+#' )
+#' }
 fun_support <- function(df_cigar,
                        df_seq,
                        mut_read_strand,

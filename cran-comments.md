@@ -4,7 +4,12 @@
 * Windows 10, R 4.0.3
 
 ## R CMD check results
-There were no ERRORs, WARNINGs, or NOTEs.
-
+── R CMD check results ─────────────────────────────────── MicroSEC 1.1.0 ────  
+Duration: 2m 53.7s  
+  
+0 errors ✓ | 0 warnings ✓ | 0 notes ✓  
+  
+R CMD check succeeded  
+  
 ## Downstream dependencies
 There were no downstream dependencies.

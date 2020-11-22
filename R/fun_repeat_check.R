@@ -12,9 +12,14 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
 #' \dontrun{
-#' fun_repeat_check(DNAString("A"), DNAString("AAT"), DNAString("GAATC"), 1, 0)
+#' fun_repeat_check(
+#'   Biostrings::DNAString("A"),
+#'   Biostrings::DNAString("AAATCTC"),
+#'   Biostrings::DNAString("CCATGTCGAAAAAAATCTCTCTCGG"),
+#'   1,
+#'   0
+#' )
 #' }
-#' @export
 fun_repeat_check <- function(rep_a, rep_b, ref_seq, ref_width, del) {
   pre_rep_status <- 0
   post_rep_status <- 0

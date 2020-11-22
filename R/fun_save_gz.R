@@ -4,6 +4,10 @@
 #'
 #' @param msec Mutation filtering information.
 #' @param output output file name (full path).
+#' @examples
+#' \dontrun{
+#' fun_save_gz(msec, output)
+#' }
 #' @export
 fun_save_gz <- function(msec, output) {
   # save the results

@@ -7,6 +7,10 @@
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
+#' @examples
+#' \dontrun{
+#' msec = fun_summary(msec)
+#' }
 #' @export
 fun_summary <- function(msec) {
   distant_homology <- NULL

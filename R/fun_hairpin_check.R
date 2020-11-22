@@ -12,9 +12,13 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
 #' \dontrun{
-#' fun_hairpin_check(DNAString("GGGGAAAA"), DNAString("TGGGGAAAAC"), 8, 9)
+#' fun_hairpin_check(
+#'   Biostrings::DNAString("GGGGAAAA"),
+#'   Biostrings::DNAString("AATGGGGGGAAAAAAAACTACG"),
+#'   8,
+#'   9
+#' )
 #' }
-#' @export
 fun_hairpin_check <- function(hairpin_seq_tmp, ref_seq, hairpin_length, hair) {
   reverse_seq <- matchPattern(pattern = hairpin_seq_tmp,
                              subject = ref_seq,

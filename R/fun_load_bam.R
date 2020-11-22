@@ -9,7 +9,9 @@
 #' @importFrom Biostrings DNAStringSet
 #' @examples
 #' \dontrun{
-#' fun_load_bam("./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam")
+#' fun_load_bam(
+#'   "./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam"
+#' )
 #' }
 #' @export
 fun_load_bam <- function(bam_file) {
