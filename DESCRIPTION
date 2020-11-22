@@ -1,5 +1,5 @@
 Package: MicroSEC
-Title: MicroSEC: Sequence Error Filtering Pipeline for FFPE Samples
+Title: Sequence Error Filtering Pipeline for FFPE Samples
 Version: 1.1.0
 Authors@R: 
     person(given = "Masachika",
@@ -9,9 +9,9 @@ Authors@R:
 Description: Clinical sequencing of tumor is usually performed on formalin-fixed
     and paraffin-embedded (FFPE) samples and have many sequencing errors. We 
     found that the majority of these errors are detected in chimeric reads 
-    caused by single-strand DNA with microhomology. Our filtering pipeline, 
-    MicroSEC, focuses on the uneven distribution of the artifacts in each read 
-    and removes such errors in FFPE samples without over-eliminating the true 
+    caused by single-strand DNA with microhomology. Our filtering pipeline
+    focuses on the uneven distribution of the artifacts in each read and 
+    removes such errors in FFPE samples without over-eliminating the true 
     mutations detected in fresh frozen samples.
 License: MIT + file LICENSE
 Encoding: UTF-8
