@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2020-11-21" />
+<meta name="date" content="2020-11-22" />
 
 <title>MicroSEC: Sequence artifact filtering pipeline for FFPE samples</title>
 
@@ -367,7 +367,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">MicroSEC: Sequence artifact filtering pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2020-11-21</h4>
+<h4 class="date">2020-11-22</h4>
 
 
 
@@ -421,7 +421,7 @@ The explatation of the results is written in detail in the second sheet of the e
 </div>
 <div id="setting" class="section level2">
 <h2>Setting</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>wd =<span class="st"> &quot;/mnt/HDD8TB/MicroSEC/archive&quot;</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>wd =<span class="st"> &quot;./output&quot;</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">collapse =</span> <span class="ot">TRUE</span>,</span>
 <span id="cb4-3"><a href="#cb4-3"></a>                      <span class="dt">fig.width =</span> <span class="dv">12</span>,</span>
 <span id="cb4-4"><a href="#cb4-4"></a>                      <span class="dt">fig.height =</span> <span class="dv">8</span>,</span>
@@ -429,9 +429,8 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb4-6"><a href="#cb4-6"></a>                      <span class="dt">warning =</span> <span class="ot">FALSE</span>,</span>
 <span id="cb4-7"><a href="#cb4-7"></a>                      <span class="dt">message =</span> <span class="ot">TRUE</span>,</span>
 <span id="cb4-8"><a href="#cb4-8"></a>                      <span class="dt">comment =</span> <span class="st">&quot;#&gt;&quot;</span>)</span>
-<span id="cb4-9"><a href="#cb4-9"></a>knitr<span class="op">::</span>opts_knit<span class="op">$</span><span class="kw">set</span>(<span class="dt">root.dir =</span> wd)</span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="kw">options</span>(<span class="dt">rmarkdown.html_vignette.check_title =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb4-11"><a href="#cb4-11"></a>progress_bar =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="kw">options</span>(<span class="dt">rmarkdown.html_vignette.check_title =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb4-10"><a href="#cb4-10"></a>progress_bar =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
 </div>
 <div id="necessary-packages" class="section level2">
 <h2>Necessary packages</h2>
@@ -626,7 +625,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; </span></span>
 <span id="cb8-21"><a href="#cb8-21"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.0.10</span></span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.1.0</span></span>
 <span id="cb8-23"><a href="#cb8-23"></a><span class="co">#&gt; </span></span>
 <span id="cb8-24"><a href="#cb8-24"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span id="cb8-25"><a href="#cb8-25"></a><span class="co">#&gt;  [1] Biobase_2.46.0                    pkgload_1.1.0                    </span></span>
