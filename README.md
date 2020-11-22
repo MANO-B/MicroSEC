@@ -208,84 +208,81 @@ wd = "/mnt/HDD8TB/MicroSEC" # set your working/output directory
 sample_list = "/mnt/HDD8TB/MicroSEC/source/Sample_list.txt"
 progress_bar = "Y"
   
-setwd(wd)
-  
-  # load sample information tsv file
-  sample_info = read.csv(sample_list,
-                         header = FALSE,
-                         stringsAsFactors = FALSE,
-                         sep = "\t")
-  
-  # initialize
-  msec = NULL
-  homology_search = NULL
-  mut_depth = NULL
-  
-  for (sample in seq_len(dim(sample_info)[1])) {
-    sample_name = sample_info[sample, 1]
-    mutation_file = sample_info[sample, 2]
-    bam_file = sample_info[sample, 3]
-    read_list = sample_info[sample, 4]
-    read_length = as.integer(sample_info[sample, 5])
-    adapter_1 = sample_info[sample, 6]
-    if (sample_info[sample, 7] %in%
-        c("Human", "Mouse", "hg19", "hg38", "mm10")) {
-      adapter_2 = adapter_1
-      organism = sample_info[sample, 7]
-    } else{
-      adapter_2 = sample_info[sample, 7]
-      organism = sample_info[sample, 8]
-    }
-    
-    # load mutation information
-    df_mutation = fun_load_mutation(mutation_file, sample_name)
-    df_bam = fun_load_bam(bam_file)
-    df_mut_call = fun_load_id(read_list)
-    
-    # load genomic sequence
-    ref_genome = fun_load_genome(organism)
-    chr_no = fun_load_chr_no(organism)
-    
-    # analysis
-    result = fun_read_check(df_mutation = df_mutation,
-                            df_bam =  df_bam,
-                            df_mut_call = df_mut_call,
-                            ref_genome = ref_genome,
-                            sample_name = sample_name,
-                            read_length = read_length,
-                            adapter_1 = adapter_1,
-                            adapter_2 = adapter_2,
-                            short_homology_search_length = 4,
-                            progress_bar = progress_bar)
-    msec = rbind(msec, result[[1]])
-    homology_search = rbind(homology_search, result[[2]])
-    mut_depth = rbind(mut_depth, result[[3]])
-  }
-  # search homologous sequences
-  msec = fun_homology(msec,
-                      homology_search,
-                      min_homology_search = 40,
-                      ref_genome,
-                      chr_no,
-                      progress_bar = progress_bar)
-  
-  # statistical analysis
-  msec = fun_summary(msec)
-  msec = fun_analysis(msec,
-                      mut_depth,
-                      short_homology_search_length = 4,
-                      min_homology_search = 40,
-                      threshold_p = 10 ^ (-6),
-                      threshold_hairpin_ratio = 0.50,
-                      threshold_soft_clip_ratio = 0.90,
-                      threshold_short_length = 0.8,
-                      threshold_distant_homology = 0.2,
-                      threshold_low_quality_rate = 0.1,
-                      homopolymer_length = 15)
-  
-  # save the results
-  fun_save(msec, sample_info[1,1], wd)
+# load sample information tsv file
+sample_info = read.csv(sample_list,
+                       header = FALSE,
+                       stringsAsFactors = FALSE,
+                       sep = "\t")
 
+# initialize
+msec = NULL
+homology_search = NULL
+mut_depth = NULL
+
+for (sample in seq_len(dim(sample_info)[1])) {
+  sample_name = sample_info[sample, 1]
+  mutation_file = sample_info[sample, 2]
+  bam_file = sample_info[sample, 3]
+  read_list = sample_info[sample, 4]
+  read_length = as.integer(sample_info[sample, 5])
+  adapter_1 = sample_info[sample, 6]
+  if (sample_info[sample, 7] %in%
+      c("Human", "Mouse", "hg19", "hg38", "mm10")) {
+    adapter_2 = adapter_1
+    organism = sample_info[sample, 7]
+  } else{
+    adapter_2 = sample_info[sample, 7]
+    organism = sample_info[sample, 8]
+  }
+
+  # load mutation information
+  df_mutation = fun_load_mutation(mutation_file, sample_name)
+  df_bam = fun_load_bam(bam_file)
+  df_mut_call = fun_load_id(read_list)
+
+  # load genomic sequence
+  ref_genome = fun_load_genome(organism)
+  chr_no = fun_load_chr_no(organism)
+
+  # analysis
+  result = fun_read_check(df_mutation = df_mutation,
+                          df_bam =  df_bam,
+                          df_mut_call = df_mut_call,
+                          ref_genome = ref_genome,
+                          sample_name = sample_name,
+                          read_length = read_length,
+                          adapter_1 = adapter_1,
+                          adapter_2 = adapter_2,
+                          short_homology_search_length = 4,
+                          progress_bar = progress_bar)
+  msec = rbind(msec, result[[1]])
+  homology_search = rbind(homology_search, result[[2]])
+  mut_depth = rbind(mut_depth, result[[3]])
+}
+# search homologous sequences
+msec = fun_homology(msec,
+                    homology_search,
+                    min_homology_search = 40,
+                    ref_genome,
+                    chr_no,
+                    progress_bar = progress_bar)
+
+# statistical analysis
+msec = fun_summary(msec)
+msec = fun_analysis(msec,
+                    mut_depth,
+                    short_homology_search_length = 4,
+                    min_homology_search = 40,
+                    threshold_p = 10 ^ (-6),
+                    threshold_hairpin_ratio = 0.50,
+                    threshold_soft_clip_ratio = 0.90,
+                    threshold_short_length = 0.8,
+                    threshold_distant_homology = 0.2,
+                    threshold_low_quality_rate = 0.1,
+                    homopolymer_length = 15)
+
+# save the results
+fun_save(msec, sample_info[1,1], wd)
 ```
 
 - Output files  
