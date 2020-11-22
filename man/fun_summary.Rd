@@ -17,6 +17,6 @@ This function summarizes the filtering results.
 }
 \examples{
 \dontrun{
-msec = fun_summary(msec)
+fun_summary(msec)
 }
 }

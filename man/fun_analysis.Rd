@@ -52,16 +52,16 @@ This function analyzes the filtering results.
 }
 \examples{
 \dontrun{
-msec = fun_analysis(msec,
-                    mut_depth,
-                    short_homology_search_length = 4,
-                    min_homology_search = 40,
-                    threshold_p = 10 ^ (-6),
-                    threshold_hairpin_ratio = 0.50,
-                    threshold_soft_clip_ratio = 0.90,
-                    threshold_short_length = 0.8,
-                    threshold_distant_homology = 0.2,
-                    threshold_low_quality_rate = 0.1,
-                    homopolymer_length = 15)
+fun_analysis(msec,
+             mut_depth,
+             short_homology_search_length = 4,
+             min_homology_search = 40,
+             threshold_p = 10 ^ (-6),
+             threshold_hairpin_ratio = 0.50,
+             threshold_soft_clip_ratio = 0.90,
+             threshold_short_length = 0.8,
+             threshold_distant_homology = 0.2,
+             threshold_low_quality_rate = 0.1,
+             homopolymer_length = 15)
 }
 }

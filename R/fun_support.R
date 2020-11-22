@@ -15,7 +15,7 @@
 #' @return list(pre_support_length, post_support_length, soft_clipped_read)
 #' @examples
 #' \dontrun{
-#' support_status <- fun_support(
+#' fun_support(
 #'   df_cigar,
 #'   df_seq,
 #'   mut_read_strand,

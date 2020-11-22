@@ -21,12 +21,12 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom GenomeInfoDb seqnames
 #' \dontrun{
-#' msec = fun_homology(msec,
-#'                     homology_search,
-#'                     min_homology_search = 40,
-#'                     ref_genome,
-#'                     chr_no,
-#'                     progress_bar = progress_bar)
+#' fun_homology(msec,
+#'              homology_search,
+#'              min_homology_search = 40,
+#'              ref_genome,
+#'              chr_no,
+#'              progress_bar = progress_bar)
 #' }
 #' @export
 fun_homology <- function(msec,

@@ -40,7 +40,7 @@ This function attempts to calculate supporting lengths of a read.
 }
 \examples{
 \dontrun{
-support_status <- fun_support(
+fun_support(
   df_cigar,
   df_seq,
   mut_read_strand,
