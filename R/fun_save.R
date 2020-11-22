@@ -83,7 +83,7 @@ fun_save <- function(msec, sample_info, wd) {
                cols = seq_len(ncol(msec)), widths = "auto")
   setColWidths(wb = new_wb, sheet = "MicroSEC_explanation",
                cols = seq_len(ncol(msec_explain)), widths = "auto")
-
+  dir.create(file.path(wd), showWarnings = FALSE)
   saveWorkbook(wb = new_wb,
                file = paste(wd, "/MicroSEC-result_", sample_info, "_",
                             Sys.Date(), ".xlsx", sep = ""),
