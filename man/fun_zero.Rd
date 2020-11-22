@@ -16,6 +16,8 @@ a devided by b
 This function attempts to devide without 0/0 errors.
 }
 \examples{
+\dontrun{
 fun_zero(0, 0)
 fun_zero(3, 5)
+}
 }

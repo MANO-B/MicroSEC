@@ -23,6 +23,11 @@ This function attempts to find hairpin structure sequences.
 }
 \examples{
 \dontrun{
-fun_hairpin_check(DNAString("GGGGAAAA"), DNAString("TGGGGAAAAC"), 8, 9)
+fun_hairpin_check(
+  Biostrings::DNAString("GGGGAAAA"),
+  Biostrings::DNAString("AATGGGGGGAAAAAAAACTACG"),
+  8,
+  9
+)
 }
 }

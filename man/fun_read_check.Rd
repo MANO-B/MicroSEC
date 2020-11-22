@@ -44,3 +44,17 @@ list(msec, homology_search)
 \description{
 This function attempts to check the mutation profile in each read.
 }
+\examples{
+\dontrun{
+result = fun_read_check(df_mutation = df_mutation,
+                        df_bam =  df_bam,
+                        df_mut_call = df_mut_call,
+                        ref_genome = ref_genome,
+                        sample_name = sample_name,
+                        read_length = read_length,
+                        adapter_1 = adapter_1,
+                        adapter_2 = adapter_2,
+                        short_homology_search_length = 4,
+                        progress_bar = progress_bar)
+}
+}

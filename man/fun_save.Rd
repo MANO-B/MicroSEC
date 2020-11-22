@@ -16,3 +16,8 @@ fun_save(msec, sample_info, wd)
 \description{
 This function attempts to save the filtering results.
 }
+\examples{
+\dontrun{
+fun_save(msec, sample_name, wd)
+}
+}

@@ -15,3 +15,8 @@ msec
 \description{
 This function summarizes the filtering results.
 }
+\examples{
+\dontrun{
+msec = fun_summary(msec)
+}
+}

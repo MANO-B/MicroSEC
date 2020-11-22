@@ -14,3 +14,8 @@ fun_save_gz(msec, output)
 \description{
 This function attempts to save the filtering results.
 }
+\examples{
+\dontrun{
+fun_save_gz(msec, output)
+}
+}

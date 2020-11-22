@@ -26,6 +26,12 @@ This function attempts to find the mutated bases in each read.
 }
 \examples{
 \dontrun{
-fun_setting(0, 20, "AGATCCT", 3, 1)
+fun_setting(
+  0,
+  20,
+  "AGATCCGCATCGATGCATGCATGCTGCCGATACTACGTACA",
+  3,
+  1
+)
 }
 }
