@@ -20,6 +20,7 @@
 #' @importFrom Biostrings countPDict
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom GenomeInfoDb seqnames
+#' @examples
 #' \dontrun{
 #' fun_homology(msec,
 #'              homology_search,

@@ -32,3 +32,13 @@ msec
 \description{
 This function attempts to search the homologous regions.
 }
+\examples{
+\dontrun{
+fun_homology(msec,
+             homology_search,
+             min_homology_search = 40,
+             ref_genome,
+             chr_no,
+             progress_bar = progress_bar)
+}
+}
