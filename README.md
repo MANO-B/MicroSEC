@@ -23,7 +23,7 @@ formalin-fixed and paraffin-embedded samples", in preparation.
 
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
-Four files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
+Four files are necessary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
   
 ### File 1: mutation information file  
 This excel file should contain at least these contents:  
@@ -63,7 +63,7 @@ chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212
     ID001-1:579185f represents that the read ID is ID001-1:579185 and the read was mapped to the forward strand.  
     ID008-1:1953407r represents that the read ID is ID008-1:1953407 and the read was mapped to the reverse strand.  
 - Mut  
-    ".;A;N#" reapresents the mutation pattern: "reference base";"altered to A";"other alterations"  
+    ".;A;N#" represents the mutation pattern: "reference base";"altered to A";"other alterations"  
     ".;.+ACACACAC;.-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
   
 ### File 4: sample information tsv file  
@@ -85,9 +85,9 @@ This pipeline contains 8 filtering processes.
 - Filter 2  : Hairpin-structure induced error detection (2-1 or 2-2).  
         - Filter 2-1: Palindromic sequences exist within 150 bases.  
         - Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
-- Filter 3  : 3’-/5’-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
+- Filter 3  : 3'-/5'-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
         - Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
-        - Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
+        - Filter 3-2: The distributions of 3'-/5'-supporting lengths are shorter than 80% of the read length.  
         - Filter 3-3: <10% of bases are low quality (Quality score <18).  
 - Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting adapter sequence).  
 - Filter 5  : >=20% mutations were called by chimeric reads comprising two distant regions.  
@@ -145,37 +145,37 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 
 ```
 > packageVersion("tidyr")
-[1] ‘1.1.2’
+[1] '1.1.2'
 > packageVersion("openxlsx")
-[1] ‘4.2.2’
+[1] '4.2.2'
 > packageVersion("data.table")
-[1] ‘1.13.2’
+[1] '1.13.2'
 > packageVersion("R.utils")
-[1] ‘2.10.1’
+[1] '2.10.1'
 > packageVersion("stringr")
-[1] ‘1.4.0’
+[1] '1.4.0'
 > packageVersion("magrittr")
-[1] ‘1.5’
+[1] '1.5'
 > packageVersion("dplyr")
-[1] ‘1.0.2’
+[1] '1.0.2'
 > packageVersion("Biostrings")
-[1] ‘2.54.0’
+[1] '2.54.0'
 > packageVersion("BSgenome.Hsapiens.UCSC.hg38")
-[1] ‘1.4.1’
+[1] '1.4.1'
 > packageVersion("BSgenome.Hsapiens.UCSC.hg19")
-[1] ‘1.4.0’
+[1] '1.4.0'
 > packageVersion("BSgenome.Mmusculus.UCSC.mm10")
-[1] ‘1.4.0’
+[1] '1.4.0'
 > packageVersion("GenomicAlignments")
-[1] ‘1.22.1’
+[1] '1.22.1'
 > packageVersion("Rsamtools")
-[1] ‘2.0.3’
+[1] '2.0.3'
 > packageVersion("gtools")
-[1] ‘3.8.2’
+[1] '3.8.2'
 > packageVersion("devtools")
-[1] ‘2.3.2’
+[1] '2.3.2'
 > packageVersion("GenomeInfoDb")
-[1] ‘1.22.1’
+[1] '1.22.1'
 ```
 
 ## Instructions for Use
@@ -305,7 +305,7 @@ MicroSEC_PC9.tsv
   
   
 ### Conversion of mutation information files
-MicroSEC utilizes a mutation information file. The format of the file is written differently from common HGSV nomenclature.  
+MicroSEC utilizes a mutation information file. The format of the file is written differently from common HGVS nomenclature.  
 A conversion function is prepared.
 ```
 # Conversion example

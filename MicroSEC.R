@@ -1,5 +1,6 @@
 # MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples
 #
+# Version 1.1.1: format modification for CRAN (Nov. 23, 2020) 
 # Version 1.1.0: formatted for CRAN (Nov. 21, 2020) 
 # Version 1.0.10: Prevent from overfiltering mutations with co-mutations in neighbor (Nov. 21, 2020) 
 # Version 1.0.9: Input style modified (Nov. 16, 2020) 
