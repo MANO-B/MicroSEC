@@ -657,7 +657,7 @@ fun_read_check <- function(df_mutation,
         }
 
         if ((fun_zero(near_indel_pre, near_indel_pre_candidate) == 1 &
-             pre_minimum_length >= 10)|
+             pre_minimum_length >= 10) |
             (fun_zero(near_indel_post, near_indel_post_candidate) == 1 &
              post_minimum_length >= 10)) {
           pre_support_length <- min(pre_support_length + post_minimum_length,
