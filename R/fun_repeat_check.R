@@ -10,16 +10,6 @@
 #' @return list(pre_rep_status, post_rep_status, homopolymer_status)
 #' @importFrom Biostrings DNAString
 #' @importFrom BiocGenerics as.data.frame
-#' @examples
-#' \dontrun{
-#' fun_repeat_check(
-#'   Biostrings::DNAString("A"),
-#'   Biostrings::DNAString("AAATCTC"),
-#'   Biostrings::DNAString("CCATGTCGAAAAAAATCTCTCTCGG"),
-#'   1,
-#'   0
-#' )
-#' }
 fun_repeat_check <- function(rep_a, rep_b, ref_seq, ref_width, del) {
   pre_rep_status <- 0
   post_rep_status <- 0

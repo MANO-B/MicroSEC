@@ -4,11 +4,6 @@
 #'
 #' @param a,b Integers
 #' @return a devided by b
-#' @examples
-#' \dontrun{
-#' fun_zero(0, 0)
-#' fun_zero(3, 5)
-#' }
 fun_zero <- function(a, b)ifelse(b == 0, 0, a / b)
 # The following block is used by usethis to automatically manage
 # roxygen namespace tags. Modify with care!
