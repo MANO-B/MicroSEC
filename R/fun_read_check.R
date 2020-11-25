@@ -664,6 +664,8 @@ fun_read_check <- function(df_mutation,
                                      read_length)
           pre_minimum_length <- 0
           post_minimum_length <- 0
+          penalty_pre <- 0
+          penalty_post <- 0
           caution <- paste(caution,
                           "minimum_lengths are set to be 0",
                           "because of neighbor co-mutations,")
