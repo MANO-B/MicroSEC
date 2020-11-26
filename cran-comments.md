@@ -1,30 +1,4 @@
 ## Resubmission
-Thank you for the comment:
-###################
-You have examples for unexported functions.
-  fun_hairpin_check() in:
-     fun_hairpin_check.Rd
-  fun_hairpin_trimming() in:
-     fun_hairpin_trimming.Rd
-  fun_repeat_check() in:
-     fun_repeat_check.Rd
-  fun_setting() in:
-     fun_setting.Rd
-  fun_support() in:
-     fun_support.Rd
-  fun_zero() in:
-     fun_zero.Rd
-Please either omit these examples or export the functions.
-
-\dontrun{} should only be used if the example really cannot be executed
-(e.g. because of missing additional software, missing API keys, ...)
-by the user. That's why wrapping examples in \dontrun{} adds the comment 
-("# Not run:") as a warning for the user.
-Does not seem necessary.
-Please unwrap the examples if they are executable in < 5 sec,
-or replace \dontrun{} with \donttest{}.
-###################
-
 This is a resubmission. In this version I have:  
 * Version changed: 1.1.1 -> 1.1.2
 * Example data are added in data.
