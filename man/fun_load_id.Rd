@@ -18,6 +18,6 @@ This function attempts to load the read ID information files.
 }
 \examples{
 fun_load_id(
-  system.file("extdata", "test.gz", package = "MicroSEC")
+  system.file("extdata", package = "MicroSEC")
 )
 }
