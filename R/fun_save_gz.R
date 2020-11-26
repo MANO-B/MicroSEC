@@ -9,14 +9,15 @@
 #' @export
 fun_save_gz <- function(msec, output) {
   # save the results
-  wd = gsub(
-         paste("/",
-               strsplit(output, "/")[[1]][length(strsplit(output, "/")[[1]])],
-               sep = ""),
-         "",
-         output)
-  dir.create(file.path(wd), showWarnings = FALSE)
-  
+  if(length(grep("/", output)) > 0){
+    wd = gsub(
+           paste("/",
+                 strsplit(output, "/")[[1]][length(strsplit(output, "/")[[1]])],
+                 sep = ""),
+           "",
+           output)
+    dir.create(file.path(wd), showWarnings = FALSE)
+  }
   gz1 <- gzfile(output, "w")
   utils::write.table(msec, gz1, sep = "\t", na = "",
               row.names = FALSE, col.names = TRUE, quote = FALSE)
