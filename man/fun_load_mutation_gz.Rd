@@ -17,6 +17,6 @@ This function attempts to load the mutation information file.
 }
 \examples{
 fun_load_mutation_gz(
-  system.file("extdata", "test_mutation.xlsx", package = "MicroSEC")
+  system.file("extdata", "test_mutation.tsv", package = "MicroSEC")
 )
 }

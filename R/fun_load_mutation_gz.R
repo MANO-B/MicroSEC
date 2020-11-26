@@ -10,7 +10,7 @@
 #' @importFrom dplyr mutate
 #' @examples
 #' fun_load_mutation_gz(
-#'   system.file("extdata", "test_mutation.xlsx", package = "MicroSEC")
+#'   system.file("extdata", "test_mutation.tsv", package = "MicroSEC")
 #' )
 #' @export
 fun_load_mutation_gz <- function(mutation_file) {
