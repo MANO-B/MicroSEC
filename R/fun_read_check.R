@@ -667,8 +667,13 @@ fun_read_check <- function(df_mutation,
                                      read_length)
           pre_minimum_length <- 0
           post_minimum_length <- 0
-          penalty_pre <- 0
-          penalty_post <- 0
+          if (indel_status == 1) {
+            penalty_pre <- 0
+            penalty_post <- 0
+          } else {
+            penalty_pre <- max(0, 4 * alt_length - 5)
+            penalty_post <- max(0, 4 * alt_length - 5)
+          }
           caution <- paste(caution,
                           "minimum_lengths are set to be 0",
                           "because of neighbor co-mutations,")
@@ -731,7 +736,7 @@ fun_read_check <- function(df_mutation,
       }
       mut_depth_tmp <- c(0, mut_depth_tmp)
       mut_depth_tmp <- t(cumsum(mut_depth_tmp))
-      colnames(mut_depth_tmp) <- paste("Depth", 0:160, sep = "")
+      colnames(mut_depth_tmp) <- c("Zero", paste("Depth", 0:159, sep = ""))
       msec <- rbind(msec, msec_tmp)
       mut_depth <- rbind(mut_depth, mut_depth_tmp)
     }

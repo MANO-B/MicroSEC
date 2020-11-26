@@ -285,6 +285,7 @@
 #'
 #' @format A list with 7 factors, each contains 460 variables:
 #' \describe{
+#'   \item{Zero}{zero vector}
 #'   \item{Depth0}{number of reads whose 5'-supporting length is <= 0}
 #'   \item{Depth1}{number of reads whose 5'-supporting length is <= 1}
 #'   \item{Depth2}{number of reads whose 5'-supporting length is <= 2}

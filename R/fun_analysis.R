@@ -44,7 +44,7 @@ fun_analysis <- function(msec,
                         threshold_distant_homology,
                         threshold_low_quality_rate,
                         homopolymer_length) {
-  if (!is.null(msec)) {
+  if (dim(msec)[1] > 0) {
     short_support_length_total <- NULL
     half_length_total <- NULL
     pre_support_length_total <- NULL
