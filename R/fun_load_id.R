@@ -10,7 +10,7 @@
 #' @importFrom dplyr mutate
 #' @examples
 #' fun_load_id(
-#'   system.file("extdata", "test.gz", package = "MicroSEC")
+#'   system.file("extdata", package = "MicroSEC")
 #' )
 #' @export
 fun_load_id <- function(read_list) {

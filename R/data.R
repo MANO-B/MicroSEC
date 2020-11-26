@@ -288,7 +288,7 @@
 #'   \item{Depth0}{number of reads whose 5'-supporting length is <= 0}
 #'   \item{Depth1}{number of reads whose 5'-supporting length is <= 1}
 #'   \item{Depth2}{number of reads whose 5'-supporting length is <= 2}
-#'   \item{Depth3}{number of reads whose 5'-supporting length is <= 2}
+#'   \item{Depth3}{number of reads whose 5'-supporting length is <= 3}
 #'   ...
 #' }
 "mut_depth_checked"
