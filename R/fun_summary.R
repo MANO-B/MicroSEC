@@ -8,9 +8,7 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #' @examples
-#' \dontrun{
-#' fun_summary(msec)
-#' }
+#' fun_summary(msec_homology_searched)
 #' @export
 fun_summary <- function(msec) {
   distant_homology <- NULL

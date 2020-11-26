@@ -9,9 +9,10 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @examples
-#' \dontrun{
-#' fun_load_mutation_gz("./source/CCLE_SM.gz")
-#' }
+#' fun_load_mutation_gz(
+#'   system.file("extdata", "test_mutation.xlsx", package = "MicroSEC"),
+#'  "H15-11943-1-T_TDv3"
+#' )
 #' @export
 fun_load_mutation_gz <- function(mutation_file) {
   Ref <- NULL

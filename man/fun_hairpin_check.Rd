@@ -21,13 +21,3 @@ list(hairpin_length, whether hairpin sequences exist or not)
 \description{
 This function attempts to find hairpin structure sequences.
 }
-\examples{
-\dontrun{
-fun_hairpin_check(
-  Biostrings::DNAString("GGGGAAAA"),
-  Biostrings::DNAString("AATGGGGGGAAAAAAAACTACG"),
-  8,
-  9
-)
-}
-}

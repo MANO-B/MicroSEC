@@ -38,17 +38,3 @@ list(pre_support_length, post_support_length, soft_clipped_read)
 \description{
 This function attempts to calculate supporting lengths of a read.
 }
-\examples{
-\dontrun{
-fun_support(
-  df_cigar,
-  df_seq,
-  mut_read_strand,
-  adapter_1,
-  adapter_2,
-  mut_position,
-  alt_length,
-  indel_status
-)
-}
-}

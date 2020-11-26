@@ -16,7 +16,5 @@ ref_genome
 This function attempts to load the appropriate genome.
 }
 \examples{
-\dontrun{
 fun_load_genome("Human")
-}
 }

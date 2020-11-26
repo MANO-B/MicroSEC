@@ -16,9 +16,7 @@ df_bam
 This function attempts to check the insert length in BAM file.
 }
 \examples{
-\dontrun{
 fun_insert_length(
-  "./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam"
+  system.file("extdata", "test.bam", package = "MicroSEC")
 )
-}
 }

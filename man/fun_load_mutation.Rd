@@ -18,7 +18,8 @@ df_mutation
 This function attempts to load the mutation information file.
 }
 \examples{
-\dontrun{
-fun_load_mutation("./source/CCLE.xlsx", "PC9")
-}
+fun_load_mutation(
+  system.file("extdata", "test_mutation.xlsx", package = "MicroSEC"),
+ "H15-11943-1-T_TDv3"
+)
 }

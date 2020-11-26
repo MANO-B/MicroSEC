@@ -51,9 +51,8 @@ msec
 This function analyzes the filtering results.
 }
 \examples{
-\dontrun{
-fun_analysis(msec,
-             mut_depth,
+fun_analysis(msec = msec_summarized,
+             mut_depth = mut_depth_checked,
              short_homology_search_length = 4,
              min_homology_search = 40,
              threshold_p = 10 ^ (-6),
@@ -63,5 +62,4 @@ fun_analysis(msec,
              threshold_distant_homology = 0.2,
              threshold_low_quality_rate = 0.1,
              homopolymer_length = 15)
-}
 }

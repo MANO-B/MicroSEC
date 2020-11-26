@@ -5,9 +5,7 @@
 #' @param organism Human or Mouse genome.
 #' @return ref_genome
 #' @examples
-#' \dontrun{
 #' fun_load_genome("Human")
-#' }
 #' @export
 fun_load_genome <- function(organism) {
   if (organism %in% c("Human", "hg38")) {

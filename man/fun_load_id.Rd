@@ -17,7 +17,7 @@ df_mut_call
 This function attempts to load the read ID information files.
 }
 \examples{
-\dontrun{
-fun_load_id("./source/PC9_Cell_line")
-}
+fun_load_id(
+  system.file("extdata", "test.gz", package = "MicroSEC")
+)
 }

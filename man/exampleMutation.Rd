@@ -23,11 +23,35 @@ A list with 14 variables:
 \item{Transition}{base change type}
 ...
 }
+
+A list with 14 variables:
+\describe{
+\item{Sample}{sample name}
+\item{Gene}{altered gene}
+\item{HGVS.c}{base change}
+\item{HGVS.p}{protein change}
+\item{Mut_type}{mutation type}
+\item{Total_QV>=20}{total reads}
+\item{\%Alt}{altered base ratio}
+\item{Chr}{altered chromosome}
+\item{Pos}{altered position}
+\item{Ref}{reference base}
+\item{Alt}{altered base}
+\item{SimpleRepeat_TRF}{mutation locating repeat sequence}
+\item{Neighborhood_sequence}{neighborhood sequence}
+\item{Transition}{base change type}
+...
+}
 }
 \usage{
 exampleMutation
+
+exampleMutation
 }
 \description{
-A dataset containing the information of four mutations.
+A dataset containing the information of eight mutations.
+
+A dataset containing the information of eight mutations processed by the
+fun_read_check function.
 }
 \keyword{datasets}

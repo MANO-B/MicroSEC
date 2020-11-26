@@ -29,18 +29,17 @@
 #' @importFrom Biostrings start
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
-#' \dontrun{
-#' fun_read_check(df_mutation = df_mutation,
-#'                df_bam =  df_bam,
-#'                df_mut_call = df_mut_call,
-#'                ref_genome = ref_genome,
-#'                sample_name = sample_name,
-#'                read_length = read_length,
-#'                adapter_1 = adapter_1,
-#'                adapter_2 = adapter_2,
+#' fun_read_check(df_mutation = exampleMutation,
+#'                df_bam =  exampleBAM,
+#'                df_mut_call = exampleMutCall,
+#'                ref_genome = BSgenome.Hsapiens.UCSC.hg38::
+#'                               BSgenome.Hsapiens.UCSC.hg38,
+#'                sample_name = "H15-11943-1-T_TDv3",
+#'                read_length = 151,
+#'                adapter_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
+#'                adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
 #'                short_homology_search_length = 4,
-#'                progress_bar = progress_bar)
-#' }
+#'                progress_bar = "Y")
 #' @export
 fun_read_check <- function(df_mutation,
                           df_bam,

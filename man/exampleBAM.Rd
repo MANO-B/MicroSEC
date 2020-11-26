@@ -21,6 +21,6 @@ A list with 7 factors, each contains 184 variables:
 exampleBAM
 }
 \description{
-A dataset containing the information of four mutations.
+A BAM file containing the information of eight mutations.
 }
 \keyword{datasets}

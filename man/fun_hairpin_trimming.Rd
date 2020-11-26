@@ -21,13 +21,3 @@ Adapter-trimmed hairpin_seq
 \description{
 This function attempts to find and cut the adapter sequences in the ends.
 }
-\examples{
-\dontrun{
-fun_hairpin_trimming(
-  Biostrings::DNAString("GGAAAAAAATCTCTCAACA"),
-  "+",
-  "AACATG",
-  "AGATCC"
-)
-}
-}

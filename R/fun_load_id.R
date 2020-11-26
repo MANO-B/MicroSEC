@@ -9,9 +9,9 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @examples
-#' \dontrun{
-#' fun_load_id("./source/PC9_Cell_line")
-#' }
+#' fun_load_id(
+#'   system.file("extdata", "test.gz", package = "MicroSEC")
+#' )
 #' @export
 fun_load_id <- function(read_list) {
   Chr <- NULL

@@ -21,14 +21,13 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom GenomeInfoDb seqnames
 #' @examples
-#' \dontrun{
-#' fun_homology(msec,
-#'              homology_search,
+#' fun_homology(msec = msec_read_checked,
+#'              df_distant = homology_searched,
 #'              min_homology_search = 40,
-#'              ref_genome,
-#'              chr_no,
-#'              progress_bar = progress_bar)
-#' }
+#'              ref_genome = BSgenome.Hsapiens.UCSC.hg38::
+#'                             BSgenome.Hsapiens.UCSC.hg38,
+#'              chr_no = 24,
+#'              progress_bar = "Y")
 #' @export
 fun_homology <- function(msec,
                          df_distant,

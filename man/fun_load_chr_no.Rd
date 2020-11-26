@@ -16,7 +16,5 @@ chr_no
 This function attempts to load the chromosome number.
 }
 \examples{
-\dontrun{
 fun_load_chr_no("Human")
-}
 }

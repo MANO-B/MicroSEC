@@ -8,7 +8,7 @@ knitr::opts_chunk$set(collapse = TRUE,
                       message = TRUE,
                       comment = "#>")
 options(rmarkdown.html_vignette.check_title = FALSE)
-progress_bar = "N"
+progress_bar = "Y"
 
 ## ----packages-----------------------------------------------------------------
 library(MicroSEC)

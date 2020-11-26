@@ -15,7 +15,5 @@ fun_save_gz(msec, output)
 This function attempts to save the filtering results.
 }
 \examples{
-\dontrun{
-fun_save_gz(msec, output)
-}
+fun_save_gz(msec_analyzed, "./test_data.tsv")
 }

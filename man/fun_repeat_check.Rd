@@ -23,14 +23,3 @@ list(pre_rep_status, post_rep_status, homopolymer_status)
 \description{
 This function attempts to check the repetitive sequence around the mutation.
 }
-\examples{
-\dontrun{
-fun_repeat_check(
-  Biostrings::DNAString("A"),
-  Biostrings::DNAString("AAATCTC"),
-  Biostrings::DNAString("CCATGTCGAAAAAAATCTCTCTCGG"),
-  1,
-  0
-)
-}
-}

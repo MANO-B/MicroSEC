@@ -11,9 +11,10 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @examples
-#' \dontrun{
-#' fun_load_mutation("./source/CCLE.xlsx", "PC9")
-#' }
+#' fun_load_mutation(
+#'   system.file("extdata", "test_mutation.xlsx", package = "MicroSEC"),
+#'  "H15-11943-1-T_TDv3"
+#' )
 #' @export
 fun_load_mutation <- function(mutation_file,
                              sample_name) {

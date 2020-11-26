@@ -19,6 +19,9 @@ This function attempts to convert the mutation information file.
 }
 \examples{
 \dontrun{
-fun_convert("/mnt/source/mutation.xlsx", "hg38")
+fun_convert(
+  system.file("extdata", "convert_test.xlsx", package = "MicroSEC"),
+  "hg19"
+)
 }  
 }

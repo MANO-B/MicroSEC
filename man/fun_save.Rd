@@ -17,7 +17,5 @@ fun_save(msec, sample_info, wd)
 This function attempts to save the filtering results.
 }
 \examples{
-\dontrun{
-fun_save(msec, sample_name, wd)
-}
+fun_save(msec_analyzed, "test_data", ".")
 }
