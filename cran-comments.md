@@ -1,6 +1,6 @@
 ## Resubmission
 Thank you for the comment:
-
+###################
 You have examples for unexported functions.
   fun_hairpin_check() in:
      fun_hairpin_check.Rd
@@ -23,6 +23,7 @@ by the user. That's why wrapping examples in \dontrun{} adds the comment
 Does not seem necessary.
 Please unwrap the examples if they are executable in < 5 sec,
 or replace \dontrun{} with \donttest{}.
+###################
 
 This is a resubmission. In this version I have:  
 * Version changed: 1.1.1 -> 1.1.2
