@@ -29,6 +29,7 @@
 #' @importFrom Biostrings start
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
+#' \donttest{
 #' fun_read_check(df_mutation = exampleMutation,
 #'                df_bam =  exampleBAM,
 #'                df_mut_call = exampleMutCall,
@@ -40,6 +41,7 @@
 #'                adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
 #'                short_homology_search_length = 4,
 #'                progress_bar = "Y")
+#' }
 #' @export
 fun_read_check <- function(df_mutation,
                           df_bam,

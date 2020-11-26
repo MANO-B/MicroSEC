@@ -21,6 +21,7 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom GenomeInfoDb seqnames
 #' @examples
+#' \donttest{
 #' fun_homology(msec = msec_read_checked,
 #'              df_distant = homology_searched,
 #'              min_homology_search = 40,
@@ -28,6 +29,7 @@
 #'                             BSgenome.Hsapiens.UCSC.hg38,
 #'              chr_no = 24,
 #'              progress_bar = "Y")
+#' }
 #' @export
 fun_homology <- function(msec,
                          df_distant,
