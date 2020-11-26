@@ -10,8 +10,7 @@
 #' @importFrom dplyr mutate
 #' @examples
 #' fun_load_mutation_gz(
-#'   system.file("extdata", "test_mutation.xlsx", package = "MicroSEC"),
-#'  "H15-11943-1-T_TDv3"
+#'   system.file("extdata", "test_mutation.xlsx", package = "MicroSEC")
 #' )
 #' @export
 fun_load_mutation_gz <- function(mutation_file) {
