@@ -17,5 +17,5 @@ fun_save(msec, sample_info, wd)
 This function attempts to save the filtering results.
 }
 \examples{
-fun_save(msec_analyzed, "test_data", ".")
+fun_save(msec_analyzed, "test_data", "./output")
 }

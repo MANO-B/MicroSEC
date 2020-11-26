@@ -5,10 +5,18 @@
 #' @param msec Mutation filtering information.
 #' @param output output file name (full path).
 #' @examples
-#' fun_save_gz(msec_analyzed, "./test_data.tsv")
+#' fun_save_gz(msec_analyzed, "./output/test_data.tsv")
 #' @export
 fun_save_gz <- function(msec, output) {
   # save the results
+  wd = gsub(
+         paste("/",
+               strsplit(output, "/")[[1]][length(strsplit(output, "/")[[1]])],
+               sep = ""),
+         "",
+         output)
+  dir.create(file.path(wd), showWarnings = FALSE)
+  
   gz1 <- gzfile(output, "w")
   utils::write.table(msec, gz1, sep = "\t", na = "",
               row.names = FALSE, col.names = TRUE, quote = FALSE)
