@@ -6,6 +6,4 @@ archive
 output
 source
 Meta
-*.xlsx
-*.tsv
 LICENSE
