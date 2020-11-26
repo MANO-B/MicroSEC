@@ -1,16 +1,23 @@
-## Resubmission
-Your kind comments were as follows:
-* Please only ship the CRAN template for the MIT licenes.
-* Is there some reference about the method you can add in the Description field in the form Authors (year) <doi:.....>?
-  
+## Resubmission-1
 This is a resubmission. In this version I have:  
-* LICENSE file follows CRAN template.
-* No reference exists now.
-* Version changed: 1.1.0 -> 1.1.1
-* The following words are added to inst/WORDLIST.
-Possibly mis-spelled words in DESCRIPTION:  
-- FFPE (2:46, 10:28, 14:28)
-- microhomology (12:38)
+* Version changed: 1.1.1 -> 1.1.2
+* Example data are added in data.
+* Example files are added in inst/extdata.
+* Examples for unexported functions are removed.
+  fun_hairpin_check() in:
+     fun_hairpin_check.Rd
+  fun_hairpin_trimming() in:
+     fun_hairpin_trimming.Rd
+  fun_repeat_check() in:
+     fun_repeat_check.Rd
+  fun_setting() in:
+     fun_setting.Rd
+  fun_support() in:
+     fun_support.Rd
+  fun_zero() in:
+     fun_zero.Rd
+Please either omit these examples or export the functions.
+
 
 ## Test environments
 * macOS 10.15.7, R 3.5.3
