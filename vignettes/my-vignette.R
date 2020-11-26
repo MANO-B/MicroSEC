@@ -72,8 +72,8 @@ msec = fun_analysis(msec,
                     threshold_low_quality_rate = 0.1,
                     homopolymer_length = 15)
 
-# save the results
-fun_save(msec, sample_name, wd)
+# save the results in the working/output directory.
+# fun_save(msec, sample_name, wd)
 
 ## -----------------------------------------------------------------------------
 msec
