@@ -5,7 +5,9 @@
 #' @param msec Mutation filtering information.
 #' @param output output file name (full path).
 #' @examples
+#' \donttest{
 #' fun_save_gz(msec_analyzed, "./test_data.tsv")
+#' }
 #' @export
 fun_save_gz <- function(msec, output) {
   # save the results

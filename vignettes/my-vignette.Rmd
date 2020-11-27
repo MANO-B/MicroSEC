@@ -174,7 +174,7 @@ msec = fun_analysis(msec,
                     homopolymer_length = 15)
 
 # save the results in the working/output directory.
-fun_save(msec, sample_name, wd)
+# fun_save(msec, sample_name, wd)
 ```
 
 ## Results

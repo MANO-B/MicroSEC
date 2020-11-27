@@ -12,7 +12,9 @@
 #' @importFrom openxlsx setColWidths
 #' @importFrom openxlsx saveWorkbook
 #' @examples
+#' \donttest{
 #' fun_save(msec_analyzed, "test_data", ".")
+#' }
 #' @export
 fun_save <- function(msec, sample_info, wd) {
   # explanation

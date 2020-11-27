@@ -5,7 +5,11 @@ This is a resubmission. In this version I have:
 * Example files are added in inst/extdata.
 * Examples for unexported functions are removed.
 * Examples for exported functions are unwrapped.
-* Examples for fun_homology and fun_read_check are wrapped with \donttest{}.
+* Examples for the following functions are wrapped with \donttest{}:
+- fun_homology
+- fun_read_check
+- fun_save
+- fun_save_gz
 
 ## Test environments
 * macOS 10.15.7, R 3.5.3
