@@ -13,4 +13,6 @@
 ^MicroSEC_insert\.R$
 ^archive$
 ^cran-comments\.md$
-LICENCE
+^LICENCE$
+^MicroSEC.*\.xlsx$
+^MicroSEC.*\.tsv$
