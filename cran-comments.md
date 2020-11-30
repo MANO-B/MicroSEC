@@ -22,7 +22,7 @@ Environments with the following packages already installed:
 - BSgenome.Mmusculus.UCSC.mm10  
 
 ## R CMD check results
-Duration: 3m 1.7s
+Duration: 3m 0.7s
 0 errors ✓ | 0 warnings ✓ | 0 notes ✓
 R CMD check succeeded  
 
