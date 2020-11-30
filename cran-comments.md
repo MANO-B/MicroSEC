@@ -2,12 +2,6 @@
 This is a resubmission. In this version I have:  
 * Version changed: 1.1.2 -> 1.1.3
 * The \dontrun{} example for fun_convert are now wrapped with \donttest{}.
-* Examples for the following functions are wrapped with \donttest{}:
-- fun_homology
-- fun_read_check
-- fun_convert
-- fun_save
-- fun_save_gz
 * The following words in DESCRIPTION file are not misspelling:
 - FFPE, acronym of "formalin-fixed and paraffin-embedded"
 - microhomology
