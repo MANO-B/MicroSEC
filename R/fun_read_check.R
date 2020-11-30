@@ -506,52 +506,38 @@ fun_read_check <- function(df_mutation,
               }
 
               # hairpin length calculation
-              hairpin_seq <- fun_hairpin_trimming(
+              hairpin_seq <- reverseComplement(
                           df_seq[max(1, (mut_position - flag_1)):
                                  min(length(df_seq),
-                                     (mut_position + flag_2 + alt_length - 1))],
-                          mut_read_strand[[j]],
-                          adapter_1, adapter_2)
-              if (minimum_hairpin_length < length(hairpin_seq)) {
-                for (hair in minimum_hairpin_length:length(hairpin_seq)) {
-                  if (check_hairpin == 1) {
-                    hairpin_status <- fun_hairpin_check(
-                                          hairpin_seq_tmp = hairpin_seq[1:hair],
-                                          ref_seq,
-                                          hairpin_length,
-                                          hair)
-                    hairpin_length <- hairpin_status[[1]]
-                    check_hairpin <- hairpin_status[[2]]
-                    flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
+                                     (mut_position + flag_2 + alt_length - 1))])
+              if (flag_1 == pre_search_length){
+                if (minimum_hairpin_length <= length(hairpin_seq)) {
+                  for (hair in minimum_hairpin_length:length(hairpin_seq)) {
+                    if (check_hairpin == 1) {
+                      hairpin_status <- fun_hairpin_check(
+                                hairpin_seq[(length(hairpin_seq) - hair + 1):
+                                            length(hairpin_seq)],
+                                ref_seq[(ref_width + 1):(2 * ref_width + 1)],
+                                hairpin_length,
+                                hair)
+                      hairpin_length <- hairpin_status[[1]]
+                      check_hairpin <- hairpin_status[[2]]
+                      flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
+                    }
                   }
                 }
               }
-              if (flag_hairpin_tmp == 0) {
-                check_hairpin <- 1
-                hairpin_seq <- fun_hairpin_trimming(
-                  df_seq[max(1, (mut_position - minimum_hairpin_length)):
-                  min(length(df_seq),
-                     (mut_position + minimum_hairpin_length + alt_length - 1))],
-                  mut_read_strand[[j]],
-                  adapter_1, adapter_2)
-                if (minimum_hairpin_length < length(hairpin_seq)) {
+              if (flag_2 == pre_search_length){
+                if (minimum_hairpin_length <= length(hairpin_seq)) {
                   for (hair in minimum_hairpin_length:length(hairpin_seq)) {
                     if (check_hairpin == 1) {
                       hairpin_status <- fun_hairpin_check(
                         hairpin_seq[1:hair],
-                        ref_seq,
+                        ref_seq[1:(ref_width + 1)],
                         hairpin_length,
                         hair)
                       hairpin_length <- hairpin_status[[1]]
                       check_hairpin <- hairpin_status[[2]]
-                      hairpin_status <- fun_hairpin_check(
-                        hairpin_seq[(length(hairpin_seq) - hair + 1):
-                                     length(hairpin_seq)],
-                        ref_seq,
-                        hairpin_length,
-                        hair)
-                      hairpin_length <- hairpin_status[[1]]
-                      check_hairpin <- max(check_hairpin, hairpin_status[[2]])
                       flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
                     }
                   }
