@@ -14,10 +14,12 @@
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_detect
 #' @examples
+#' \donttest{
 #' fun_convert(
 #'   system.file("extdata", "convert_test.xlsx", package = "MicroSEC"),
 #'   "hg19"
 #' )
+#' }
 #' @export
 fun_convert <- function(mutation_file,
                         organism) {
