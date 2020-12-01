@@ -76,6 +76,7 @@ fun_read_check <- function(df_mutation,
 
     # analyze each somatic mutation
     for (i in seq_len(length(df_mutation[, 1]))) {
+      total_read <- 0
       pos_err <- 0
       indel_status <- 0
       indel_length <- 0
@@ -159,7 +160,6 @@ fun_read_check <- function(df_mutation,
         flag_hairpin <- 0
         hairpin_length <- 0
         soft_clipped_read <- 0
-        total_read <- 0
         low_quality_base <- 0
         homology_search_tmp <- NULL
         distant_homology <- 0
@@ -694,31 +694,6 @@ fun_read_check <- function(df_mutation,
         if (flag_hairpin == 0) {
           homology_search <- rbind(homology_search, homology_search_tmp)
         }
-      } else{
-        msec_tmp <- df_mutation[i, ] %>% dplyr::mutate(
-          read_length = read_length,
-          mut_type = mut_type,
-          alt_length = 0,
-          total_read = 0,
-          soft_clipped_read = 0,
-          flag_hairpin = 0,
-          hairpin_length = 0,
-          pre_support_length = 0,
-          post_support_length = 0,
-          short_support_length = 0,
-          pre_minimum_length = 0,
-          post_minimum_length = 0,
-          low_quality_base_rate_under_q18 = 0,
-          pre_rep_status = 0,
-          post_rep_status = 0,
-          homopolymer_status = 0,
-          indel_status = 0,
-          indel_length = 0,
-          distant_homology = 0,
-          penalty_pre = 0,
-          penalty_post = 0,
-          caution = ""
-        )
       }
       if (total_read == 0) {
         msec_tmp <- df_mutation[i, ] %>% dplyr::mutate(
