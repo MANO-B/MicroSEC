@@ -213,11 +213,15 @@ fun_read_check <- function(df_mutation,
                  Pos != (df_mutation[i, "Pos"] - pos_err))
         mut_near_1 <- dim(near_list_1)[1]
         mut_near_2 <- dim(near_list_2)[1]
-        if (all(nchar(near_list_1$Ref) != nchar(near_list_1$Alt))) {
-          with_indel_1 <- TRUE
+        if(mut_near_1 > 0){
+          if (all(nchar(near_list_1$Ref) != nchar(near_list_1$Alt))) {
+            with_indel_1 <- TRUE
+          }
         }
-        if (all(nchar(near_list_2$Ref) != nchar(near_list_2$Alt))) {
-          with_indel_2 <- TRUE
+        if(mut_near_2 > 0){
+          if (all(nchar(near_list_2$Ref) != nchar(near_list_2$Alt))) {
+            with_indel_2 <- TRUE
+          }
         }
         # short repeat around indel mutations
         if (mut_type == "ins") {
@@ -414,12 +418,12 @@ fun_read_check <- function(df_mutation,
                 }
               }
 
-              if (mut_position < (length(df_seq) - 10)) {
+              if (mut_position <= (length(df_seq) - 9 - alt_length)) {
                 near_indel_post_candidate <- near_indel_post_candidate + 1
                 co_mut_post_tmp <- length(
                   matchPattern(
-                    df_seq[mut_position:(mut_position + 10)],
-                    ref_indel[(ref_width + 1):(ref_width + 11)],
+                    df_seq[mut_position:(mut_position + 9 + alt_length)],
+                    ref_indel[(ref_width + 1):(ref_width + 10 + alt_length)],
                     max.mismatch = 3,
                     min.mismatch = 0,
                     with.indels = FALSE,
