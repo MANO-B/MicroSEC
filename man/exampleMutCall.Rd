@@ -5,7 +5,7 @@
 \alias{exampleMutCall}
 \title{An example mutated read ID file.}
 \format{
-A list with 7 factors, each contains 184 variables:
+A list with 7 factors, each contains 8 variables:
 \describe{
 \item{Chr}{altered chromosome}
 \item{Pos}{altered position}

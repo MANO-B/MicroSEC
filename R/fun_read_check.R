@@ -83,6 +83,7 @@ fun_read_check <- function(df_mutation,
       with_indel_1 <- FALSE
       with_indel_2 <- FALSE
       mut_call <- logical(0)
+      mut_read <- matrix(logical(0))
       co_mut_pre <- 3
       co_mut_post <- 3
       penalty_pre <- 0
@@ -105,46 +106,57 @@ fun_read_check <- function(df_mutation,
         df_bam_qual <- df_bam$qual[id_no]
         df_bam_pos <- df_bam$pos[id_no]
       }
-      mut_read <- df_mut_call %>%
-        filter(Chr == df_mutation[i, "Chr"] & Pos == df_mutation[i, "Pos"])
       mut_type <- str_split(df_mutation[i, "Mut_type"], "-")[[1]][[2]]
-      if (mut_type == "ins") {
+      if (mut_type == "snv") {
+        mut_read <- df_mut_call %>%
+        filter(Chr == df_mutation[i, "Chr"] & Pos == df_mutation[i, "Pos"])
+        if (dim(mut_read)[1] > 0) {
+          mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
+          mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+          mut_call <- which(mut_detail == str_sub(df_mutation[i, "Alt"],
+                                                    start = 1, end = 1))
+        }
+      } else if (mut_type == "ins") {
         indel_length <- nchar(df_mutation[i, "Alt"]) - 1
         indel_status <- 1
         with_indel_1 <- TRUE
         with_indel_2 <- TRUE
+        for (tmp in 0:max_mutation_search) {
+          if (length(mut_call) == 0) {
+            mut_read <- df_mut_call %>%
+              filter(Chr == df_mutation[i, "Chr"] &
+                       Pos == (df_mutation[i, "Pos"] - tmp))
+            pos_err <- tmp
+            if (dim(mut_read)[[1]] > 0) {
+              mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
+              mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+              mut_call <- which(mut_detail ==
+                                  str_replace(df_mutation[i, "Alt"],
+                                              pattern = df_mutation[i, "Ref"],
+                                              replacement = ".+"))
+            }
+          }
+        }
       } else if (mut_type == "del") {
         indel_length <- nchar(df_mutation[i, "Ref"]) - 1
         indel_status <- 1
         with_indel_1 <- TRUE
         with_indel_2 <- TRUE
-      }
-      if (dim(mut_read)[[1]] == 0 & indel_status == 1) {
-        for (tmp in 1:max_mutation_search) {
-          if (dim(mut_read)[[1]] == 0) {
+        for (tmp in 0:max_mutation_search) {
+          if (length(mut_call) == 0) {
             mut_read <- df_mut_call %>%
               filter(Chr == df_mutation[i, "Chr"] &
-                     Pos == (df_mutation[i, "Pos"] - tmp))
+                       Pos == (df_mutation[i, "Pos"] - tmp))
             pos_err <- tmp
+            if (dim(mut_read)[[1]] > 0) {
+              mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
+              mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+              mut_call <- which(mut_detail ==
+                                str_replace(df_mutation[i, "Ref"],
+                                            pattern = df_mutation[i, "Alt"],
+                                            replacement = ".-"))
+            }
           }
-        }
-      }
-      if (dim(mut_read)[1] > 0) {
-        mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-        mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
-        if (indel_status == 0) {
-          mut_call <- which(mut_detail == str_sub(df_mutation[i, "Alt"],
-                                                 start = 1, end = 1))
-        } else if (mut_type == "del") {
-          mut_call <- which(mut_detail ==
-                             str_replace(df_mutation[i, "Ref"],
-                                         pattern = df_mutation[i, "Alt"],
-                                         replacement = ".-"))
-        } else if (mut_type == "ins") {
-          mut_call <- which(mut_detail ==
-                             str_replace(df_mutation[i, "Alt"],
-                                         pattern = df_mutation[i, "Ref"],
-                                         replacement = ".+"))
         }
       }
       # if mutation supporting reads exist
@@ -171,14 +183,14 @@ fun_read_check <- function(df_mutation,
                                   start = -1,
                                   end = -1)
         mut_read_strand <- gsub("r", "-", gsub("f", "+", mut_read_strand))
+        neighbor_seq <- df_mutation[i, "Neighborhood_sequence"]
+        alt_length <- nchar(df_mutation[i, "Alt"])
         ref_seq <- ref_genome[[df_mutation[i, "Chr"]]][
-          (df_mutation[i, "Pos"] - pos_err - ref_width):
-          (df_mutation[i, "Pos"] - pos_err + ref_width)]
+          (df_mutation[i, "Pos"] - ref_width):
+          (df_mutation[i, "Pos"] + ref_width)]
         ref_indel <- c(ref_seq[1:ref_width], DNAString(df_mutation[i, "Alt"]),
                       ref_seq[(ref_width + nchar(df_mutation[i, "Ref"]) + 1):
                                 (2 * ref_width + 1)])
-        neighbor_seq <- df_mutation[i, "Neighborhood_sequence"]
-        alt_length <- nchar(df_mutation[i, "Alt"])
         # sequence information around the mutation position
         setting <- fun_setting(pre = pre_search_length_default,
                               post = post_search_length_default,
@@ -318,7 +330,8 @@ fun_read_check <- function(df_mutation,
                       peri_seq_1 <- setting[[3]]
                       peri_seq_2 <- setting[[4]]
                       mutation_supporting_1 <- matchPattern(
-                        peri_seq_1, df_seq,
+                        peri_seq_1,
+                        df_seq,
                         max.mismatch = mut_near_1 + Lax_2 * laxness,
                         min.mismatch = 0,
                         with.indels = with_indel_1,
@@ -510,37 +523,30 @@ fun_read_check <- function(df_mutation,
                           df_seq[max(1, (mut_position - flag_1)):
                                  min(length(df_seq),
                                      (mut_position + flag_2 + alt_length - 1))])
-              if (flag_1 == pre_search_length){
+              if (flag_1 == pre_search_length_default){
                 if (minimum_hairpin_length <= length(hairpin_seq)) {
-                  for (hair in minimum_hairpin_length:length(hairpin_seq)) {
-                    if (check_hairpin == 1) {
-                      hairpin_status <- fun_hairpin_check(
-                                hairpin_seq[(length(hairpin_seq) - hair + 1):
-                                            length(hairpin_seq)],
-                                ref_seq[(ref_width + 1):(2 * ref_width + 1)],
-                                hairpin_length,
-                                hair)
-                      hairpin_length <- hairpin_status[[1]]
-                      check_hairpin <- hairpin_status[[2]]
-                      flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
-                    }
-                  }
+                  hairpin_status <- fun_hairpin_check(
+                            hairpin_seq[(length(hairpin_seq) -
+                                           minimum_hairpin_length + 1):
+                                        length(hairpin_seq)],
+                            ref_seq[(ref_width + 1):(2 * ref_width + 1)],
+                            hairpin_length,
+                            minimum_hairpin_length)
+                  hairpin_length <- hairpin_status[[1]]
+                  check_hairpin <- hairpin_status[[2]]
+                  flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
                 }
               }
-              if (flag_2 == pre_search_length){
+              if (flag_2 == pre_search_length_default){
                 if (minimum_hairpin_length <= length(hairpin_seq)) {
-                  for (hair in minimum_hairpin_length:length(hairpin_seq)) {
-                    if (check_hairpin == 1) {
-                      hairpin_status <- fun_hairpin_check(
-                        hairpin_seq[1:hair],
-                        ref_seq[1:(ref_width + 1)],
-                        hairpin_length,
-                        hair)
-                      hairpin_length <- hairpin_status[[1]]
-                      check_hairpin <- hairpin_status[[2]]
-                      flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
-                    }
-                  }
+                  hairpin_status <- fun_hairpin_check(
+                    hairpin_seq[1:minimum_hairpin_length],
+                    ref_seq[1:(ref_width + 1)],
+                    hairpin_length,
+                    hair)
+                  hairpin_length <- hairpin_status[[1]]
+                  check_hairpin <- hairpin_status[[2]]
+                  flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
                 }
               }
               flag_hairpin <- flag_hairpin + flag_hairpin_tmp

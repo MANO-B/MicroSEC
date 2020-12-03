@@ -2,7 +2,7 @@
 #'
 #' A dataset containing the information of eight mutations.
 #'
-#' @format A list with 14 variables:
+#' @format A list with 14 factors, each contains 8 variables
 #' \describe{
 #'   \item{Sample}{sample name}
 #'   \item{Gene}{altered gene}
@@ -26,7 +26,7 @@
 #'
 #' A BAM file containing the information of eight mutations.
 #'
-#' @format A list with 7 factors, each contains 184 variables:
+#' @format A list with 7 factors, each contains 2317 variables:
 #' \describe{
 #'   \item{rname}{chromosome of the read}
 #'   \item{qname}{read ID list}
@@ -43,7 +43,7 @@
 #'
 #' A dataset containing the information of mutated read.
 #'
-#' @format A list with 7 factors, each contains 184 variables:
+#' @format A list with 7 factors, each contains 8 variables:
 #' \describe{
 #'   \item{Chr}{altered chromosome}
 #'   \item{Pos}{altered position}
@@ -60,7 +60,7 @@
 #' A dataset containing the information of eight mutations processed by the
 #' fun_read_check function.
 #'
-#' @format A list with 36 variables:
+#' @format A list with 36 factors, each contains 8 variables
 #' \describe{
 #'   \item{Sample}{sample name}
 #'   \item{Gene}{altered gene}
@@ -107,7 +107,7 @@
 #' A dataset containing the information of eight mutations processed by the
 #' fun_homology function.
 #'
-#' @format A list with 36 variables:
+#' @format A list with 36 factors, each contains 8 variables
 #' \describe{
 #'   \item{Sample}{sample name}
 #'   \item{Gene}{altered gene}
@@ -154,7 +154,7 @@
 #' A dataset containing the information of eight mutations processed by the
 #' fun_homology function.
 #'
-#' @format A list with 53 variables:
+#' @format A list with 53 factors, each contains 8 variables
 #' \describe{
 #'   \item{Sample}{sample name}
 #'   \item{Gene}{altered gene}
@@ -218,7 +218,7 @@
 #' A dataset containing the information of eight mutations processed by the
 #' fun_homology function.
 #'
-#' @format A list with 38 variables:
+#' @format A list with 38 factors, each contains 8 variables
 #' \describe{
 #'   \item{Sample}{sample name}
 #'   \item{Gene}{altered gene}
@@ -283,7 +283,7 @@
 #'
 #' A dataset containing the information of reads for homology search.
 #'
-#' @format A list with 7 factors, each contains 460 variables:
+#' @format A list with 160 factors, each contains 8 variables:
 #' \describe{
 #'   \item{Zero}{zero vector}
 #'   \item{Depth0}{number of reads whose 5'-supporting length is <= 0}

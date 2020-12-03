@@ -5,7 +5,7 @@
 \alias{mut_depth_checked}
 \title{An example sequence infromation file.}
 \format{
-A list with 7 factors, each contains 460 variables:
+A list with 160 factors, each contains 8 variables:
 \describe{
 \item{Zero}{zero vector}
 \item{Depth0}{number of reads whose 5'-supporting length is <= 0}

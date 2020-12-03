@@ -5,7 +5,7 @@
 \alias{msec_homology_searched}
 \title{An example mutation file.}
 \format{
-A list with 36 variables:
+A list with 36 factors, each contains 8 variables
 \describe{
 \item{Sample}{sample name}
 \item{Gene}{altered gene}

@@ -5,7 +5,7 @@
 \alias{exampleMutation}
 \title{An example mutation file.}
 \format{
-A list with 14 variables:
+A list with 14 factors, each contains 8 variables
 \describe{
 \item{Sample}{sample name}
 \item{Gene}{altered gene}

@@ -5,7 +5,7 @@
 \alias{msec_summarized}
 \title{An example mutation file.}
 \format{
-A list with 53 variables:
+A list with 53 factors, each contains 8 variables
 \describe{
 \item{Sample}{sample name}
 \item{Gene}{altered gene}

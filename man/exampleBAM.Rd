@@ -5,7 +5,7 @@
 \alias{exampleBAM}
 \title{An example BAM file.}
 \format{
-A list with 7 factors, each contains 184 variables:
+A list with 7 factors, each contains 2317 variables:
 \describe{
 \item{rname}{chromosome of the read}
 \item{qname}{read ID list}
