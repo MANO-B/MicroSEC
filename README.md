@@ -330,11 +330,10 @@ A conversion function is prepared.
 library(openxlsx)
 library(MicroSEC)
 
-mutation_file = "/mnt/HDD8TB/MicroSEC/mutation.xlsx"
-organism = "hg19"
-
-df_mutation = fun_convert(mutation_file = mutation_file,
-                          organism = organism)
+df_mutation = fun_convert(
+  system.file("extdata", "convert_test.xlsx", package = "MicroSEC"),
+  "hg19"
+)
 
 write.xlsx(df_mutation, "/mnt/HDD8TB/MicroSEC/mutation_modified.xlsx")
 ```
