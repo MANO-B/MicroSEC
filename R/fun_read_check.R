@@ -19,6 +19,7 @@
 #' @importFrom stringr str_split
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_replace
+#' @importFrom BiocGenerics which
 #' @importFrom BiocGenerics which.max
 #' @importFrom gtools asc
 #' @importFrom Biostrings matchPattern
@@ -27,6 +28,8 @@
 #' @importFrom Biostrings trimLRPatterns
 #' @importFrom Biostrings width
 #' @importFrom Biostrings start
+#' @importFrom Biostrings end
+#' @importFrom Biostrings nchar
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
 #' \donttest{
