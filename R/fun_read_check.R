@@ -550,7 +550,7 @@ fun_read_check <- function(df_mutation,
                     hairpin_seq[1:minimum_hairpin_length],
                     ref_seq[1:(ref_width + 1)],
                     hairpin_length,
-                    hair)
+                    minimum_hairpin_length)
                   hairpin_length <- hairpin_status[[1]]
                   check_hairpin <- hairpin_status[[2]]
                   flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
