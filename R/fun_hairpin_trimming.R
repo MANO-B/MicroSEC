@@ -19,10 +19,12 @@ fun_hairpin_trimming <- function(hairpin_seq,
   if (mut_read_strand == "+") {
     hairpin_seq <- trimLRPatterns(Rpattern = adapter_1,
                                  subject = hairpin_seq,
-                                 max.Rmismatch = 0.1)
+                                 max.Rmismatch = 0.1,
+                                 with.Rindels = TRUE)
     hairpin_seq <- trimLRPatterns(Rpattern = adapter_2,
                                  subject = hairpin_seq,
-                                 max.Rmismatch = 0.1)
+                                 max.Rmismatch = 0.1,
+                                 with.Rindels = TRUE)
     hairpin_seq <- str_split(hairpin_seq,
                             str_sub(adapter_1, 1, 15))[[1]]
     if (length(hairpin_seq) > 1) {
