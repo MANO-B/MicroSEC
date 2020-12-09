@@ -72,7 +72,8 @@ fun_read_check <- function(df_mutation,
     post_search_length <- 20
     minimum_hairpin_length <- 15
     ref_width <- 150
-    hairpin_search_length <- 50
+    hairpin_search_length_1 <- 5
+    hairpin_search_length_2 <- 10
     max_mutation_search <- 50
     neighbor_length <- 20
     laxness <- 1
@@ -274,8 +275,6 @@ fun_read_check <- function(df_mutation,
           }
           length_flag <- 0
           mut_position <- 0
-          flag_1 <- pre_search_length
-          flag_2 <- pre_search_length
           # progress bar
           if (progress_bar == "Y") {
             utils::setTxtProgressBar(pb, j)
@@ -393,17 +392,14 @@ fun_read_check <- function(df_mutation,
               mut_position <- min(
                 length(df_seq),
                 start(mutation_supporting_1) + pre_search_length)
-              flag_1 <- hairpin_search_length
             } else if (length(mutation_supporting_2) == 1) {
               mut_position <- min(
                 length(df_seq),
                 end(mutation_supporting_2) - pre_search_length - alt_length + 1)
-              flag_2 <- hairpin_search_length
             }
             if (mut_position > 0) {
               total_read <- total_read + 1
               flag_hairpin_tmp <- 0
-              check_hairpin <- 1
 
               # search co-mutations on neighbor
               if (mut_position > 10) {
@@ -420,7 +416,6 @@ fun_read_check <- function(df_mutation,
                   near_indel_pre <- near_indel_pre + 1
                 }
               }
-
               if (mut_position <= (length(df_seq) - 9 - alt_length)) {
                 near_indel_post_candidate <- near_indel_post_candidate + 1
                 co_mut_post_tmp <- length(
@@ -524,37 +519,38 @@ fun_read_check <- function(df_mutation,
                   }
                 }
               }
-
               # hairpin length calculation
               hairpin_seq <- reverseComplement(
-                          df_seq[max(1, (mut_position - flag_1)):
-                                 min(length(df_seq),
-                                     (mut_position + flag_2 + alt_length - 1))])
-              if (flag_1 == pre_search_length_default){
-                if (minimum_hairpin_length <= length(hairpin_seq)) {
-                  hairpin_status <- fun_hairpin_check(
-                            hairpin_seq[(length(hairpin_seq) -
-                                           minimum_hairpin_length + 1):
-                                        length(hairpin_seq)],
-                            ref_seq[(ref_width + 1):(2 * ref_width + 1)],
-                            hairpin_length,
-                            minimum_hairpin_length)
-                  hairpin_length <- hairpin_status[[1]]
-                  check_hairpin <- hairpin_status[[2]]
-                  flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
-                }
+                df_seq[max(1, (mut_position - hairpin_search_length_1)):
+                         min(length(df_seq),
+                             (mut_position +
+                                hairpin_search_length_2 +
+                                alt_length - 1))])
+              if (minimum_hairpin_length <= length(hairpin_seq)) {
+                hairpin_status <- fun_hairpin_check(
+                          hairpin_seq[(length(hairpin_seq) -
+                                         minimum_hairpin_length + 1):
+                                      length(hairpin_seq)],
+                          ref_seq,
+                          hairpin_length,
+                          minimum_hairpin_length)
+                hairpin_length <- max(hairpin_length, hairpin_status[[1]])
+                flag_hairpin_tmp <- max(flag_hairpin_tmp, hairpin_status[[2]])
               }
-              if (flag_2 == pre_search_length_default){
-                if (minimum_hairpin_length <= length(hairpin_seq)) {
-                  hairpin_status <- fun_hairpin_check(
-                    hairpin_seq[1:minimum_hairpin_length],
-                    ref_seq[1:(ref_width + 1)],
-                    hairpin_length,
-                    minimum_hairpin_length)
-                  hairpin_length <- hairpin_status[[1]]
-                  check_hairpin <- hairpin_status[[2]]
-                  flag_hairpin_tmp <- max(flag_hairpin_tmp, check_hairpin)
-                }
+              hairpin_seq <- reverseComplement(
+                df_seq[max(1, (mut_position - hairpin_search_length_2)):
+                         min(length(df_seq),
+                             (mut_position +
+                                hairpin_search_length_1 +
+                                alt_length - 1))])
+              if (minimum_hairpin_length <= length(hairpin_seq)) {
+                hairpin_status <- fun_hairpin_check(
+                  hairpin_seq[1:minimum_hairpin_length],
+                  ref_seq,
+                  hairpin_length,
+                  minimum_hairpin_length)
+                hairpin_length <- max(hairpin_length, hairpin_status[[1]])
+                flag_hairpin_tmp <- max(flag_hairpin_tmp, hairpin_status[[2]])
               }
               flag_hairpin <- flag_hairpin + flag_hairpin_tmp
 
@@ -562,7 +558,8 @@ fun_read_check <- function(df_mutation,
               support_status <- fun_support(df_cigar,
                                      df_seq,
                                      mut_read_strand[[j]],
-                                     adapter_1, adapter_2,
+                                     adapter_1,
+                                     adapter_2,
                                      mut_position,
                                      alt_length,
                                      indel_status)
