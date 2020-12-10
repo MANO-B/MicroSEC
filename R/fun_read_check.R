@@ -180,6 +180,8 @@ fun_read_check <- function(df_mutation,
         homology_search_tmp <- NULL
         distant_homology <- 0
         mis_mapping <- 0
+        search_status_1 <- 0
+        search_status_2 <- 0
         mutated_id <- mut_read_id_list[mut_call]
         mut_read_id <- str_sub(str_split(mutated_id, ",")[[1]],
                                start = 1,
@@ -323,6 +325,7 @@ fun_read_check <- function(df_mutation,
                 for (Lax_1 in seq(3, 9, length = 3)) {
                   for (Lax_2 in 2:0) {
                     if (length(mutation_supporting_1) != 1) {
+                      search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
                         pre = pre_search_length_default,
                         post = post_search_length_default - Lax_1 * laxness,
@@ -348,6 +351,7 @@ fun_read_check <- function(df_mutation,
                 for (Lax_1 in seq(5, 15, length = 3)) {
                   for (Lax_2 in 3:0) {
                     if (length(mutation_supporting_1) != 1) {
+                      search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
                         pre = pre_search_length_default + Lax_1 * laxness,
                         post = post_search_length_default,
@@ -376,6 +380,7 @@ fun_read_check <- function(df_mutation,
                 for (Lax_1 in seq(3, 9, length = 3)) {
                   for (Lax_2 in 2:0) {
                     if (length(mutation_supporting_2) != 1) {
+                      search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
                         pre = pre_search_length_default,
                         post = post_search_length_default - Lax_1 * laxness,
@@ -401,6 +406,7 @@ fun_read_check <- function(df_mutation,
                 for (Lax_1 in seq(5, 15, length = 3)) {
                   for (Lax_2 in 3:0) {
                     if (length(mutation_supporting_2) != 1) {
+                      search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
                         pre = pre_search_length_default + Lax_1 * laxness,
                         post = post_search_length_default,
@@ -434,35 +440,51 @@ fun_read_check <- function(df_mutation,
               if (mut_position_1 == mut_position_2) {
                 mut_position <- mut_position_1
               } else if (mut_position_1 < mut_position_2) {
-                mut_position <- mut_position_1
-                mis_mapping_flag  <- 1
-                mis_mapping <- mis_mapping + 1
-                if (mis_mapping == 1) {
-                  rep_status <- fun_repeat_check(
-                    df_seq[mut_position],
-                    df_seq[mut_position:(mut_position + 1)],
-                    c(ref_seq[1],
-                      ref_seq[1:(2 * ref_width)]),
-                    ref_width,
-                    del = 1)
-                  pre_rep_status <- rep_status[[1]]
-                  post_rep_status <- rep_status[[2]]
-                  homopolymer_status <- rep_status[[3]]
+                if (search_status_1 < search_status_2) {
+                  mut_position <- mut_position_1
+                } else if (search_status_1 > search_status_2) {
+                  mut_position <- mut_position_2
+                } else if (search_status_1 == 0) {
+                  mut_position <- mut_position_1
+                  mis_mapping_flag  <- 1
+                  mis_mapping <- mis_mapping + 1
+                  if (mis_mapping == 1) {
+                    rep_status <- fun_repeat_check(
+                      df_seq[mut_position],
+                      df_seq[mut_position:(mut_position + 1)],
+                      c(ref_seq[1],
+                        ref_seq[1:(2 * ref_width)]),
+                      ref_width,
+                      del = 1)
+                    pre_rep_status <- rep_status[[1]]
+                    post_rep_status <- rep_status[[2]]
+                    homopolymer_status <- rep_status[[3]]
+                  }
+                } else {
+                  mut_position <- mut_position_1
                 }
-              } else if (mut_position_1 > mut_position_2) {
-                mut_position <- mut_position_2
-                mis_mapping_flag  <- 1
-                mis_mapping <- mis_mapping + 1
-                if (mis_mapping == 1) {
-                  rep_status <- fun_repeat_check(
-                    df_seq[mut_position],
-                    df_seq[mut_position:(mut_position + 1)],
-                    ref_seq,
-                    ref_width,
-                    del = 0)
-                  pre_rep_status <- rep_status[[1]]
-                  post_rep_status <- rep_status[[2]]
-                  homopolymer_status <- rep_status[[3]]
+              } else {
+                if (search_status_1 < search_status_2) {
+                  mut_position <- mut_position_1
+                } else if (search_status_1 > search_status_2) {
+                  mut_position <- mut_position_2
+                } else if (search_status_1 == 0) {
+                  mut_position <- mut_position_2
+                  mis_mapping_flag  <- 1
+                  mis_mapping <- mis_mapping + 1
+                  if (mis_mapping == 1) {
+                    rep_status <- fun_repeat_check(
+                      df_seq[mut_position],
+                      df_seq[mut_position:(mut_position + 1)],
+                      ref_seq,
+                      ref_width,
+                      del = 0)
+                    pre_rep_status <- rep_status[[1]]
+                    post_rep_status <- rep_status[[2]]
+                    homopolymer_status <- rep_status[[3]]
+                  }
+                } else {
+                  mut_position <- mut_position_1
                 }
               }
             } else if (length(mutation_supporting_1) == 1) {
