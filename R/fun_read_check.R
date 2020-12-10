@@ -446,15 +446,13 @@ fun_read_check <- function(df_mutation,
                   mut_position <- mut_position_2
                 } else if (search_status_1 == 0) {
                   mut_position <- mut_position_1
-                  mis_mapping_flag  <- 1
                   mis_mapping <- mis_mapping + 1
                   if (mis_mapping == 1) {
                     rep_status <- fun_repeat_check(
                       df_seq[mut_position],
                       df_seq[mut_position:(mut_position + 1)],
-                      c(ref_seq[1],
-                        ref_seq[1:(2 * ref_width)]),
-                      ref_width,
+                      ref_seq,
+                      ref_width - 1,
                       del = 1)
                     pre_rep_status <- rep_status[[1]]
                     post_rep_status <- rep_status[[2]]
@@ -470,7 +468,6 @@ fun_read_check <- function(df_mutation,
                   mut_position <- mut_position_2
                 } else if (search_status_1 == 0) {
                   mut_position <- mut_position_2
-                  mis_mapping_flag  <- 1
                   mis_mapping <- mis_mapping + 1
                   if (mis_mapping == 1) {
                     rep_status <- fun_repeat_check(
@@ -809,7 +806,7 @@ fun_read_check <- function(df_mutation,
           distant_homology = distant_homology,
           penalty_pre = penalty_pre,
           penalty_post = penalty_post,
-          caution = caution
+          caution = paste(mis_mapping, caution)
         )
         if (flag_hairpin == 0) {
           homology_search <- rbind(homology_search, homology_search_tmp)
