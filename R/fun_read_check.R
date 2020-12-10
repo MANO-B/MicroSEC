@@ -810,7 +810,7 @@ fun_read_check <- function(df_mutation,
           distant_homology = distant_homology,
           penalty_pre = penalty_pre,
           penalty_post = penalty_post,
-          caution = paste(mis_mapping, caution)
+          caution = caution
         )
         if (flag_hairpin == 0) {
           homology_search <- rbind(homology_search, homology_search_tmp)
