@@ -374,6 +374,10 @@ fun_read_check <- function(df_mutation,
                 }
               }
             }
+            pre_search_length_1 <- pre_search_length
+            post_search_length_1 <- post_search_length
+            pre_search_length <- pre_search_length_default
+            post_search_length <- post_search_length_default
             if (length(mutation_supporting_2) != 1) {
               length_flag <- 1
               if (length(mutation_supporting_2) == 0) {
@@ -433,7 +437,7 @@ fun_read_check <- function(df_mutation,
                 length(mutation_supporting_2) == 1) {
               mut_position_1 <- min(
                 length(df_seq),
-                start(mutation_supporting_1) + pre_search_length)
+                start(mutation_supporting_1) + pre_search_length_1)
               mut_position_2 <- min(
                 length(df_seq),
                 end(mutation_supporting_2) - pre_search_length - alt_length + 1)
@@ -487,7 +491,7 @@ fun_read_check <- function(df_mutation,
             } else if (length(mutation_supporting_1) == 1) {
                 mut_position <- min(
                   length(df_seq),
-                  start(mutation_supporting_1) + pre_search_length)
+                  start(mutation_supporting_1) + pre_search_length_1)
             } else if (length(mutation_supporting_2) == 1) {
               mut_position <- min(
                 length(df_seq),
