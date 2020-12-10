@@ -431,19 +431,35 @@ fun_read_check <- function(df_mutation,
               mut_position_2 <- min(
                 length(df_seq),
                 end(mutation_supporting_2) - pre_search_length - alt_length + 1)
-              if (mut_position_1 < mut_position_2) {
+              if (mut_position_1 == mut_position_2) {
+                mut_position <- mut_position_1
+              } else if (mut_position_1 < mut_position_2) {
                 mut_position <- mut_position_1
                 mis_mapping_flag  <- 1
                 mis_mapping <- mis_mapping + 1
                 if (mis_mapping == 1) {
                   rep_status <- fun_repeat_check(
-                    df_seq[mis_mapping],
-                    df_seq[mis_mapping:max(mis_mapping + 20, length(df_seq))],
-                    c(ref_seq[1:ref_width],
-                      ref_seq[(ref_width + 1):(2 * ref_width + 1)],
-                      ref_seq[2 * ref_width + 1]),
+                    df_seq[mut_position],
+                    df_seq[mut_position:(mut_position + 1)],
+                    c(ref_seq[1],
+                      ref_seq[1:(2 * ref_width)]),
                     ref_width,
                     del = 1)
+                  pre_rep_status <- rep_status[[1]]
+                  post_rep_status <- rep_status[[2]]
+                  homopolymer_status <- rep_status[[3]]
+                }
+              } else if (mut_position_1 > mut_position_2) {
+                mut_position <- mut_position_2
+                mis_mapping_flag  <- 1
+                mis_mapping <- mis_mapping + 1
+                if (mis_mapping == 1) {
+                  rep_status <- fun_repeat_check(
+                    df_seq[mut_position],
+                    df_seq[mut_position:(mut_position + 1)],
+                    ref_seq,
+                    ref_width,
+                    del = 0)
                   pre_rep_status <- rep_status[[1]]
                   post_rep_status <- rep_status[[2]]
                   homopolymer_status <- rep_status[[3]]
