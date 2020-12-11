@@ -63,7 +63,7 @@ chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212
     ID001-1:579185f represents that the read ID is ID001-1:579185 and the read was mapped to the forward strand.  
     ID008-1:1953407r represents that the read ID is ID008-1:1953407 and the read was mapped to the reverse strand.  
 - Mut  
-    ".;A;N#" represents the mutation pattern: "reference base";"altered to A";"other alterations"  
+    ".;A;N" represents the mutation pattern: "reference base";"altered to A";"other alterations"  
     ".;.+ACACACAC;.-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
   
 ### File 4: sample information tsv file  
@@ -106,12 +106,12 @@ github url: https://github.com/MANO-B/MicroSEC
 
 ### Hardware Requirements
 
-The scripts requires only a standard computer with enough RAM to support the operations defined by a user. For minimal performance, this will be a computer with about 8 GB of RAM. For optimal performance, we recommend a computer with the following specs:
+The scripts requires only a standard computer with enough RAM to support the operations defined by a user. For minimal performance, this will be a computer with about 32 GB of RAM. For optimal performance, we recommend a computer with the following specs:
 
-RAM: 32+ GB  
+RAM: 128+ GB  
 CPU: 4+ cores, 4.2+ GHz/core
 
-The runtimes below are generated using a computer with the recommended specs (32 GB RAM, 4 cores@4.2 GHz) and internet of speed 100 Mbps.
+The runtimes below are generated using a computer with the recommended specs (128 GB RAM, 4 cores@4.2 GHz) and internet of speed 100 Mbps.
 
 ### Software Requirements
 
@@ -184,7 +184,10 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 # Stable version from CRAN
 install.packages("MicroSEC")
 
-# Development version from github
+# Developmental stable version from github (recommended)
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="1.1.7")
+
+# Developmental unstable version from github (not recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 ```
 - How to use in command line
@@ -205,6 +208,8 @@ Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz /mnt/result/mutation/SAMPLE
 ```  
 - How to use in R Console
 ```
+## See also the vignette file.
+
 ## Necessary packages
 library(MicroSEC)
 
