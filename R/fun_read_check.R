@@ -295,7 +295,7 @@ fun_read_check <- function(df_mutation,
                            with.indels = FALSE,
                            fixed = FALSE)
             for (Lax_1 in seq(0, 9, length = 4)) {
-              for (Lax_2 in 2:0) {
+              for (Lax_2 in 3:0) {
                 if (length(mutation_supporting_1) != 1) {
                   search_status_1 <- search_status_1 + 1
                   setting <- fun_setting(
@@ -348,7 +348,7 @@ fun_read_check <- function(df_mutation,
               length_flag <- 1
               if (length(mutation_supporting_1) == 0) {
                 for (Lax_1 in seq(0, 9, length = 4)) {
-                  for (Lax_2 in 4:3) {
+                  for (Lax_2 in 5:4) {
                     if (length(mutation_supporting_1) != 1) {
                       search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
@@ -401,7 +401,7 @@ fun_read_check <- function(df_mutation,
             }
             if (length(mutation_supporting_1) == 0) {
               for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 2:0) {
+                for (Lax_2 in 3:0) {
                   if (length(mutation_supporting_1) != 1) {
                     search_status_1 <- search_status_1 + 1
                     setting <- fun_setting(
@@ -440,7 +440,7 @@ fun_read_check <- function(df_mutation,
               length_flag <- 1
               if (length(mutation_supporting_2) == 0) {
                 for (Lax_1 in seq(0, 9, length = 4)) {
-                  for (Lax_2 in 2:0) {
+                  for (Lax_2 in 3:0) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
@@ -494,7 +494,7 @@ fun_read_check <- function(df_mutation,
             if (length(mutation_supporting_2) != 1) {
               if (length(mutation_supporting_2) == 0) {
                 for (Lax_1 in seq(0, 9, length = 4)) {
-                  for (Lax_2 in 4:3) {
+                  for (Lax_2 in 5:4) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
@@ -547,7 +547,7 @@ fun_read_check <- function(df_mutation,
             }
             if (length(mutation_supporting_2) != 1) {
               for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 2:0) {
+                for (Lax_2 in 3:0) {
                   if (length(mutation_supporting_2) != 1) {
                     search_status_2 <- search_status_2 + 1
                     setting <- fun_setting(
@@ -582,9 +582,8 @@ fun_read_check <- function(df_mutation,
               if (mut_position_1 == mut_position_2) {
                 mut_position <- mut_position_1
               } else if (mut_position_1 < mut_position_2) {
-                if (!str_detect(peri_seq_1, pattern = "N") &
-                    !str_detect(peri_seq_2, pattern = "N") &
-                    search_status_1 < 3 & search_status_2 < 3) {
+                if (search_status_1 < 4 & search_status_2 < 4) {
+                  mut_position <- mut_position_1
                   rep_status <- fun_repeat_check(
                     df_seq[mut_position_1],
                     df_seq[mut_position_1:(mut_position_1 + 1)],
@@ -602,7 +601,8 @@ fun_read_check <- function(df_mutation,
               } else {
                 if (!str_detect(peri_seq_1, pattern = "N") &
                     !str_detect(peri_seq_2, pattern = "N") &
-                    search_status_1 < 3 & search_status_2 < 3) {
+                    search_status_1 < 4 & search_status_2 < 4) {
+                  mut_position <- mut_position_2
                   rep_status <- fun_repeat_check(
                     df_seq[mut_position_2],
                     df_seq[mut_position_2:(mut_position_2 + 1)],
