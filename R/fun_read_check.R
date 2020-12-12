@@ -175,6 +175,7 @@ fun_read_check <- function(df_mutation,
         distant_homology <- 0
         search_status_1 <- 0
         search_status_2 <- 0
+        indel_flag <- 0
         mutated_id <- mut_read_id_list[mut_call]
         mut_read_id <- str_sub(str_split(mutated_id, ",")[[1]],
                                start = 1,
@@ -583,6 +584,7 @@ fun_read_check <- function(df_mutation,
                 mut_position <- mut_position_1
               } else if (mut_position_1 < mut_position_2) {
                 if (search_status_1 < 4 & search_status_2 < 4) {
+                  indel_flag <- 1
                   mut_position <- mut_position_1
                   rep_status <- fun_repeat_check(
                     df_seq[mut_position_1],
@@ -599,9 +601,8 @@ fun_read_check <- function(df_mutation,
                   mut_position <- mut_position_2
                 }
               } else {
-                if (!str_detect(peri_seq_1, pattern = "N") &
-                    !str_detect(peri_seq_2, pattern = "N") &
-                    search_status_1 < 4 & search_status_2 < 4) {
+                if (search_status_1 < 4 & search_status_2 < 4) {
+                  indel_flag <- 1
                   mut_position <- mut_position_2
                   rep_status <- fun_repeat_check(
                     df_seq[mut_position_2],
@@ -818,6 +819,15 @@ fun_read_check <- function(df_mutation,
                     max(1, mut_position - short_homology_search_length
                                         - pre_rep_status):
                     length(df_seq)]
+                } else if (indel_flag == 1) {
+                    pre_homology_search_seq <- df_seq[1:
+                          min(length(df_seq),
+                              mut_position + short_homology_search_length +
+                                  post_rep_status + alt_length)]
+                    post_homology_search_seq <- df_seq[
+                      max(1, mut_position - short_homology_search_length
+                          - pre_rep_status):
+                        length(df_seq)]
                 } else {
                   pre_homology_search_seq <- df_seq[1:
                     min(length(df_seq),
