@@ -84,8 +84,6 @@ fun_read_check <- function(df_mutation,
       pos_err <- 0
       indel_status <- 0
       indel_length <- 0
-      with_indel_1 <- FALSE
-      with_indel_2 <- FALSE
       mut_call <- logical(0)
       mut_read <- matrix(logical(0))
       co_mut_pre <- 3
@@ -123,8 +121,6 @@ fun_read_check <- function(df_mutation,
       } else if (mut_type == "ins") {
         indel_length <- nchar(df_mutation[i, "Alt"]) - 1
         indel_status <- 1
-        with_indel_1 <- TRUE
-        with_indel_2 <- TRUE
         for (tmp in 0:max_mutation_search) {
           if (length(mut_call) == 0) {
             mut_read <- df_mut_call %>%
@@ -144,8 +140,6 @@ fun_read_check <- function(df_mutation,
       } else if (mut_type == "del") {
         indel_length <- nchar(df_mutation[i, "Ref"]) - 1
         indel_status <- 1
-        with_indel_1 <- TRUE
-        with_indel_2 <- TRUE
         for (tmp in 0:max_mutation_search) {
           if (length(mut_call) == 0) {
             mut_read <- df_mut_call %>%
@@ -179,7 +173,6 @@ fun_read_check <- function(df_mutation,
         low_quality_base <- 0
         homology_search_tmp <- NULL
         distant_homology <- 0
-        mis_mapping <- 0
         search_status_1 <- 0
         search_status_2 <- 0
         mutated_id <- mut_read_id_list[mut_call]
@@ -220,16 +213,6 @@ fun_read_check <- function(df_mutation,
                  Pos != (df_mutation[i, "Pos"] - pos_err))
         mut_near_1 <- dim(near_list_1)[1]
         mut_near_2 <- dim(near_list_2)[1]
-        if(mut_near_1 > 0){
-          if (all(nchar(near_list_1$Ref) != nchar(near_list_1$Alt))) {
-            with_indel_1 <- TRUE
-          }
-        }
-        if(mut_near_2 > 0){
-          if (all(nchar(near_list_2$Ref) != nchar(near_list_2$Alt))) {
-            with_indel_2 <- TRUE
-          }
-        }
         # short repeat around indel mutations
         if (mut_type == "ins") {
           rep_status <- fun_repeat_check(
@@ -307,40 +290,65 @@ fun_read_check <- function(df_mutation,
             mutation_supporting_1 <-
               matchPattern(peri_seq_1,
                            df_seq,
-                           max.mismatch = mut_near_1 + laxness,
+                           max.mismatch = mut_near_1,
                            min.mismatch = 0,
                            with.indels = FALSE,
                            fixed = FALSE)
-            mutation_supporting_2 <-
-              matchPattern(peri_seq_2,
-                           df_seq,
-                           max.mismatch = mut_near_2 + laxness,
-                           min.mismatch = 0,
-                           with.indels = FALSE,
-                           fixed = FALSE)
-            if (length(mutation_supporting_1) != 1) {
-              mutation_supporting_1 <-
-                matchPattern(peri_seq_1,
-                             df_seq,
-                             max.mismatch = mut_near_1 + laxness,
-                             min.mismatch = 0,
-                             with.indels = with_indel_1,
-                             fixed = FALSE)
+            for (Lax_1 in seq(0, 9, length = 4)) {
+              for (Lax_2 in 2:0) {
+                if (length(mutation_supporting_1) != 1) {
+                  search_status_1 <- search_status_1 + 1
+                  setting <- fun_setting(
+                    pre = pre_search_length_default,
+                    post = post_search_length_default - Lax_1 * laxness,
+                    neighbor_seq = neighbor_seq,
+                    neighbor_length = neighbor_length,
+                    alt_length = alt_length)
+                  pre_search_length <- setting[[1]]
+                  post_search_length <- setting[[2]]
+                  peri_seq_1 <- setting[[3]]
+                  peri_seq_2 <- setting[[4]]
+                  mutation_supporting_1 <- matchPattern(
+                    peri_seq_1,
+                    df_seq,
+                    max.mismatch = mut_near_1 + Lax_2 * laxness,
+                    min.mismatch = 0,
+                    with.indels = FALSE,
+                    fixed = FALSE)
+                }
+              }
             }
-            if (length(mutation_supporting_2) != 1) {
-                mutation_supporting_2 <-
-                  matchPattern(peri_seq_2,
-                               df_seq,
-                               max.mismatch = mut_near_2 + laxness,
-                               min.mismatch = 0,
-                               with.indels = with_indel_2,
-                               fixed = FALSE)
+            if (length(mutation_supporting_1) != 1) {
+              for (Lax_1 in seq(5, 15, length = 3)) {
+                for (Lax_2 in 3:0) {
+                  if (length(mutation_supporting_1) != 1) {
+                    search_status_1 <- search_status_1 + 1
+                    setting <- fun_setting(
+                      pre = pre_search_length_default + Lax_1 * laxness,
+                      post = post_search_length_default,
+                      neighbor_seq = neighbor_seq,
+                      neighbor_length = neighbor_length,
+                      alt_length = alt_length)
+                    pre_search_length <- setting[[1]]
+                    post_search_length <- setting[[2]]
+                    peri_seq_1 <- setting[[3]]
+                    peri_seq_2 <- setting[[4]]
+                    mutation_supporting_1 <- matchPattern(
+                      peri_seq_1,
+                      df_seq,
+                      max.mismatch = mut_near_1 + Lax_2 * laxness,
+                      min.mismatch = 0,
+                      with.indels = FALSE,
+                      fixed = FALSE)
+                  }
+                }
+              }
             }
             if (length(mutation_supporting_1) != 1) {
               length_flag <- 1
               if (length(mutation_supporting_1) == 0) {
-                for (Lax_1 in seq(3, 9, length = 3)) {
-                  for (Lax_2 in 2:0) {
+                for (Lax_1 in seq(0, 9, length = 4)) {
+                  for (Lax_2 in 4:3) {
                     if (length(mutation_supporting_1) != 1) {
                       search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
@@ -358,15 +366,15 @@ fun_read_check <- function(df_mutation,
                         df_seq,
                         max.mismatch = mut_near_1 + Lax_2 * laxness,
                         min.mismatch = 0,
-                        with.indels = with_indel_1,
+                        with.indels = FALSE,
                         fixed = FALSE)
                     }
                   }
                 }
               }
               if (length(mutation_supporting_1) != 1) {
-                for (Lax_1 in seq(5, 15, length = 3)) {
-                  for (Lax_2 in 3:0) {
+                for (Lax_1 in seq(5, 20, length = 3)) {
+                  for (Lax_2 in 5:4) {
                     if (length(mutation_supporting_1) != 1) {
                       search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
@@ -384,9 +392,35 @@ fun_read_check <- function(df_mutation,
                         df_seq,
                         max.mismatch = mut_near_1 + Lax_2 * laxness,
                         min.mismatch = 0,
-                        with.indels = with_indel_1,
+                        with.indels = FALSE,
                         fixed = FALSE)
                     }
+                  }
+                }
+              }
+            }
+            if (length(mutation_supporting_1) == 0) {
+              for (Lax_1 in seq(0, 9, length = 4)) {
+                for (Lax_2 in 2:0) {
+                  if (length(mutation_supporting_1) != 1) {
+                    search_status_1 <- search_status_1 + 1
+                    setting <- fun_setting(
+                      pre = pre_search_length_default,
+                      post = post_search_length_default - Lax_1 * laxness,
+                      neighbor_seq = neighbor_seq,
+                      neighbor_length = neighbor_length,
+                      alt_length = alt_length)
+                    pre_search_length <- setting[[1]]
+                    post_search_length <- setting[[2]]
+                    peri_seq_1 <- setting[[3]]
+                    peri_seq_2 <- setting[[4]]
+                    mutation_supporting_1 <- matchPattern(
+                      peri_seq_1,
+                      df_seq,
+                      max.mismatch = mut_near_1 + Lax_2 * laxness,
+                      min.mismatch = 0,
+                      with.indels = TRUE,
+                      fixed = FALSE)
                   }
                 }
               }
@@ -395,10 +429,17 @@ fun_read_check <- function(df_mutation,
             post_search_length_1 <- post_search_length
             pre_search_length <- pre_search_length_default
             post_search_length <- post_search_length_default
+            mutation_supporting_2 <-
+              matchPattern(peri_seq_2,
+                           df_seq,
+                           max.mismatch = mut_near_2,
+                           min.mismatch = 0,
+                           with.indels = FALSE,
+                           fixed = FALSE)
             if (length(mutation_supporting_2) != 1) {
               length_flag <- 1
               if (length(mutation_supporting_2) == 0) {
-                for (Lax_1 in seq(3, 9, length = 3)) {
+                for (Lax_1 in seq(0, 9, length = 4)) {
                   for (Lax_2 in 2:0) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
@@ -417,7 +458,7 @@ fun_read_check <- function(df_mutation,
                         df_seq,
                         max.mismatch = mut_near_2 + Lax_2 * laxness,
                         min.mismatch = 0,
-                        with.indels = with_indel_2,
+                        with.indels = FALSE,
                         fixed = FALSE)
                     }
                   }
@@ -443,9 +484,89 @@ fun_read_check <- function(df_mutation,
                         df_seq,
                         max.mismatch = mut_near_2 + Lax_2 * laxness,
                         min.mismatch = 0,
-                        with.indels = with_indel_2,
+                        with.indels = FALSE,
                         fixed = FALSE)
                     }
+                  }
+                }
+              }
+            }
+            if (length(mutation_supporting_2) != 1) {
+              if (length(mutation_supporting_2) == 0) {
+                for (Lax_1 in seq(0, 9, length = 4)) {
+                  for (Lax_2 in 4:3) {
+                    if (length(mutation_supporting_2) != 1) {
+                      search_status_2 <- search_status_2 + 1
+                      setting <- fun_setting(
+                        pre = pre_search_length_default,
+                        post = post_search_length_default - Lax_1 * laxness,
+                        neighbor_seq = neighbor_seq,
+                        neighbor_length = neighbor_length,
+                        alt_length = alt_length)
+                      pre_search_length <- setting[[1]]
+                      post_search_length <- setting[[2]]
+                      peri_seq_1 <- setting[[3]]
+                      peri_seq_2 <- setting[[4]]
+                      mutation_supporting_2 <- matchPattern(
+                        peri_seq_2,
+                        df_seq,
+                        max.mismatch = mut_near_2 + Lax_2 * laxness,
+                        min.mismatch = 0,
+                        with.indels = FALSE,
+                        fixed = FALSE)
+                    }
+                  }
+                }
+              }
+              if (length(mutation_supporting_2) != 1) {
+                for (Lax_1 in seq(5, 20, length = 3)) {
+                  for (Lax_2 in 5:4) {
+                    if (length(mutation_supporting_2) != 1) {
+                      search_status_2 <- search_status_2 + 1
+                      setting <- fun_setting(
+                        pre = pre_search_length_default + Lax_1 * laxness,
+                        post = post_search_length_default,
+                        neighbor_seq = neighbor_seq,
+                        neighbor_length = neighbor_length,
+                        alt_length = alt_length)
+                      pre_search_length <- setting[[1]]
+                      post_search_length <- setting[[2]]
+                      peri_seq_1 <- setting[[3]]
+                      peri_seq_2 <- setting[[4]]
+                      mutation_supporting_2 <- matchPattern(
+                        peri_seq_2,
+                        df_seq,
+                        max.mismatch = mut_near_2 + Lax_2 * laxness,
+                        min.mismatch = 0,
+                        with.indels = FALSE,
+                        fixed = FALSE)
+                    }
+                  }
+                }
+              }
+            }
+            if (length(mutation_supporting_2) != 1) {
+              for (Lax_1 in seq(0, 9, length = 4)) {
+                for (Lax_2 in 2:0) {
+                  if (length(mutation_supporting_2) != 1) {
+                    search_status_2 <- search_status_2 + 1
+                    setting <- fun_setting(
+                      pre = pre_search_length_default,
+                      post = post_search_length_default - Lax_1 * laxness,
+                      neighbor_seq = neighbor_seq,
+                      neighbor_length = neighbor_length,
+                      alt_length = alt_length)
+                    pre_search_length <- setting[[1]]
+                    post_search_length <- setting[[2]]
+                    peri_seq_1 <- setting[[3]]
+                    peri_seq_2 <- setting[[4]]
+                    mutation_supporting_2 <- matchPattern(
+                      peri_seq_2,
+                      df_seq,
+                      max.mismatch = mut_near_2 + Lax_2 * laxness,
+                      min.mismatch = 0,
+                      with.indels = TRUE,
+                      fixed = FALSE)
                   }
                 }
               }
@@ -461,48 +582,40 @@ fun_read_check <- function(df_mutation,
               if (mut_position_1 == mut_position_2) {
                 mut_position <- mut_position_1
               } else if (mut_position_1 < mut_position_2) {
-                if (search_status_1 < search_status_2) {
+                if (!str_detect(peri_seq_1, pattern = "N") &
+                    !str_detect(peri_seq_2, pattern = "N") &
+                    search_status_1 < 3 & search_status_2 < 3) {
+                  rep_status <- fun_repeat_check(
+                    df_seq[mut_position_1],
+                    df_seq[mut_position_1:(mut_position_1 + 1)],
+                    ref_seq,
+                    ref_width - 1,
+                    del = 1)
+                  pre_rep_status <- max(pre_rep_status, rep_status[[1]])
+                  post_rep_status <- max(post_rep_status, rep_status[[2]])
+                  homopolymer_status <- max(homopolymer_status, rep_status[[3]])
+                } else if (search_status_1 <= search_status_2) {
                   mut_position <- mut_position_1
-                } else if (search_status_1 > search_status_2) {
-                  mut_position <- mut_position_2
-                } else if (search_status_1 == 0) {
-                  mut_position <- mut_position_1
-                  mis_mapping <- mis_mapping + 1
-                  if (mis_mapping == 1) {
-                    rep_status <- fun_repeat_check(
-                      df_seq[mut_position],
-                      df_seq[mut_position:(mut_position + 1)],
-                      ref_seq,
-                      ref_width - 1,
-                      del = 1)
-                    pre_rep_status <- rep_status[[1]]
-                    post_rep_status <- rep_status[[2]]
-                    homopolymer_status <- rep_status[[3]]
-                  }
                 } else {
-                  mut_position <- mut_position_1
+                  mut_position <- mut_position_2
                 }
               } else {
-                if (search_status_1 < search_status_2) {
+                if (!str_detect(peri_seq_1, pattern = "N") &
+                    !str_detect(peri_seq_2, pattern = "N") &
+                    search_status_1 < 3 & search_status_2 < 3) {
+                  rep_status <- fun_repeat_check(
+                    df_seq[mut_position_2],
+                    df_seq[mut_position_2:(mut_position_2 + 1)],
+                    ref_seq,
+                    ref_width,
+                    del = 0)
+                  pre_rep_status <- rep_status[[1]]
+                  post_rep_status <- rep_status[[2]]
+                  homopolymer_status <- rep_status[[3]]
+                } else if (search_status_1 <= search_status_2) {
                   mut_position <- mut_position_1
-                } else if (search_status_1 > search_status_2) {
-                  mut_position <- mut_position_2
-                } else if (search_status_1 == 0) {
-                  mut_position <- mut_position_2
-                  mis_mapping <- mis_mapping + 1
-                  if (mis_mapping == 1) {
-                    rep_status <- fun_repeat_check(
-                      df_seq[mut_position],
-                      df_seq[mut_position:(mut_position + 1)],
-                      ref_seq,
-                      ref_width,
-                      del = 0)
-                    pre_rep_status <- rep_status[[1]]
-                    post_rep_status <- rep_status[[2]]
-                    homopolymer_status <- rep_status[[3]]
-                  }
                 } else {
-                  mut_position <- mut_position_1
+                  mut_position <- mut_position_2
                 }
               }
             } else if (length(mutation_supporting_1) == 1) {
