@@ -84,7 +84,7 @@ fun_summary <- function(msec) {
           (((pre_minimum_length_adj - pre_rep_status - 1) +
               abs(pre_minimum_length_adj - pre_rep_status - 1)) / 2) +
             pre_rep_status + 1,
-      post_minimum_length_adj =,
+      post_minimum_length_adj =
           (((post_minimum_length_adj - post_rep_status - 1) +
               abs(post_minimum_length_adj - post_rep_status - 1)) / 2) +
             post_rep_status + 1,
@@ -92,7 +92,7 @@ fun_summary <- function(msec) {
        (((pre_support_length_adj - (read_length - post_rep_status - 1)) -
        abs(pre_support_length_adj - (read_length - post_rep_status - 1))) / 2) +
             (read_length - post_rep_status - 1),
-      post_support_length_adj =,
+      post_support_length_adj =
        (((post_support_length_adj - (read_length - pre_rep_status - 1)) -
        abs(post_support_length_adj - (read_length - pre_rep_status - 1))) / 2) +
             (read_length - pre_rep_status - 1)
