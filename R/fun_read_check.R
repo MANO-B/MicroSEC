@@ -675,20 +675,23 @@ fun_read_check <- function(df_mutation,
                   mut_position <- mut_position_2
                 }
               }
-            } else if (length(mutation_supporting_1) == 1 &
-                       str_count(as.character(as.data.frame(
-                         mutation_supporting_1)[1]), "N") <= 10 &
-                       start(mutation_supporting_1) > 0) {
+            } else if (length(mutation_supporting_1) == 1) {
+              if (str_count(as.character(as.data.frame(
+                    mutation_supporting_1)[1]), "N") <= 10 &
+                  start(mutation_supporting_1) > 0) {
                 mut_position <- min(
                   length(df_seq),
                   start(mutation_supporting_1) + pre_search_length_1)
-            } else if (length(mutation_supporting_2) == 1 &
-                       str_count(as.character(as.data.frame(
-                         mutation_supporting_2)[1]), "N") <= 10 &
-                       end(mutation_supporting_2) <= length(df_seq)) {
-              mut_position <- min(
-                length(df_seq),
-                end(mutation_supporting_2) - pre_search_length - alt_length + 1)
+              }
+            } else if (length(mutation_supporting_2) == 1) {
+              if (str_count(as.character(as.data.frame(
+                    mutation_supporting_2)[1]), "N") <= 10 &
+                  end(mutation_supporting_2) <= length(df_seq)) {
+                mut_position <- min(
+                  length(df_seq),
+                  end(mutation_supporting_2) -
+                    pre_search_length - alt_length + 1)
+              }
             }
             if (mut_position > 0) {
               total_read <- total_read + 1
