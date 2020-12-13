@@ -19,6 +19,7 @@
 #' @importFrom stringr str_split
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_replace
+#' @importFrom stringr str_count
 #' @importFrom BiocGenerics which
 #' @importFrom BiocGenerics which.max
 #' @importFrom gtools asc
@@ -296,7 +297,7 @@ fun_read_check <- function(df_mutation,
                            with.indels = FALSE,
                            fixed = FALSE)
             for (Lax_1 in seq(0, 9, length = 4)) {
-              for (Lax_2 in 3:0) {
+              for (Lax_2 in 0:3) {
                 if (length(mutation_supporting_1) != 1) {
                   search_status_1 <- search_status_1 + 1
                   setting <- fun_setting(
@@ -321,7 +322,7 @@ fun_read_check <- function(df_mutation,
             }
             if (length(mutation_supporting_1) != 1) {
               for (Lax_1 in seq(5, 15, length = 3)) {
-                for (Lax_2 in 3:0) {
+                for (Lax_2 in 0:3) {
                   if (length(mutation_supporting_1) != 1) {
                     search_status_1 <- search_status_1 + 1
                     setting <- fun_setting(
@@ -349,7 +350,7 @@ fun_read_check <- function(df_mutation,
               length_flag <- 1
               if (length(mutation_supporting_1) == 0) {
                 for (Lax_1 in seq(0, 9, length = 4)) {
-                  for (Lax_2 in 5:4) {
+                  for (Lax_2 in 4:5) {
                     if (length(mutation_supporting_1) != 1) {
                       search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
@@ -375,7 +376,7 @@ fun_read_check <- function(df_mutation,
               }
               if (length(mutation_supporting_1) != 1) {
                 for (Lax_1 in seq(5, 20, length = 3)) {
-                  for (Lax_2 in 5:4) {
+                  for (Lax_2 in 4:5) {
                     if (length(mutation_supporting_1) != 1) {
                       search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
@@ -402,7 +403,7 @@ fun_read_check <- function(df_mutation,
             }
             if (length(mutation_supporting_1) == 0) {
               for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 3:0) {
+                for (Lax_2 in 0:3) {
                   if (length(mutation_supporting_1) != 1) {
                     search_status_1 <- search_status_1 + 1
                     setting <- fun_setting(
@@ -441,7 +442,7 @@ fun_read_check <- function(df_mutation,
               length_flag <- 1
               if (length(mutation_supporting_2) == 0) {
                 for (Lax_1 in seq(0, 9, length = 4)) {
-                  for (Lax_2 in 3:0) {
+                  for (Lax_2 in 0:3) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
@@ -467,7 +468,7 @@ fun_read_check <- function(df_mutation,
               }
               if (length(mutation_supporting_2) != 1) {
                 for (Lax_1 in seq(5, 15, length = 3)) {
-                  for (Lax_2 in 3:0) {
+                  for (Lax_2 in 0:3) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
@@ -495,7 +496,7 @@ fun_read_check <- function(df_mutation,
             if (length(mutation_supporting_2) != 1) {
               if (length(mutation_supporting_2) == 0) {
                 for (Lax_1 in seq(0, 9, length = 4)) {
-                  for (Lax_2 in 5:4) {
+                  for (Lax_2 in 4:5) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
@@ -521,7 +522,7 @@ fun_read_check <- function(df_mutation,
               }
               if (length(mutation_supporting_2) != 1) {
                 for (Lax_1 in seq(5, 20, length = 3)) {
-                  for (Lax_2 in 5:4) {
+                  for (Lax_2 in 4:5) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
@@ -548,7 +549,7 @@ fun_read_check <- function(df_mutation,
             }
             if (length(mutation_supporting_2) != 1) {
               for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 3:0) {
+                for (Lax_2 in 0:3) {
                   if (length(mutation_supporting_2) != 1) {
                     search_status_2 <- search_status_2 + 1
                     setting <- fun_setting(
@@ -583,7 +584,12 @@ fun_read_check <- function(df_mutation,
               if (mut_position_1 == mut_position_2) {
                 mut_position <- mut_position_1
               } else if (mut_position_1 < mut_position_2) {
-                if (search_status_1 < 4 & search_status_2 < 4) {
+                if (mut_position_1 > (mut_position_2 - 5) &
+                    str_count(as.character(as.data.frame(
+                      mutation_supporting_1)[1]), "N") < 10 &
+                    str_count(as.character(as.data.frame(
+                      mutation_supporting_2)[1]), "N") < 10 &
+                    search_status_1 < 4 & search_status_2 < 4) {
                   indel_flag <- 1
                   mut_position <- mut_position_1
                   rep_status <- fun_repeat_check(
@@ -595,13 +601,41 @@ fun_read_check <- function(df_mutation,
                   pre_rep_status <- max(pre_rep_status, rep_status[[1]])
                   post_rep_status <- max(post_rep_status, rep_status[[2]])
                   homopolymer_status <- max(homopolymer_status, rep_status[[3]])
-                } else if (search_status_1 <= search_status_2) {
-                  mut_position <- mut_position_1
-                } else {
-                  mut_position <- mut_position_2
+                } else if (str_count(as.character(as.data.frame(
+                             mutation_supporting_1)[1]), "N") < 10 &
+                           str_count(as.character(as.data.frame(
+                             mutation_supporting_1)[1]), "N") < 10){
+                  if (search_status_1 <= search_status_2) {
+                    if (mut_position_1 > 0) {
+                      mut_position <- mut_position_1
+                    } else if (mut_position_2 <= length(df_seq)) {
+                      mut_position <- mut_position_2
+                    }
+                  } else {
+                    if (mut_position_2 <= length(df_seq)) {
+                      mut_position <- mut_position_2
+                    } else if (mut_position_1 > 0) {
+                      mut_position <- mut_position_1
+                    }
+                  }
+                } else if (str_count(as.character(as.data.frame(
+                  mutation_supporting_1)[1]), "N") < 10) {
+                  if (mut_position_1 > 0) {
+                    mut_position <- mut_position_1
+                  }
+                } else if (str_count(as.character(as.data.frame(
+                  mutation_supporting_2)[1]), "N") < 10) {
+                  if (mut_position_2 <= length(df_seq)) {
+                    mut_position <- mut_position_2
+                  }
                 }
-              } else {
-                if (search_status_1 < 4 & search_status_2 < 4) {
+              } else if (mut_position_2 < mut_position_1 &
+                         mut_position_2 > (mut_position_1 - 5) &
+                         str_count(as.character(as.data.frame(
+                           mutation_supporting_1)[1]), "N") < 10 &
+                         str_count(as.character(as.data.frame(
+                           mutation_supporting_2)[1]), "N") < 10 &
+                         search_status_1 < 4 & search_status_2 < 4) {
                   indel_flag <- 1
                   mut_position <- mut_position_2
                   rep_status <- fun_repeat_check(
@@ -613,17 +647,45 @@ fun_read_check <- function(df_mutation,
                   pre_rep_status <- rep_status[[1]]
                   post_rep_status <- rep_status[[2]]
                   homopolymer_status <- rep_status[[3]]
-                } else if (search_status_1 <= search_status_2) {
-                  mut_position <- mut_position_1
+              } else if (str_count(as.character(as.data.frame(
+                mutation_supporting_1)[1]), "N") < 10 &
+                str_count(as.character(as.data.frame(
+                  mutation_supporting_1)[1]), "N") < 10){
+                if (search_status_1 <= search_status_2) {
+                  if (mut_position_1 > 0) {
+                    mut_position <- mut_position_1
+                  } else if (mut_position_2 <= length(df_seq)) {
+                    mut_position <- mut_position_2
+                  }
                 } else {
+                  if (mut_position_2 <= length(df_seq)) {
+                    mut_position <- mut_position_2
+                  } else if (mut_position_1 > 0) {
+                    mut_position <- mut_position_1
+                  }
+                }
+              } else if (str_count(as.character(as.data.frame(
+                mutation_supporting_1)[1]), "N") < 10) {
+                if (mut_position_1 > 0) {
+                  mut_position <- mut_position_1
+                }
+              } else if (str_count(as.character(as.data.frame(
+                mutation_supporting_2)[1]), "N") < 10) {
+                if (mut_position_2 <= length(df_seq)) {
                   mut_position <- mut_position_2
                 }
               }
-            } else if (length(mutation_supporting_1) == 1) {
+            } else if (length(mutation_supporting_1) == 1 &
+                       str_count(as.character(as.data.frame(
+                         mutation_supporting_1)[1]), "N") <= 10 &
+                       start(mutation_supporting_1) > 0) {
                 mut_position <- min(
                   length(df_seq),
                   start(mutation_supporting_1) + pre_search_length_1)
-            } else if (length(mutation_supporting_2) == 1) {
+            } else if (length(mutation_supporting_2) == 1 &
+                       str_count(as.character(as.data.frame(
+                         mutation_supporting_2)[1]), "N") <= 10 &
+                       end(mutation_supporting_2) <= length(df_seq)) {
               mut_position <- min(
                 length(df_seq),
                 end(mutation_supporting_2) - pre_search_length - alt_length + 1)
