@@ -185,7 +185,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 install.packages("MicroSEC")
 
 # Developmental stable version from github (recommended)
-devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.8")
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.9")
 
 # Developmental unstable version from github (not recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
