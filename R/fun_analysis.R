@@ -297,12 +297,12 @@ fun_analysis <- function(msec,
       filter_5_highly_homologous_region =
         ifelse((distant_homology_rate >= threshold_distant_homology &
                   not_long_repeat &
-                  (short_pre_support &
-                   short_pre_support_sum) |
-                  (short_post_support &
-                   short_post_support_sum) |
-                  (short_short_support &
-                   short_short_support_sum)),
+                  ((short_pre_support &
+                    short_pre_support_sum) |
+                   (short_post_support &
+                    short_post_support_sum) |
+                   (short_short_support &
+                    short_short_support_sum))),
                TRUE, FALSE),
       filter_6_simple_repeat =
         ifelse((SimpleRepeat_TRF == "Y"),
