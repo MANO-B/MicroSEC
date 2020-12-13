@@ -83,6 +83,7 @@
 # Results are saved in a excel file.
 # The explatation of the results is written in detail in the second sheet of the excel file.
 
+options(warn=-1)
 # load necessary packages
 library(MicroSEC)
 

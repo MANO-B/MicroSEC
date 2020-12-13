@@ -300,8 +300,9 @@ fun_analysis <- function(msec,
                   (short_pre_support &
                    short_pre_support_sum) |
                   (short_post_support &
-                   short_post_support_sum)
-                  ),
+                   short_post_support_sum) |
+                  (short_short_support &
+                   short_short_support_sum)),
                TRUE, FALSE),
       filter_6_simple_repeat =
         ifelse((SimpleRepeat_TRF == "Y"),
@@ -352,7 +353,7 @@ fun_analysis <- function(msec,
     )
     msec <- msec %>% mutate(
       caution =
-        ifelse((distant_homology_rate < threshold_distant_homology &
+        ifelse((distant_homology_rate >= threshold_distant_homology &
                   !filter_5_highly_homologous_region &
                   !not_long_repeat),
                paste(caution,
@@ -361,7 +362,7 @@ fun_analysis <- function(msec,
     )
     msec <- msec %>% mutate(
       caution =
-        ifelse((distant_homology_rate < threshold_distant_homology &
+        ifelse((distant_homology_rate >= threshold_distant_homology &
                   !filter_5_highly_homologous_region &
                   not_long_repeat),
                paste(caution,
