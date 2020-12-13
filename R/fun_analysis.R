@@ -296,7 +296,12 @@ fun_analysis <- function(msec,
                TRUE, FALSE),
       filter_5_highly_homologous_region =
         ifelse((distant_homology_rate >= threshold_distant_homology &
-                  not_long_repeat),
+                  not_long_repeat &
+                  (short_pre_support &
+                   short_pre_support_sum) |
+                  (short_post_support &
+                   short_post_support_sum)
+                  ),
                TRUE, FALSE),
       filter_6_simple_repeat =
         ifelse((SimpleRepeat_TRF == "Y"),
@@ -343,6 +348,24 @@ fun_analysis <- function(msec,
                   !high_rate_q18),
                paste(caution,
                      "filter 3: p is small, but reads are low quality,"),
+               caution)
+    )
+    msec <- msec %>% mutate(
+      caution =
+        ifelse((distant_homology_rate < threshold_distant_homology &
+                  !filter_5_highly_homologous_region &
+                  !not_long_repeat),
+               paste(caution,
+                     "filter 5: sequence is too repetitive,"),
+               caution)
+    )
+    msec <- msec %>% mutate(
+      caution =
+        ifelse((distant_homology_rate < threshold_distant_homology &
+                  !filter_5_highly_homologous_region &
+                  not_long_repeat),
+               paste(caution,
+                "filter 5: many homologous region, but supported enough long,"),
                caution)
     )
     msec <- msec %>% mutate(
