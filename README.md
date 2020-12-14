@@ -185,7 +185,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 install.packages("MicroSEC")
 
 # Developmental stable version from github (recommended)
-devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.11")
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.12")
 
 # Developmental unstable version from github (not recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
@@ -213,6 +213,7 @@ Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz SAMPLE_NAME /mnt/result/mut
 ## Necessary packages
 library(MicroSEC)
 
+options(show.error.messages = FALSE, warn = -1)
 wd = "/mnt/HDD8TB/MicroSEC" # set your working/output directory
 sample_list = "/mnt/HDD8TB/MicroSEC/source/Sample_list.txt"
 progress_bar = "Y"
