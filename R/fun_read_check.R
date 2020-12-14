@@ -59,7 +59,7 @@ fun_read_check <- function(df_mutation,
                           progress_bar) {
   Chr <- NULL
   Pos <- NULL
-  options(show.error.messages = FALSE)
+  options(show.error.messages = FALSE, warn = -1)
   if (length(df_mutation[, 1]) > 0) {
     # initialize
     msec <- NULL
