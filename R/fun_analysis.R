@@ -366,7 +366,7 @@ fun_analysis <- function(msec,
                   !filter_5_highly_homologous_region &
                   not_long_repeat),
                paste(caution,
-                "filter 5: many homologous region, but supported enough long,"),
+                "filter 5: many homologous regions but supported enough long,"),
                caution)
     )
     msec <- msec %>% mutate(
