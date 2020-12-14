@@ -179,6 +179,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 ```
 
 ## Instructions for Use
+See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
 # Stable version from CRAN
