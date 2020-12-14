@@ -102,12 +102,12 @@ fun_read_check <- function(df_mutation,
       if (df_mutation[i, "Chr"] != chrom) {
         chrom <- df_mutation[i, "Chr"]
         id_no <- df_bam$rname == chrom
-        df_bam_qname <- df_bam$qname[id_no]
-        df_bam_seq <- df_bam$seq[id_no]
-        df_bam_strand <- df_bam$strand[id_no]
-        df_bam_cigar <- df_bam$cigar[id_no]
-        df_bam_qual <- df_bam$qual[id_no]
-        df_bam_pos <- df_bam$pos[id_no]
+        df_bam_qname_chr <- df_bam$qname[id_no]
+        df_bam_seq_chr <- df_bam$seq[id_no]
+        df_bam_strand_chr <- df_bam$strand[id_no]
+        df_bam_cigar_chr <- df_bam$cigar[id_no]
+        df_bam_qual_chr <- df_bam$qual[id_no]
+        df_bam_pos_chr <- df_bam$pos[id_no]
       }
       mut_type <- str_split(df_mutation[i, "Mut_type"], "-")[[1]][[2]]
       if (mut_type == "snv") {
@@ -185,6 +185,14 @@ fun_read_check <- function(df_mutation,
                                   start = -1,
                                   end = -1)
         mut_read_strand <- gsub("r", "-", gsub("f", "+", mut_read_strand))
+        id_no <- (df_bam_pos_chr > (df_mutation[i, "Pos"] - 200) &
+                    df_bam_pos_chr < (df_mutation[i, "Pos"] + 10))
+        df_bam_qname <- df_bam_qname_chr[id_no]
+        df_bam_seq <- df_bam_seq_chr[id_no]
+        df_bam_strand <- df_bam_strand_chr[id_no]
+        df_bam_cigar <- df_bam_cigar_chr[id_no]
+        df_bam_qual <- df_bam_qual_chr[id_no]
+        df_bam_pos <- df_bam_pos_chr[id_no]
         neighbor_seq <- df_mutation[i, "Neighborhood_sequence"]
         alt_length <- nchar(df_mutation[i, "Alt"])
         ref_seq <- ref_genome[[df_mutation[i, "Chr"]]][
