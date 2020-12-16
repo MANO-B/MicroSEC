@@ -185,7 +185,7 @@ See also https://rdrr.io/cran/MicroSEC/
 install.packages("MicroSEC")
 
 # Developmental stable version from github (recommended)
-devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.12")
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.13")
 
 # Developmental unstable version from github (not recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
