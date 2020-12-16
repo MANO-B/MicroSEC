@@ -81,11 +81,10 @@ fun_analysis <- function(msec,
     filter_1_mutation_intra_hairpin_loop <- NULL
     filter_2_hairpin_structure <- NULL
     filter_3_microhomology_induced_mutation <- NULL
-    filter_4_soft_clipping <- NULL
-    filter_5_highly_homologous_region <- NULL
-    filter_6_simple_repeat <- NULL
-    filter_7_c_to_t_artifact <- NULL
-    filter_8_mutation_at_homopolymer <- NULL
+    filter_4_highly_homologous_region <- NULL
+    filter_5_simple_repeat <- NULL
+    filter_6_c_to_t_artifact <- NULL
+    filter_7_mutation_at_homopolymer <- NULL
     mut_type <- NULL
     hairpin_length <- NULL
     pre_minimum_length <- NULL
@@ -290,27 +289,17 @@ fun_analysis <- function(msec,
                       short_post_support &
                       short_post_support_sum))),
                TRUE, FALSE),
-      filter_4_soft_clipping =
-        ifelse((fun_zero(soft_clipped_read, total_read)) >
-                 threshold_soft_clip_ratio,
-               TRUE, FALSE),
-      filter_5_highly_homologous_region =
+      filter_4_highly_homologous_region =
         ifelse((distant_homology_rate >= threshold_distant_homology &
-                  not_long_repeat &
-                  ((short_pre_support &
-                    short_pre_support_sum) |
-                   (short_post_support &
-                    short_post_support_sum) |
-                   (short_short_support &
-                    short_short_support_sum))),
+                  not_long_repeat),
                TRUE, FALSE),
-      filter_6_simple_repeat =
+      filter_5_simple_repeat =
         ifelse((SimpleRepeat_TRF == "Y"),
                TRUE, FALSE),
-      filter_7_c_to_t_artifact =
+      filter_6_c_to_t_artifact =
         ifelse((Transition == "C>T_g_FFPE"),
                TRUE, FALSE),
-      filter_8_mutation_at_homopolymer =
+      filter_7_mutation_at_homopolymer =
         ifelse((homopolymer_status  >= homopolymer_length),
                TRUE, FALSE)
     )
@@ -354,44 +343,32 @@ fun_analysis <- function(msec,
     msec <- msec %>% mutate(
       caution =
         ifelse((distant_homology_rate >= threshold_distant_homology &
-                  !filter_5_highly_homologous_region &
+                  !filter_4_highly_homologous_region &
                   !not_long_repeat),
                paste(caution,
-                     "filter 5: sequence is too repetitive,"),
+                     "filter 4: sequence is too repetitive,"),
                caution)
     )
     msec <- msec %>% mutate(
-      caution =
-        ifelse((distant_homology_rate >= threshold_distant_homology &
-                  !filter_5_highly_homologous_region &
-                  not_long_repeat),
-               paste(caution,
-                "filter 5: many homologous regions but supported enough long,"),
-               caution)
-    )
-    msec <- msec %>% mutate(
+        msec_filter_123 = ifelse(
+          filter_1_mutation_intra_hairpin_loop |
+          filter_2_hairpin_structure |
+          filter_3_microhomology_induced_mutation,
+          "Artifact suspicious", ""),
         msec_filter_1234 = ifelse(
           filter_1_mutation_intra_hairpin_loop |
           filter_2_hairpin_structure |
           filter_3_microhomology_induced_mutation |
-          filter_4_soft_clipping,
-          "Artifact suspicious", ""),
-        msec_filter_12345 = ifelse(
-          filter_1_mutation_intra_hairpin_loop |
-          filter_2_hairpin_structure |
-          filter_3_microhomology_induced_mutation |
-          filter_4_soft_clipping |
-          filter_5_highly_homologous_region,
+          filter_4_highly_homologous_region,
           "Artifact suspicious", ""),
         msec_filter_all = ifelse(
           filter_1_mutation_intra_hairpin_loop |
           filter_2_hairpin_structure |
           filter_3_microhomology_induced_mutation |
-          filter_4_soft_clipping |
-          filter_5_highly_homologous_region |
-          filter_6_simple_repeat |
-          filter_7_c_to_t_artifact |
-          filter_8_mutation_at_homopolymer,
+          filter_4_highly_homologous_region |
+          filter_5_simple_repeat |
+          filter_6_c_to_t_artifact |
+          filter_7_mutation_at_homopolymer,
           "Artifact suspicious", ""),
         comment = caution
       )

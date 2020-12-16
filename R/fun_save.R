@@ -52,17 +52,16 @@ fun_save <- function(msec, sample_info, wd) {
       "Palindromic sequences exist within 150 bases",
     filter_3_microhomology_induced_mutation =
       "3'-/5'-supporting lengths are too densely distributed to occur.",
-    filter_4_soft_clipping = ">=90% mutation-supporting reads are soft-clipped",
-    filter_5_highly_homologous_region = paste(
+    filter_4_highly_homologous_region = paste(
       ">=20% mutations were called by chimeric reads comprising two distant",
       "regions"),
-    filter_6_simple_repeat = "Mutations locating at simple repeat sequences",
-    filter_7_c_to_t_artifact = "C>T_g false positive calls in FFPE samples",
-    filter_8_mutation_at_homopolymer =
+    filter_5_simple_repeat = "Mutations locating at simple repeat sequences",
+    filter_6_c_to_t_artifact = "C>T_g false positive calls in FFPE samples",
+    filter_7_mutation_at_homopolymer =
       "Indel mutations located inside a >=15 homopolymer",
-    msec_filter_1234 = "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",
-    msec_filter_12345 =
-      "One or more filters of Fitler 1, 2, 3, 4, or 5 are TRUE",
+    msec_filter_123 = "One or more filters of Fitler 1, 2, or 3 are TRUE",
+    msec_filter_1234 =
+      "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",
     msec_filter_all = "One or more filters are TRUE"
   )
   msec_explain <- data.frame(t(msec_explain))
