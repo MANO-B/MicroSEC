@@ -1,20 +1,5 @@
 # MicroSEC: Microhomology-induced chimeric read-originating sequence error cleaning pipeline for FFPE samples
 #
-# Version 1.1.2: format modification for CRAN (Nov. 26, 2020) 
-# Version 1.1.1: format modification for CRAN (Nov. 23, 2020) 
-# Version 1.1.0: formatted for CRAN (Nov. 21, 2020) 
-# Version 1.0.10: Prevent from overfiltering mutations with co-mutations in neighbor (Nov. 21, 2020) 
-# Version 1.0.9: Input style modified (Nov. 16, 2020) 
-# Version 1.0.8: Mutation information conversion function added (Nov. 8, 2020) 
-# Version 1.0.7: Adapter trimming modified (Nov. 3, 2020) 
-# Version 1.0.6: probability calculation considering coverage depth around mutations (Nov. 3, 2020) 
-# Version 1.0.5: save function modified (Nov. 2, 2020)
-# Version 1.0.4: package install via github (Nov. 1, 2020)
-# Version 1.0.3: parameter justification, version management with github (Oct. 29, 2020)
-# Version 1.0.2: Indel length correction based on Bowtie2 penalty score (Oct. 28, 2020)
-# Version 1.0.1: Correspond to the mouse genome. Homopolymer should have >=12 bases (Oct. 25, 2020)
-# Version 1.0.0: Original version (Oct. 23, 2020)
-# 
 # Author: "Masachika Ikegami"
 # 
 # This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.
@@ -58,11 +43,10 @@
 # Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
 # Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
 # Filter 3-3: <10% of bases are low quality (Quality score <18).
-# Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting adapter sequence).  
-# Filter 5  : >=20% mutations were called by chimeric reads comprising two distant regions.
-# Filter 6  : Mutations locating at simple repeat sequences.
-# Filter 7  : C>T_g false positive calls in FFPE samples.
-# Filter 8  : Mutations locating at a >=15 homopolymer.
+# Filter 4  : >=20% mutations were called by chimeric reads comprising two distant regions.
+# Filter 5  : Mutations locating at simple repeat sequences.
+# Filter 6  : C>T_g false positive calls in FFPE samples.
+# Filter 7  : Mutations locating at a >=15 homopolymer.
 #
 # Supporting lengths are adjusted considering small repeat sequences around the mutations.
 #
