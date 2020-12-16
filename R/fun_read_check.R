@@ -660,9 +660,9 @@ fun_read_check <- function(df_mutation,
                     ref_seq,
                     ref_width,
                     del = 0)
-                  pre_rep_status <- rep_status[[1]]
-                  post_rep_status <- rep_status[[2]]
-                  homopolymer_status <- rep_status[[3]]
+                  pre_rep_status <- max(pre_rep_status, rep_status[[1]])
+                  post_rep_status <- max(post_rep_status, rep_status[[2]])
+                  homopolymer_status <- max(homopolymer_status, rep_status[[3]])
               } else if (str_count(as.character(as.data.frame(
                 mutation_supporting_1)[1]), "N") < 10 &
                 str_count(as.character(as.data.frame(
