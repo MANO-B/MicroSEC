@@ -20,6 +20,7 @@
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_replace
 #' @importFrom stringr str_count
+#' @importFrom stringr str_dup
 #' @importFrom BiocGenerics which
 #' @importFrom BiocGenerics which.max
 #' @importFrom gtools asc
@@ -224,6 +225,13 @@ fun_read_check <- function(df_mutation,
         mut_near_1 <- dim(near_list_1)[1]
         mut_near_2 <- dim(near_list_2)[1]
         # short repeat around indel mutations
+        homo_seq <- str_sub(neighbor_seq, 6, - 5 - alt_length)
+        if (str_count(homo_seq, str_dup("A", 15)) > 0 |
+            str_count(homo_seq, str_dup("T", 15)) > 0 |
+            str_count(homo_seq, str_dup("G", 15)) > 0 |
+             str_count(homo_seq, str_dup("C", 15)) > 0) {
+          homopolymer_status <- 15
+        }
         if (mut_type == "ins") {
           rep_status <- fun_repeat_check(
             rep_a = DNAString(df_mutation[i, "Ref"]),
@@ -233,7 +241,7 @@ fun_read_check <- function(df_mutation,
             del = 0)
           pre_rep_status <- rep_status[[1]]
           post_rep_status <- rep_status[[2]]
-          homopolymer_status <- rep_status[[3]]
+          homopolymer_status <- max(homopolymer_status, rep_status[[3]])
         } else if (mut_type == "del") {
           rep_status <- fun_repeat_check(
             rep_a = DNAString(df_mutation[i, "Alt"]),
@@ -243,7 +251,7 @@ fun_read_check <- function(df_mutation,
             del = 1)
           pre_rep_status <- rep_status[[1]]
           post_rep_status <- rep_status[[2]]
-          homopolymer_status <- rep_status[[3]]
+          homopolymer_status <- max(homopolymer_status, rep_status[[3]])
         }
         for (depth in 1:(read_length + 1)) {
           mut_depth_tmp[depth] <-
