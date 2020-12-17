@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2020-12-16" />
+<meta name="date" content="2020-12-17" />
 
 <title>MicroSEC: Sequence artifact filtering pipeline for FFPE samples</title>
 
@@ -367,7 +367,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">MicroSEC: Sequence artifact filtering pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2020-12-16</h4>
+<h4 class="date">2020-12-17</h4>
 
 
 
@@ -409,11 +409,10 @@ Filter 3 : 3’-/5’-supporting lengths are too densely distributed to occur (3
 Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).<br />
 Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.<br />
 Filter 3-3: &lt;10% of bases are low quality (Quality score &lt;18).<br />
-Filter 4 : &gt;=90% mutation-supporting reads are soft-clipped (after cutting adapter sequence).<br />
-Filter 5 : &gt;=20% mutations were called by chimeric reads comprising two distant regions.<br />
-Filter 6 : Mutations locating at simple repeat sequences.<br />
-Filter 7 : C&gt;T_g positive artifacts in FFPE samples.<br />
-Filter 8 : Indel mutations locating at a &gt;=15 homopolymer.</p>
+Filter 4 : &gt;=20% mutations were called by chimeric reads comprising two distant regions.<br />
+Filter 5 : Mutations locating at simple repeat sequences.<br />
+Filter 6 : C&gt;T_g positive artifacts in FFPE samples.<br />
+Filter 7 : Indel mutations locating at a &gt;=15 homopolymer.</p>
 <p>Supporting lengths are adjusted considering small repeat sequences around the mutations.</p>
 <p>Results are saved in a excel file.<br />
 The explatation of the results is written in detail in the second sheet of the excel file.</p>
@@ -566,41 +565,41 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt; 6                                FALSE                      FALSE</span></span>
 <span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt; 7                                FALSE                      FALSE</span></span>
 <span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt; 8                                FALSE                      FALSE</span></span>
-<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;   filter_3_microhomology_induced_mutation filter_4_soft_clipping</span></span>
-<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt; 1                                   FALSE                   TRUE</span></span>
-<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt; 2                                   FALSE                   TRUE</span></span>
-<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt; 3                                   FALSE                  FALSE</span></span>
-<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt; 4                                   FALSE                  FALSE</span></span>
-<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt; 5                                   FALSE                  FALSE</span></span>
-<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt; 6                                   FALSE                  FALSE</span></span>
-<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt; 7                                   FALSE                  FALSE</span></span>
-<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt; 8                                   FALSE                  FALSE</span></span>
-<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt;   filter_5_highly_homologous_region filter_6_simple_repeat</span></span>
-<span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt; 1                             FALSE                  FALSE</span></span>
-<span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt; 2                             FALSE                  FALSE</span></span>
-<span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; 3                             FALSE                  FALSE</span></span>
-<span id="cb7-78"><a href="#cb7-78"></a><span class="co">#&gt; 4                             FALSE                  FALSE</span></span>
-<span id="cb7-79"><a href="#cb7-79"></a><span class="co">#&gt; 5                             FALSE                  FALSE</span></span>
-<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt; 6                             FALSE                  FALSE</span></span>
-<span id="cb7-81"><a href="#cb7-81"></a><span class="co">#&gt; 7                             FALSE                  FALSE</span></span>
-<span id="cb7-82"><a href="#cb7-82"></a><span class="co">#&gt; 8                             FALSE                  FALSE</span></span>
-<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt;   filter_7_c_to_t_artifact filter_8_mutation_at_homopolymer    msec_filter_1234</span></span>
-<span id="cb7-84"><a href="#cb7-84"></a><span class="co">#&gt; 1                    FALSE                            FALSE Artifact suspicious</span></span>
-<span id="cb7-85"><a href="#cb7-85"></a><span class="co">#&gt; 2                    FALSE                            FALSE Artifact suspicious</span></span>
-<span id="cb7-86"><a href="#cb7-86"></a><span class="co">#&gt; 3                    FALSE                            FALSE Artifact suspicious</span></span>
-<span id="cb7-87"><a href="#cb7-87"></a><span class="co">#&gt; 4                    FALSE                            FALSE Artifact suspicious</span></span>
-<span id="cb7-88"><a href="#cb7-88"></a><span class="co">#&gt; 5                    FALSE                            FALSE                    </span></span>
-<span id="cb7-89"><a href="#cb7-89"></a><span class="co">#&gt; 6                    FALSE                            FALSE                    </span></span>
-<span id="cb7-90"><a href="#cb7-90"></a><span class="co">#&gt; 7                    FALSE                            FALSE                    </span></span>
-<span id="cb7-91"><a href="#cb7-91"></a><span class="co">#&gt; 8                    FALSE                            FALSE                    </span></span>
-<span id="cb7-92"><a href="#cb7-92"></a><span class="co">#&gt;     msec_filter_12345     msec_filter_all comment</span></span>
-<span id="cb7-93"><a href="#cb7-93"></a><span class="co">#&gt; 1 Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb7-94"><a href="#cb7-94"></a><span class="co">#&gt; 2 Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb7-95"><a href="#cb7-95"></a><span class="co">#&gt; 3 Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb7-96"><a href="#cb7-96"></a><span class="co">#&gt; 4 Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb7-97"><a href="#cb7-97"></a><span class="co">#&gt; 5                                                </span></span>
-<span id="cb7-98"><a href="#cb7-98"></a><span class="co">#&gt; 6                                                </span></span>
-<span id="cb7-99"><a href="#cb7-99"></a><span class="co">#&gt; 7                                                </span></span>
+<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;   filter_3_microhomology_induced_mutation filter_4_highly_homologous_region</span></span>
+<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt; 1                                   FALSE                             FALSE</span></span>
+<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt; 2                                   FALSE                             FALSE</span></span>
+<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt; 3                                   FALSE                             FALSE</span></span>
+<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt; 4                                   FALSE                             FALSE</span></span>
+<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt; 5                                   FALSE                             FALSE</span></span>
+<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt; 6                                   FALSE                             FALSE</span></span>
+<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt; 7                                   FALSE                             FALSE</span></span>
+<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt; 8                                   FALSE                             FALSE</span></span>
+<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt;   filter_5_simple_repeat filter_6_c_to_t_artifact</span></span>
+<span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt; 1                  FALSE                    FALSE</span></span>
+<span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt; 2                  FALSE                    FALSE</span></span>
+<span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; 3                  FALSE                    FALSE</span></span>
+<span id="cb7-78"><a href="#cb7-78"></a><span class="co">#&gt; 4                  FALSE                    FALSE</span></span>
+<span id="cb7-79"><a href="#cb7-79"></a><span class="co">#&gt; 5                  FALSE                    FALSE</span></span>
+<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt; 6                  FALSE                    FALSE</span></span>
+<span id="cb7-81"><a href="#cb7-81"></a><span class="co">#&gt; 7                  FALSE                    FALSE</span></span>
+<span id="cb7-82"><a href="#cb7-82"></a><span class="co">#&gt; 8                  FALSE                    FALSE</span></span>
+<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt;   filter_7_mutation_at_homopolymer     msec_filter_123    msec_filter_1234</span></span>
+<span id="cb7-84"><a href="#cb7-84"></a><span class="co">#&gt; 1                            FALSE Artifact suspicious Artifact suspicious</span></span>
+<span id="cb7-85"><a href="#cb7-85"></a><span class="co">#&gt; 2                            FALSE Artifact suspicious Artifact suspicious</span></span>
+<span id="cb7-86"><a href="#cb7-86"></a><span class="co">#&gt; 3                            FALSE Artifact suspicious Artifact suspicious</span></span>
+<span id="cb7-87"><a href="#cb7-87"></a><span class="co">#&gt; 4                            FALSE Artifact suspicious Artifact suspicious</span></span>
+<span id="cb7-88"><a href="#cb7-88"></a><span class="co">#&gt; 5                            FALSE                                        </span></span>
+<span id="cb7-89"><a href="#cb7-89"></a><span class="co">#&gt; 6                            FALSE                                        </span></span>
+<span id="cb7-90"><a href="#cb7-90"></a><span class="co">#&gt; 7                            FALSE                                        </span></span>
+<span id="cb7-91"><a href="#cb7-91"></a><span class="co">#&gt; 8                            FALSE                                        </span></span>
+<span id="cb7-92"><a href="#cb7-92"></a><span class="co">#&gt;       msec_filter_all comment</span></span>
+<span id="cb7-93"><a href="#cb7-93"></a><span class="co">#&gt; 1 Artifact suspicious        </span></span>
+<span id="cb7-94"><a href="#cb7-94"></a><span class="co">#&gt; 2 Artifact suspicious        </span></span>
+<span id="cb7-95"><a href="#cb7-95"></a><span class="co">#&gt; 3 Artifact suspicious        </span></span>
+<span id="cb7-96"><a href="#cb7-96"></a><span class="co">#&gt; 4 Artifact suspicious        </span></span>
+<span id="cb7-97"><a href="#cb7-97"></a><span class="co">#&gt; 5                            </span></span>
+<span id="cb7-98"><a href="#cb7-98"></a><span class="co">#&gt; 6                            </span></span>
+<span id="cb7-99"><a href="#cb7-99"></a><span class="co">#&gt; 7                            </span></span>
 <span id="cb7-100"><a href="#cb7-100"></a><span class="co">#&gt; 8</span></span></code></pre></div>
 </div>
 <div id="information-about-the-current-r-session" class="section level2">
@@ -626,7 +625,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; </span></span>
 <span id="cb8-21"><a href="#cb8-21"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.1.12</span></span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.1.13</span></span>
 <span id="cb8-23"><a href="#cb8-23"></a><span class="co">#&gt; </span></span>
 <span id="cb8-24"><a href="#cb8-24"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span id="cb8-25"><a href="#cb8-25"></a><span class="co">#&gt;  [1] Biobase_2.46.0                    pkgload_1.1.0                    </span></span>

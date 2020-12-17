@@ -225,11 +225,10 @@ fun_read_check <- function(df_mutation,
         mut_near_1 <- dim(near_list_1)[1]
         mut_near_2 <- dim(near_list_2)[1]
         # short repeat around indel mutations
-        homo_seq <- str_sub(neighbor_seq, 6, - 5 - alt_length)
-        if (str_count(homo_seq, str_dup("A", 15)) > 0 |
-            str_count(homo_seq, str_dup("T", 15)) > 0 |
-            str_count(homo_seq, str_dup("G", 15)) > 0 |
-             str_count(homo_seq, str_dup("C", 15)) > 0) {
+        if (str_count(neighbor_seq, str_dup("A", 15)) > 0 |
+            str_count(neighbor_seq, str_dup("T", 15)) > 0 |
+            str_count(neighbor_seq, str_dup("G", 15)) > 0 |
+             str_count(neighbor_seq, str_dup("C", 15)) > 0) {
           homopolymer_status <- 15
         }
         if (mut_type == "ins") {
