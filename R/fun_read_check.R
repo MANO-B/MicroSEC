@@ -916,21 +916,6 @@ fun_read_check <- function(df_mutation,
                     max(1, mut_position - short_homology_search_length):
                     length(df_seq)]
                 }
-                if (mut_read_strand[[j]] == "-") {
-                  pre_homology_search_seq <- fun_hairpin_trimming(
-                    pre_homology_search_seq,
-                    mut_read_strand[[j]],
-                    adapter_1, adapter_2)
-                  pre_homology_search_seq <-
-                    reverseComplement(pre_homology_search_seq)
-                } else {
-                  post_homology_search_seq <- fun_hairpin_trimming(
-                    post_homology_search_seq,
-                    mut_read_strand[[j]],
-                    adapter_1, adapter_2)
-                  post_homology_search_seq <-
-                    reverseComplement(post_homology_search_seq)
-                }
                 homology_search_tmp <- rbind(homology_search_tmp,
                   data.frame(sample_name,
                              Chr = df_mutation[i, "Chr"],
