@@ -57,7 +57,8 @@ fun_analysis <- function(msec,
     short_support_length_adj_sum <- NULL
     half_length_adj_sum <- NULL
     pre_support_length_adj_sum <- NULL
-    total_length_adj_sum <- NULL
+    total_length_pre_adj_sum <- NULL
+    total_length_post_adj_sum <- NULL
     post_support_length_adj_sum <- NULL
     total_read <- NULL
     prob_filter_1 <- NULL
@@ -105,6 +106,11 @@ fun_analysis <- function(msec,
     short_support_length_adj <- NULL
     altered_length <- NULL
     distant_homology <- NULL
+    
+    mut_depth_pre <- mut_depth[[1]]
+    mut_depth_post <- mut_depth[[2]]
+    mut_depth_short <- mut_depth[[3]]
+    
     msec <- msec %>% mutate(
       short_short_support =
         (short_support_length_total <=
@@ -128,32 +134,14 @@ fun_analysis <- function(msec,
     msec$short_support_length_adj_sum <-
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
-        },
-        1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length + 2 -
-          msec$shortest_support_length_adj
-      ) -
-      mapply(
-        function(x, y) {
-          return(mut_depth[x, y])
-        },
-        1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length + 1 -
-          msec$short_support_length_adj
-      ) +
-      mapply(
-        function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
         msec$short_support_length_adj + 2
       ) -
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
         msec$shortest_support_length_adj + 1
@@ -161,73 +149,52 @@ fun_analysis <- function(msec,
     msec$pre_support_length_adj_sum <-
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
         msec$pre_support_length_adj + 2
       ) -
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
-        msec$pre_minimum_length_adj + 1)
+        msec$pre_minimum_length_adj + 1
+      )
     msec$post_support_length_adj_sum <-
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length + 2 -
-          msec$post_minimum_length_adj
+        msec$post_support_length_adj + 2
       ) -
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length -
-          msec$post_support_length_adj + 1
+        msec$post_minimum_length_adj + 1
       )
     msec$half_length_adj_sum <-
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
-        },
-        1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length + 2 -
-          msec$minimum_length
-      ) -
-      mapply(
-        function(x, y) {
-          return(mut_depth[x, y])
-        },
-        1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length -
-          msec$half_length + 1
-      ) +
-      mapply(
-        function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
         msec$half_length + 2
       ) -
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
         msec$minimum_length + 1
       )
-    msec$total_length_adj_sum <-
+    msec$total_length_pre_adj_sum <-
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
         msec$read_length -
@@ -236,7 +203,24 @@ fun_analysis <- function(msec,
       ) -
       mapply(
         function(x, y) {
-          return(mut_depth[x, y])
+          return(mut_depth_pre[x, y])
+        },
+        1:dim(msec)[1],
+        msec$minimum_length_1 + 1
+      )
+    msec$total_length_post_adj_sum <-
+      mapply(
+        function(x, y) {
+          return(mut_depth_post[x, y])
+        },
+        1:dim(msec)[1],
+        msec$read_length -
+          msec$altered_length + 2 -
+          msec$minimum_length_2
+      ) -
+      mapply(
+        function(x, y) {
+          return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
         msec$minimum_length_1 + 1
@@ -247,10 +231,10 @@ fun_analysis <- function(msec,
            half_length_adj_sum * threshold_short_length),
       short_pre_support_sum =
         (pre_support_length_adj_sum <=
-           total_length_adj_sum * threshold_short_length),
+           total_length_pre_adj_sum * threshold_short_length),
       short_post_support_sum =
         (post_support_length_adj_sum <=
-           total_length_adj_sum * threshold_short_length)
+           total_length_post_adj_sum * threshold_short_length)
     )
     msec <- msec %>% mutate(
       prob_filter_1 =
@@ -258,10 +242,10 @@ fun_analysis <- function(msec,
                  half_length_adj_sum) ^ total_read,
       prob_filter_3_pre =
         fun_zero(pre_support_length_adj_sum,
-                 total_length_adj_sum) ^ total_read,
+                 total_length_pre_adj_sum) ^ total_read,
       prob_filter_3_post =
         fun_zero(post_support_length_adj_sum,
-                 total_length_adj_sum) ^ total_read
+                 total_length_post_adj_sum) ^ total_read
     )
     msec <- msec %>% mutate(
       prob_filter_1 = ifelse((prob_filter_1 > 1),
@@ -388,7 +372,8 @@ fun_analysis <- function(msec,
             -short_short_support_sum, -short_pre_support_sum,
             -short_post_support_sum, -short_support_length_adj_sum,
             -pre_support_length_adj_sum, -post_support_length_adj_sum,
-            -half_length_adj_sum, -total_length_adj_sum
+            -half_length_adj_sum, -total_length_pre_adj_sum,
+            -total_length_post_adj_sum
             )
   }
   return(msec)
