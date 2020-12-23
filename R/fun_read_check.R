@@ -99,6 +99,10 @@ fun_read_check <- function(df_mutation,
       near_indel_pre_candidate <- 0
       near_indel_post <- 0
       near_indel_post_candidate <- 0
+      pre_mutation_quality_score <- 0
+      pre_mutation_quality_num <- 0
+      post_mutation_quality_score <- 0
+      post_mutation_quality_num <- 0
       mut_depth_pre_tmp <- rep(0, 201)
       mut_depth_post_tmp <- rep(0, 201)
       mut_depth_short_tmp <- rep(0, 101)
@@ -860,7 +864,18 @@ fun_read_check <- function(df_mutation,
               # read quality check
               low_quality_base <-
                 low_quality_base + sum(df_qual < 51) / length(df_seq)
-
+              df_qual_pre = df_qual[max(1, mut_position - 11):
+                                    max(1, mut_position - 1)]
+              df_qual_post = df_qual[mut_position:
+                                    min(length(df_seq), mut_position + 10)]
+              pre_mutation_quality_score <-
+                pre_mutation_quality_score + sum(df_qual_pre < 51)
+              pre_mutation_quality_num <-
+                pre_mutation_quality_num + length(df_qual_pre)
+              post_mutation_quality_score <-
+                post_mutation_quality_score + sum(df_qual_post < 51)
+              post_mutation_quality_num <-
+                post_mutation_quality_num + length(df_qual_post)
               # save sequence for homologous region search
               if (flag_hairpin_tmp == 0 & flag_hairpin == 0) {
                 if (indel_status == 1) {
@@ -980,6 +995,10 @@ fun_read_check <- function(df_mutation,
           post_minimum_length = post_minimum_length,
           low_quality_base_rate_under_q18 =
             fun_zero(low_quality_base, total_read),
+          low_quality_pre =
+            pre_mutation_quality_score / pre_mutation_quality_num,
+          low_quality_post =
+            post_mutation_quality_score / post_mutation_quality_num,
           pre_rep_status = pre_rep_status,
           post_rep_status = post_rep_status,
           homopolymer_status = homopolymer_status,
@@ -1009,6 +1028,8 @@ fun_read_check <- function(df_mutation,
           pre_minimum_length = 0,
           post_minimum_length = 0,
           low_quality_base_rate_under_q18 = 0,
+          low_quality_pre = 0,
+          low_quality_post = 0,
           pre_rep_status = 0,
           post_rep_status = 0,
           homopolymer_status = 0,

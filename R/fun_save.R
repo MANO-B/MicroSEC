@@ -36,7 +36,11 @@ fun_save <- function(msec, sample_info, wd) {
     distant_homology_rate =
       "The rate of chimeric reads comprising two distant regions",
     low_quality_base_rate_under_q18 =
-      "The rate of low quality bases in the mutation supporting reads",
+      "The low quality base rate of the mutation supporting reads",
+    low_quality_pre =
+      "The low quality base rate of the upstream 10 bases of the mutation",
+    low_quality_post =
+      "The low quality base rate of the downstream 10 bases of the mutation",
     prob_filter_1 = paste(
       "The probability of the occurence of the shorter-supporting lengths",
       "distribution (threshold_p: 10 ^ (-6))"),
