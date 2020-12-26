@@ -1014,6 +1014,34 @@ fun_read_check <- function(df_mutation,
         if (flag_hairpin == 0) {
           homology_search <- rbind(homology_search, homology_search_tmp)
         }
+        # normal supporting status detection
+        for (depth in seq_len(length(df_bam_pos))) {
+          if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+            support_depth <- fun_normal_support(df_bam_cigar[depth],
+                                                df_bam_pos[depth],
+                                                df_mutation[i, "Pos"],
+                                                alt_length,
+                                                indel_status)
+            if (support_depth[[3]] != -1) {
+              mut_depth_pre_tmp[support_depth[[1]] + 2] <-
+                mut_depth_pre_tmp[support_depth[[1]] + 2] + 1
+              mut_depth_post_tmp[support_depth[[2]] + 2] <-
+                mut_depth_post_tmp[support_depth[[2]] + 2] + 1
+              mut_depth_short_tmp[support_depth[[3]] + 2] <-
+                mut_depth_short_tmp[support_depth[[3]] + 2] + 1
+            }
+          }
+        }
+        
+        mut_depth_pre_tmp <- t(cumsum(mut_depth_pre_tmp))
+        mut_depth_post_tmp <- t(cumsum(mut_depth_post_tmp))
+        mut_depth_short_tmp <- t(cumsum(mut_depth_short_tmp))
+        mut_depth_pre <- rbind(mut_depth_pre, mut_depth_pre_tmp)
+        mut_depth_post <- rbind(mut_depth_post, mut_depth_post_tmp)
+        mut_depth_short <- rbind(mut_depth_short, mut_depth_short_tmp)
+        colnames(mut_depth_pre_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
+        colnames(mut_depth_post_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
+        colnames(mut_depth_short_tmp) <- c("Zero", paste("Depth", 0:99, sep = ""))
       }
       if (total_read == 0) {
         msec_tmp <- df_mutation[i, ] %>% dplyr::mutate(
@@ -1043,34 +1071,6 @@ fun_read_check <- function(df_mutation,
           caution = ""
         )
       }
-      # normal supporting status detection
-      for (depth in seq_len(length(df_bam_pos))) {
-        if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
-          support_depth <- fun_normal_support(df_bam_cigar[depth],
-                                              df_bam_pos[depth],
-                                              df_mutation[i, "Pos"],
-                                              alt_length,
-                                              indel_status)
-          if (support_depth[[3]] != -1) {
-            mut_depth_pre_tmp[support_depth[[1]] + 2] <-
-              mut_depth_pre_tmp[support_depth[[1]] + 2] + 1
-            mut_depth_post_tmp[support_depth[[2]] + 2] <-
-              mut_depth_post_tmp[support_depth[[2]] + 2] + 1
-            mut_depth_short_tmp[support_depth[[3]] + 2] <-
-              mut_depth_short_tmp[support_depth[[3]] + 2] + 1
-          }
-        }
-      }
-      
-      mut_depth_pre_tmp <- t(cumsum(mut_depth_pre_tmp))
-      mut_depth_post_tmp <- t(cumsum(mut_depth_post_tmp))
-      mut_depth_short_tmp <- t(cumsum(mut_depth_short_tmp))
-      mut_depth_pre <- rbind(mut_depth_pre, mut_depth_pre_tmp)
-      mut_depth_post <- rbind(mut_depth_post, mut_depth_post_tmp)
-      mut_depth_short <- rbind(mut_depth_short, mut_depth_short_tmp)
-      colnames(mut_depth_pre_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
-      colnames(mut_depth_post_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
-      colnames(mut_depth_short_tmp) <- c("Zero", paste("Depth", 0:99, sep = ""))
       msec <- rbind(msec, msec_tmp)
     }
     mut_depth <- list(mut_depth_pre, mut_depth_post, mut_depth_short)

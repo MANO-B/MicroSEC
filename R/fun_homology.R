@@ -19,6 +19,7 @@
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings countPDict
 #' @importFrom BiocGenerics as.data.frame
+#' @importFrom BiocGenerics paste
 #' @importFrom GenomeInfoDb seqnames
 #' @examples
 #' \donttest{
@@ -73,61 +74,63 @@ fun_homology <- function(msec,
                           width = 20,
                           style = 3)
     }
-    for (seqname in 1:chr_no) {
-      if (progress_bar == "Y") {
-        utils::setTxtProgressBar(pb, seqname)
-        cat(paste(" Chromosome screening:", seqname, "/", chr_no, "  "))
-     }
-
-      target <- ref_genome[[seqnames(ref_genome)[[seqname]]]]
-      distant_homology <- distant_homology + countPDict(search_seq_f, target)
-      distant_homology <- distant_homology + countPDict(search_seq_r, target)
-    }
-    df_distant$distant_homology <- distant_homology
-    if (progress_bar == "Y") {
-      pb <- utils::txtProgressBar(min = 0,
-                          max = max(1, dim(df_distant)[1]),
-                          width = 20,
-                          style = 3)
-      pb_t <- ceiling(max_no / 100)
-    }
-    for (i in 1:max_no) {
-      if (progress_bar == "Y") {
-        utils::setTxtProgressBar(pb, i)
-        if ((i - 1) %% pb_t == 0) {
-          cat(paste(" Homology count:", i, "/", max_no, "      "))
+    if (length(search_seq_f) > 0) {
+      for (seqname in 1:chr_no) {
+        if (progress_bar == "Y") {
+          utils::setTxtProgressBar(pb, seqname)
+          cat(paste(" Chromosome screening:", seqname, "/", chr_no, "  "))
         }
+  
+        target <- ref_genome[[seqnames(ref_genome)[[seqname]]]]
+        distant_homology <- distant_homology + countPDict(search_seq_f, target)
+        distant_homology <- distant_homology + countPDict(search_seq_r, target)
       }
-      if (dim(df_distant[df_distant$number == i, ])[1] == 1) {
-        tmp_distant <- df_distant[df_distant$number == i, ][1, ]
-        if (tmp_distant$distant_homology > 0) {
-          msec[msec$Sample == tmp_distant$sample_name &
-                     msec$Chr == tmp_distant$Chr &
-                     msec$Pos == tmp_distant$Pos &
-                     msec$Ref == tmp_distant$Ref &
-                     msec$Alt == tmp_distant$Alt, ]$distant_homology <-
-          msec[msec$Sample == tmp_distant$sample_name &
-                     msec$Chr == tmp_distant$Chr &
-                     msec$Pos == tmp_distant$Pos &
-                     msec$Ref == tmp_distant$Ref &
-                     msec$Alt == tmp_distant$Alt, ]$distant_homology + 1
+      df_distant$distant_homology <- distant_homology
+      if (progress_bar == "Y") {
+        pb <- utils::txtProgressBar(min = 0,
+                            max = max(1, dim(df_distant)[1]),
+                            width = 20,
+                            style = 3)
+        pb_t <- ceiling(max_no / 100)
+      }
+      for (i in 1:max_no) {
+        if (progress_bar == "Y") {
+          utils::setTxtProgressBar(pb, i)
+          if ((i - 1) %% pb_t == 0) {
+            cat(paste(" Homology count:", i, "/", max_no, "      "))
+          }
         }
-      }
-      if (dim(df_distant[df_distant$number == i, ])[1] == 2) {
-        tmp_distant <- df_distant[df_distant$number == i, ][1, ]
-        tmp_distant_2 <- df_distant[df_distant$number == i, ][2, ]
-        if (tmp_distant$distant_homology > 0 |
-            tmp_distant_2$distant_homology > 0) {
-          msec[msec$Sample == tmp_distant$sample_name &
-                     msec$Chr == tmp_distant$Chr &
-                     msec$Pos == tmp_distant$Pos &
-                     msec$Ref == tmp_distant$Ref &
-                     msec$Alt == tmp_distant$Alt, ]$distant_homology <-
-          msec[msec$Sample == tmp_distant$sample_name &
-                     msec$Chr == tmp_distant$Chr &
-                     msec$Pos == tmp_distant$Pos &
-                     msec$Ref == tmp_distant$Ref &
-                     msec$Alt == tmp_distant$Alt, ]$distant_homology + 1
+        if (dim(df_distant[df_distant$number == i, ])[1] == 1) {
+          tmp_distant <- df_distant[df_distant$number == i, ][1, ]
+          if (tmp_distant$distant_homology > 0) {
+            msec[msec$Sample == tmp_distant$sample_name &
+                       msec$Chr == tmp_distant$Chr &
+                       msec$Pos == tmp_distant$Pos &
+                       msec$Ref == tmp_distant$Ref &
+                       msec$Alt == tmp_distant$Alt, ]$distant_homology <-
+            msec[msec$Sample == tmp_distant$sample_name &
+                       msec$Chr == tmp_distant$Chr &
+                       msec$Pos == tmp_distant$Pos &
+                       msec$Ref == tmp_distant$Ref &
+                       msec$Alt == tmp_distant$Alt, ]$distant_homology + 1
+          }
+        }
+        if (dim(df_distant[df_distant$number == i, ])[1] == 2) {
+          tmp_distant <- df_distant[df_distant$number == i, ][1, ]
+          tmp_distant_2 <- df_distant[df_distant$number == i, ][2, ]
+          if (tmp_distant$distant_homology > 0 |
+              tmp_distant_2$distant_homology > 0) {
+            msec[msec$Sample == tmp_distant$sample_name &
+                       msec$Chr == tmp_distant$Chr &
+                       msec$Pos == tmp_distant$Pos &
+                       msec$Ref == tmp_distant$Ref &
+                       msec$Alt == tmp_distant$Alt, ]$distant_homology <-
+            msec[msec$Sample == tmp_distant$sample_name &
+                       msec$Chr == tmp_distant$Chr &
+                       msec$Pos == tmp_distant$Pos &
+                       msec$Ref == tmp_distant$Ref &
+                       msec$Alt == tmp_distant$Alt, ]$distant_homology + 1
+          }
         }
       }
     }
