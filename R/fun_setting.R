@@ -14,10 +14,12 @@
 fun_setting <- function(pre, post, neighbor_seq, neighbor_length, alt_length) {
   peri_seq_1 <- substring(neighbor_seq,
                          neighbor_length + 1 - pre,
-                         neighbor_length + post + alt_length)
+                         min(nchar(neighbor_seq),
+                           neighbor_length + post + alt_length))
   peri_seq_2 <- substring(neighbor_seq,
                          neighbor_length + 1 - post,
-                         neighbor_length + pre + alt_length)
+                         min(nchar(neighbor_seq),
+                           neighbor_length + pre + alt_length))
   return(list(pre, post, peri_seq_1, peri_seq_2))
 }
 

@@ -23,6 +23,8 @@
 #' @importFrom stringr str_dup
 #' @importFrom BiocGenerics which
 #' @importFrom BiocGenerics which.max
+#' @importFrom BiocGenerics rbind
+#' @importFrom BiocGenerics colnames
 #' @importFrom gtools asc
 #' @importFrom Biostrings matchPattern
 #' @importFrom Biostrings DNAString
@@ -236,7 +238,7 @@ fun_read_check <- function(df_mutation,
         if (str_count(neighbor_seq, str_dup("A", 15)) > 0 |
             str_count(neighbor_seq, str_dup("T", 15)) > 0 |
             str_count(neighbor_seq, str_dup("G", 15)) > 0 |
-             str_count(neighbor_seq, str_dup("C", 15)) > 0) {
+            str_count(neighbor_seq, str_dup("C", 15)) > 0) {
           homopolymer_status <- 15
         }
         if (mut_type == "ins") {

@@ -20,6 +20,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
+#' @importFrom BiocGenerics mapply
 #' @examples
 #' fun_analysis(msec = msec_summarized,
 #'              mut_depth = mut_depth_checked,

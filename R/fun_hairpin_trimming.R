@@ -12,6 +12,7 @@
 #' @importFrom Biostrings reverseComplement
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom stringr str_split
+#' @importFrom stringr str_sub
 fun_hairpin_trimming <- function(hairpin_seq,
                                 mut_read_strand,
                                 adapter_1,

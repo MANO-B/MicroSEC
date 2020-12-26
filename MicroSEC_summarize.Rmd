@@ -1,0 +1,835 @@
+# private source codes
+
+## Setting
+```{r, eval=FALSE}
+wd = "/mnt/HDD8TB/MicroSEC"
+knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, warning=FALSE, message=TRUE, comment = "#>")
+knitr::opts_knit$set(root.dir = wd)
+options(rmarkdown.html_vignette.check_title = FALSE)
+fun_zero <- function(a, b)ifelse(b == 0, 0, a / b)
+setwd(wd)
+```
+
+## Necessary packages
+```{r packages, eval=FALSE}
+library(tidyr)
+library(openxlsx)
+library(data.table)
+library(R.utils)
+library(stringr)
+library(magrittr)
+library(dplyr)
+library(Biostrings)
+library(BSgenome.Hsapiens.UCSC.hg38)
+library(GenomicAlignments)
+library(Rsamtools)
+library(tcltk)
+library(gtools)
+library(MicroSEC)
+library(tidyverse)
+library(ggplot2)
+```
+
+## data division
+```{r}
+SAMPLE_LIST = "/mnt/HDD8TB/MicroSEC/source/201115_sample_correspondence_sheet_V3.xlsx"
+df_sample_list = read.xlsx(SAMPLE_LIST, sheet = 1)
+
+READ_SUMMARY = "/mnt/HDD8TB/MicroSEC/source/SL_read_summary_201219.xlsx"
+READ_SUMMARY_TOP = "/mnt/HDD8TB/MicroSEC/source/TOP_RS.xlsx"
+df_read_summary = read.xlsx(READ_SUMMARY, sheet = 1)[,1:16]
+df_read_summary_TOP = read.xlsx(READ_SUMMARY_TOP, sheet = 1)[,1:16]
+
+info_1 = "/mnt/HDD8TB/MicroSEC/source/SL_mutation_somatic_200907.xlsx"
+info_5 = "/mnt/HDD8TB/MicroSEC/source/SL_mutation_somatic_201130.xlsx"
+info_match = "/mnt/HDD8TB/MicroSEC/source/SL_mutation_somatic_200907.xlsx"
+info_TOP = "/mnt/HDD8TB/MicroSEC/source/TOP_validation.xlsx"
+
+df_sample_list = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood != "Blood")
+df_sample_list = df_sample_list %>% dplyr::filter(!is.na(Tumor.or.Normal))
+df_sample_list = df_sample_list %>% dplyr::filter(TOP.or.WES == "TOP")
+df_sample_list = df_sample_list %>% dplyr::filter(`Sample.(n=389).(SL0005_RN1.not.excluded)` != "SL_0005-RN-1_TDv4(exclude)")
+df_sample_list = df_sample_list %>% dplyr::mutate(Sample = paste(str_sub(`Sample.(n=389).(SL0005_RN1.not.excluded)`, 1, -6), "-B", sep=""))
+
+df_read_summary_TOP$Sample = paste(str_sub(df_read_summary_TOP$Sample, 1, -6), "-N", sep="")
+
+df_frozen_normal = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "Frozen" & (Tumor.or.Normal == "Normal(true)" | Tumor.or.Normal == "Normal(susp)"))
+df_FFPE_normal = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" & (Tumor.or.Normal == "Normal(true)" | Tumor.or.Normal == "Normal(susp)"))
+df_frozen_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "Frozen" & (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
+df_FFPE_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" & (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
+
+MUTATION_LIST_1 = "/mnt/HDD8TB/MicroSEC/source/summary_1112.tsv"
+#MUTATION_LIST_3 = "/mnt/HDD8TB/MicroSEC/source/summary_1114.tsv"
+MUTATION_LIST_5 = "/mnt/HDD8TB/MicroSEC/source/summary_1201.tsv"
+MUTATION_LIST_match = "/mnt/HDD8TB/MicroSEC/source/summary_1217.tsv"
+MUTATION_LIST_TOP = "/mnt/HDD8TB/MicroSEC/source/summary_TOP.tsv"
+
+df_mutation_1 =  read.csv(MUTATION_LIST_1, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+#df_mutation_3 =  read.csv(MUTATION_LIST_3, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+df_mutation_5 =  read.csv(MUTATION_LIST_5, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+df_mutation_match =  read.csv(MUTATION_LIST_match, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+df_mutation_TOP =  read.csv(MUTATION_LIST_TOP, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+```
+
+# analysis
+```{r}
+LQ_threshold = 0.05
+Homo_length = 8
+
+df_mutation = rbind(df_mutation_1, df_mutation_5, df_mutation_match)
+#df_mutation = rbind(df_mutation_1, df_mutation_3, df_mutation_5, df_mutation_match) %>% dplyr::distinct()
+df_mutation = df_mutation %>% dplyr::mutate(LQ =
+              low_quality_base_rate_under_q18 >= LQ_threshold)
+df_mutation = df_mutation %>% dplyr::mutate(LQ_local =
+              (low_quality_pre >= LQ_threshold | low_quality_post >= LQ_threshold))
+df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(LQ =
+              low_quality_base_rate_under_q18 >= LQ_threshold)
+df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(LQ_local =
+              (low_quality_pre >= LQ_threshold | low_quality_post >= LQ_threshold))
+
+df_mutation = df_mutation %>% dplyr::mutate(Homopolymer =
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("C", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("C", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("C", Homo_length)) > 0)
+df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(Homopolymer =
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("C", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("C", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("C", Homo_length)) > 0)
+
+
+matched_FFPE = c("SL_0004_L_FFPE_TUMOR-B", "SL_0005_L_FFPE_TUMOR-B", "SL_0007_L_FFPE_TUMOR-B", "SL_0008_L_FFPE_TUMOR-B", "SL_0009_L_FFPE_TUMOR-B", "SL_0011_R_FFPE_TUMOR-B", "SL_0012_R_FFPE_TUMOR-B", "SL_0013_R_FFPE_TUMOR-B")
+matched_frozen = c("SL_0004-LT-8-B",  "SL_0005-LT-4-B", "SL_0007_LT_3-B", "SL_0008_LT_8-B", "SL_0009-LT_3-B", "SL_0011-LT_2-B", "SL_0012_RT_4-B", "SL_0013_RT_4-B")
+
+#df_filter = df_mutation %>% dplyr::filter(total_read >= 10, SimpleRepeat_TRF == "N")
+df_filter = df_mutation %>% dplyr::filter(total_read >= 5, SimpleRepeat_TRF == "N")
+df_TOP = df_mutation_TOP %>% dplyr::filter(total_read >= 10, SimpleRepeat_TRF == "N")
+
+df_filter = df_filter %>% dplyr::filter(filter_7_mutation_at_homopolymer == FALSE & !LQ & !LQ_local)
+df_TOP = df_TOP %>% dplyr::filter(filter_7_mutation_at_homopolymer == FALSE & !LQ & !LQ_local)
+
+df_filter = df_filter %>% dplyr::filter(`%Alt` >= 5)
+df_TOP = df_TOP %>% dplyr::filter(`%Alt` >= 5)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample)
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample)
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample)
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample)
+df_filter_TOP = df_TOP
+
+df_matched = NULL
+for (i in 1:length(matched_FFPE)){
+  df_matched = rbind(df_matched, dplyr::inner_join(df_filter_FFPE_tumor %>% dplyr::filter(Sample %in% matched_FFPE[i]),
+                                       df_filter_frozen_tumor %>% dplyr::filter(Sample %in% matched_frozen[i]),
+                                       by=c("Chr", "Pos", "Ref", "Alt")))
+}
+
+data_matched = data.frame("Number" = "Total_mutations",
+                          "FF_only" = dim(df_filter_frozen_tumor %>% dplyr::filter(Sample %in% matched_frozen))[1] - dim(df_matched)[1],
+                          "FF_and_FFPE"= dim(df_matched)[1],
+                          "FFPE_only" = dim(df_filter_FFPE_tumor %>% dplyr::filter(Sample %in% matched_FFPE))[1] - dim(df_matched)[1])
+data_mutations = data.frame("Number" = "ALL_samples_No_filter",
+                          "FF_N_sample" = 57,
+                          "FFPE_N_sample" = 212,
+                          "FF_T_sample" = 23,
+                          "FFPE_T_sample" = 37,
+                          "FFPE_TOP_sample"= 62,
+                          "FF_N_min" = min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)),
+                          "FFPE_N_min" = min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)),
+                          "FF_T_min" = min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)),
+                          "FFPE_T_min" = min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)),
+                          "FFPE_TOP_min"= min(sort(rle(sort(df_filter_TOP$Sample))$lengths)),
+                          "FF_N_max" = max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)),
+                          "FFPE_N_max" = max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)),
+                          "FF_T_max" = max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)),
+                          "FFPE_T_max" = max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)),
+                          "FFPE_TOP_max"= max(sort(rle(sort(df_filter_TOP$Sample))$lengths)),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1],
+                          "FFPE_N_median" = mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])),
+                          "FF_T_median" = (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1],
+                          "FFPE_T_median" = (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1],
+                          "FFPE_TOP_median"= mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1]))
+                          )
+
+```
+
+## summarize
+```{r}
+data_mutations_tmp = data.frame("Number" = "Samples_with_mutation_no_filter",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & filter_1_mutation_intra_hairpin_loop)
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & filter_1_mutation_intra_hairpin_loop)
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & filter_1_mutation_intra_hairpin_loop)
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & filter_1_mutation_intra_hairpin_loop)
+df_filter_TOP = df_TOP %>% dplyr::filter(filter_1_mutation_intra_hairpin_loop)
+
+data_mutations_tmp = data.frame("Number" = "Filter_1",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & filter_2_hairpin_structure)
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & filter_2_hairpin_structure)
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & filter_2_hairpin_structure)
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & filter_2_hairpin_structure)
+df_filter_TOP = df_TOP %>% dplyr::filter(filter_2_hairpin_structure)
+
+data_mutations_tmp = data.frame("Number" = "Filter_2",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & filter_3_microhomology_induced_mutation)
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & filter_3_microhomology_induced_mutation)
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & filter_3_microhomology_induced_mutation)
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & filter_3_microhomology_induced_mutation)
+df_filter_TOP = df_TOP %>% dplyr::filter(filter_3_microhomology_induced_mutation)
+
+data_mutations_tmp = data.frame("Number" = "Filter_3",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & filter_4_highly_homologous_region)
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & filter_4_highly_homologous_region)
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & filter_4_highly_homologous_region)
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & filter_4_highly_homologous_region)
+df_filter_TOP = df_TOP %>% dplyr::filter(filter_4_highly_homologous_region)
+
+data_mutations_tmp = data.frame("Number" = "Filter_4",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & msec_filter_1234 == "Artifact suspicious")
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & msec_filter_1234 == "Artifact suspicious")
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & msec_filter_1234 == "Artifact suspicious")
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & msec_filter_1234 == "Artifact suspicious")
+df_filter_TOP = df_TOP %>% dplyr::filter(msec_filter_1234 == "Artifact suspicious")
+
+data_mutations_tmp = data.frame("Number" = "Filter_1234",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_matched = NULL
+for (i in 1:length(matched_FFPE)){
+  df_matched = rbind(df_matched, dplyr::inner_join(df_filter_FFPE_tumor %>% dplyr::filter(Sample %in% matched_FFPE[i]),
+                                       df_filter_frozen_tumor %>% dplyr::filter(Sample %in% matched_frozen[i]),
+                                       by=c("Chr", "Pos", "Ref", "Alt")))
+}
+
+data_matched_tmp = data.frame("Number" = "Filtered_mutations",
+                          "FF_only" = dim(df_filter_frozen_tumor %>% dplyr::filter(Sample %in% matched_frozen))[1] - dim(df_matched)[1],
+                          "FF_and_FFPE"= dim(df_matched)[1],
+                          "FFPE_only" = dim(df_filter_FFPE_tumor %>% dplyr::filter(Sample %in% matched_FFPE))[1] - dim(df_matched)[1])
+
+data_matched = rbind(data_matched, data_matched_tmp)
+
+data_matched_tmp = data.frame("Number" = "Filter_passing_mutations",
+                          "FF_only" = data_matched$FF_only[1] - data_matched$FF_only[2],
+                          "FF_and_FFPE"= data_matched$FF_and_FFPE[1] - data_matched$FF_and_FFPE[2],
+                          "FFPE_only" = data_matched$FFPE_only[1] - data_matched$FFPE_only[2])
+
+data_matched = rbind(data_matched, data_matched_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & msec_filter_1234 != "Artifact suspicious")
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & msec_filter_1234 != "Artifact suspicious")
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & msec_filter_1234 != "Artifact suspicious")
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & msec_filter_1234 != "Artifact suspicious")
+df_filter_TOP = df_TOP %>% dplyr::filter(msec_filter_1234 != "Artifact suspicious")
+
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & msec_filter_1234 != "Artifact suspicious" & (Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & msec_filter_1234 != "Artifact suspicious" & (Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & msec_filter_1234 != "Artifact suspicious" & (Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & msec_filter_1234 != "Artifact suspicious" & (Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+df_filter_TOP = df_TOP %>% dplyr::filter(msec_filter_1234 != "Artifact suspicious" & (Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_T>C",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & msec_filter_1234 != "Artifact suspicious" & Homopolymer)
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & msec_filter_1234 != "Artifact suspicious" & Homopolymer)
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & msec_filter_1234 != "Artifact suspicious" & Homopolymer)
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & msec_filter_1234 != "Artifact suspicious" & Homopolymer)
+df_filter_TOP = df_TOP %>% dplyr::filter(msec_filter_1234 != "Artifact suspicious" & Homopolymer)
+
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_homopolymer",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & msec_filter_1234 != "Artifact suspicious")
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & msec_filter_1234 != "Artifact suspicious" & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & msec_filter_1234 != "Artifact suspicious")
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & msec_filter_1234 != "Artifact suspicious" & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+df_filter_TOP = df_TOP %>% dplyr::filter(msec_filter_1234 != "Artifact suspicious" & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_notC>T",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample & msec_filter_1234 != "Artifact suspicious" & !Homopolymer)
+df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample & msec_filter_1234 != "Artifact suspicious" & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g") & !Homopolymer)
+df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample & msec_filter_1234 != "Artifact suspicious" & !Homopolymer)
+df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample & msec_filter_1234 != "Artifact suspicious" & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g") & !Homopolymer)
+df_filter_TOP = df_TOP %>% dplyr::filter(msec_filter_1234 != "Artifact suspicious" & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g") & !Homopolymer)
+
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_notT>C_notHomo",
+                          "FF_N_sample" = length(unique(df_filter_frozen_normal$Sample)),
+                          "FFPE_N_sample" = length(unique(df_filter_FFPE_normal$Sample)),
+                          "FF_T_sample" = length(unique(df_filter_frozen_tumor$Sample)),
+                          "FFPE_T_sample" = length(unique(df_filter_FFPE_tumor$Sample)),
+                          "FFPE_TOP_sample"= length(unique(df_filter_TOP$Sample)),
+                          "FF_N_min" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == data_mutations$FF_N_sample[1], min(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)), 0),
+                          "FFPE_N_min" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == data_mutations$FFPE_N_sample[1], min(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)), 0),
+                          "FF_T_min" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == data_mutations$FF_T_sample[1], min(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)), 0),
+                          "FFPE_T_min" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == data_mutations$FFPE_T_sample[1], min(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)), 0),
+                          "FFPE_TOP_min"= ifelse(length(unique(df_filter_TOP$Sample)) == data_mutations$FFPE_TOP_sample[1], min(sort(rle(sort(df_filter_TOP$Sample))$lengths)), 0),
+                          "FF_N_max" = ifelse(length(unique(df_filter_frozen_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths))),
+                          "FFPE_N_max" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths))),
+                          "FF_T_max" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths))),
+                          "FFPE_T_max" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) == 0, 0, max(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths))),
+                          "FFPE_TOP_max"= ifelse(length(unique(df_filter_TOP$Sample)) == 0, 0, max(sort(rle(sort(df_filter_TOP$Sample))$lengths))),
+                          "FF_N_sum" = sum(rle(sort(df_filter_frozen_normal$Sample))$lengths),
+                          "FFPE_N_sum" = sum(rle(sort(df_filter_FFPE_normal$Sample))$lengths),
+                          "FF_T_sum" = sum(rle(sort(df_filter_frozen_tumor$Sample))$lengths),
+                          "FFPE_T_sum" = sum(rle(sort(df_filter_FFPE_tumor$Sample))$lengths),
+                          "FFPE_TOP_sum"= sum(rle(sort(df_filter_TOP$Sample))$lengths),
+                          "FF_N_median" = ifelse(length(unique(df_filter_frozen_normal$Sample)) > as.integer(data_mutations$FF_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_normal$Sample))$lengths)) - 28])[1], 0),
+                          "FFPE_N_median" = ifelse(length(unique(df_filter_FFPE_normal$Sample)) == as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1] / 2,
+                                                   ifelse(length(unique(df_filter_FFPE_normal$Sample)) > as.integer(data_mutations$FFPE_N_sample[1] / 2),
+                                                   mean(c((sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 106])[1],
+                                                   (sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_normal$Sample))$lengths)) - 105])[1])), 0)),
+                          "FF_T_median" = ifelse(length(unique(df_filter_frozen_tumor$Sample)) > as.integer(data_mutations$FF_T_sample[1] / 2),
+                                                 (sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_frozen_tumor$Sample))$lengths)) - 11])[1], 0),
+                          "FFPE_T_median" = ifelse(length(unique(df_filter_FFPE_tumor$Sample)) > as.integer(data_mutations$FFPE_T_sample[1] / 2),
+                                                   (sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)[length(sort(rle(sort(df_filter_FFPE_tumor$Sample))$lengths)) - 18])[1], 0),
+                          "FFPE_TOP_median"= ifelse(length(unique(df_filter_TOP$Sample)) == as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1] / 2,
+                                                    ifelse(length(unique(df_filter_TOP$Sample)) > as.integer(data_mutations$FFPE_TOP_sample[1] / 2),
+                                                    mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
+                                                    (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1])), 0))
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+
+```
+
+########
+```{r}
+### insert size summary
+INSERT_LIST_1 = "/mnt/HDD8TB/MicroSEC/source/summary_insert_1_per.tsv"
+INSERT_LIST_5 = "/mnt/HDD8TB/MicroSEC/source/summary_insert_5_per.tsv"
+INSERT_LIST_match = "/mnt/HDD8TB/MicroSEC/source/summary_insert_1217.tsv"
+INSERT_LIST_TOP = "/mnt/HDD8TB/MicroSEC/source/summary_insert_TOP.tsv"
+
+df_insert_1 =  read.csv(INSERT_LIST_1, stringsAsFactors=FALSE, header=FALSE, check.names=F, sep="\t")
+df_insert_5 =  read.csv(INSERT_LIST_5, stringsAsFactors=FALSE, header=FALSE, check.names=F, sep="\t")
+df_insert_match =  read.csv(INSERT_LIST_match, stringsAsFactors=FALSE, header=FALSE, check.names=F, sep="\t")
+df_insert_TOP =  read.csv(INSERT_LIST_TOP, stringsAsFactors=FALSE, header=FALSE, check.names=F, sep="\t")
+
+df_insert = rbind(df_insert_1, df_insert_5)
+df_insert = rbind(df_insert, df_insert_match)
+colnames(df_insert) = c("Sample", "Count")
+colnames(df_insert_TOP) = c("Sample", "Count")
+
+df_insert_frozen_normal = df_insert %>% dplyr::filter(Sample %in% df_frozen_normal$Sample)
+df_insert_FFPE_normal = df_insert %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample)
+df_insert_frozen_tumor = df_insert %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample)
+df_insert_FFPE_tumor = df_insert %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample)
+
+### read summary
+df_summary_frozen_normal = df_read_summary %>% dplyr::filter(Sample %in% df_frozen_normal$`Sample.(n=389).(SL0005_RN1.not.excluded)`)
+df_summary_FFPE_normal = df_read_summary %>% dplyr::filter(Sample %in% df_FFPE_normal$`Sample.(n=389).(SL0005_RN1.not.excluded)`)
+df_summary_frozen_tumor = df_read_summary %>% dplyr::filter(Sample %in% df_frozen_tumor$`Sample.(n=389).(SL0005_RN1.not.excluded)`)
+df_summary_FFPE_tumor = df_read_summary %>% dplyr::filter(Sample %in% df_FFPE_tumor$`Sample.(n=389).(SL0005_RN1.not.excluded)`)
+df_summary_TOP = df_read_summary_TOP %>% dplyr::filter(Sample %in% unique(df_TOP$Sample))
+
+data_summary = NULL
+
+data_summary_tmp = data.frame("Number" = "FF_N",
+"Raw_read_no.median" = median(df_summary_frozen_normal$`Raw_read_no.`),
+"Raw_read_no.min" = min(df_summary_frozen_normal$`Raw_read_no.`),
+"Raw_read_no.max" = max(df_summary_frozen_normal$`Raw_read_no.`),
+"Mapped_read_ratio.median" = median(df_summary_frozen_normal$`Mapped_read_ratio%`),
+"Mapped_read_ratio.min" = min(df_summary_frozen_normal$`Mapped_read_ratio%`),
+"Mapped_read_ratio.max" = max(df_summary_frozen_normal$`Mapped_read_ratio%`),
+"Unique_read_ratio.median" = median(df_summary_frozen_normal$`Unique_read_ratio%`),
+"Unique_read_ratio.min" = min(df_summary_frozen_normal$`Unique_read_ratio%`),
+"Unique_read_ratio.max" = max(df_summary_frozen_normal$`Unique_read_ratio%`),
+"Mean_coverage.median" = median(df_summary_frozen_normal$`Mean_coverage`),
+"Mean_coverage.min" = min(df_summary_frozen_normal$`Mean_coverage`),
+"Mean_coverage.max" = max(df_summary_frozen_normal$`Mean_coverage`),
+"Insert.median" = median(df_insert_frozen_normal$Count),
+"Insert.min" = min(df_insert_frozen_normal$Count),
+"Insert.max" = max(df_insert_frozen_normal$Count)
+
+)
+data_summary = rbind(data_summary, data_summary_tmp)
+
+data_summary_tmp = data.frame("Number" = "FFPE_N",
+"Raw_read_no.median" = median(df_summary_FFPE_normal$`Raw_read_no.`),
+"Raw_read_no.min" = min(df_summary_FFPE_normal$`Raw_read_no.`),
+"Raw_read_no.max" = max(df_summary_FFPE_normal$`Raw_read_no.`),
+"Mapped_read_ratio.median" = median(df_summary_FFPE_normal$`Mapped_read_ratio%`),
+"Mapped_read_ratio.min" = min(df_summary_FFPE_normal$`Mapped_read_ratio%`),
+"Mapped_read_ratio.max" = max(df_summary_FFPE_normal$`Mapped_read_ratio%`),
+"Unique_read_ratio.median" = median(df_summary_FFPE_normal$`Unique_read_ratio%`),
+"Unique_read_ratio.min" = min(df_summary_FFPE_normal$`Unique_read_ratio%`),
+"Unique_read_ratio.max" = max(df_summary_FFPE_normal$`Unique_read_ratio%`),
+"Mean_coverage.median" = median(df_summary_FFPE_normal$`Mean_coverage`),
+"Mean_coverage.min" = min(df_summary_FFPE_normal$`Mean_coverage`),
+"Mean_coverage.max" = max(df_summary_FFPE_normal$`Mean_coverage`),
+"Insert.median" = median(df_insert_FFPE_normal$Count),
+"Insert.min" = min(df_insert_FFPE_normal$Count),
+"Insert.max" = max(df_insert_FFPE_normal$Count)
+)
+data_summary = rbind(data_summary, data_summary_tmp)
+
+
+data_summary_tmp = data.frame("Number" = "FF_T",
+"Raw_read_no.median" = median(df_summary_frozen_tumor$`Raw_read_no.`),
+"Raw_read_no.min" = min(df_summary_frozen_tumor$`Raw_read_no.`),
+"Raw_read_no.max" = max(df_summary_frozen_tumor$`Raw_read_no.`),
+"Mapped_read_ratio.median" = median(df_summary_frozen_tumor$`Mapped_read_ratio%`),
+"Mapped_read_ratio.min" = min(df_summary_frozen_tumor$`Mapped_read_ratio%`),
+"Mapped_read_ratio.max" = max(df_summary_frozen_tumor$`Mapped_read_ratio%`),
+"Unique_read_ratio.median" = median(df_summary_frozen_tumor$`Unique_read_ratio%`),
+"Unique_read_ratio.min" = min(df_summary_frozen_tumor$`Unique_read_ratio%`),
+"Unique_read_ratio.max" = max(df_summary_frozen_tumor$`Unique_read_ratio%`),
+"Mean_coverage.median" = median(df_summary_frozen_tumor$`Mean_coverage`),
+"Mean_coverage.min" = min(df_summary_frozen_tumor$`Mean_coverage`),
+"Mean_coverage.max" = max(df_summary_frozen_tumor$`Mean_coverage`),
+"Insert.median" = median(df_insert_frozen_tumor$Count),
+"Insert.min" = min(df_insert_frozen_tumor$Count),
+"Insert.max" = max(df_insert_frozen_tumor$Count)
+)
+data_summary = rbind(data_summary, data_summary_tmp)
+
+data_summary_tmp = data.frame("Number" = "FFPE_T",
+"Raw_read_no.median" = median(df_summary_FFPE_tumor$`Raw_read_no.`),
+"Raw_read_no.min" = min(df_summary_FFPE_tumor$`Raw_read_no.`),
+"Raw_read_no.max" = max(df_summary_FFPE_tumor$`Raw_read_no.`),
+"Mapped_read_ratio.median" = median(df_summary_FFPE_tumor$`Mapped_read_ratio%`),
+"Mapped_read_ratio.min" = min(df_summary_FFPE_tumor$`Mapped_read_ratio%`),
+"Mapped_read_ratio.max" = max(df_summary_FFPE_tumor$`Mapped_read_ratio%`),
+"Unique_read_ratio.median" = median(df_summary_FFPE_tumor$`Unique_read_ratio%`),
+"Unique_read_ratio.min" = min(df_summary_FFPE_tumor$`Unique_read_ratio%`),
+"Unique_read_ratio.max" = max(df_summary_FFPE_tumor$`Unique_read_ratio%`),
+"Mean_coverage.median" = median(df_summary_FFPE_tumor$`Mean_coverage`),
+"Mean_coverage.min" = min(df_summary_FFPE_tumor$`Mean_coverage`),
+"Mean_coverage.max" = max(df_summary_FFPE_tumor$`Mean_coverage`),
+"Insert.median" = median(df_insert_FFPE_tumor$Count),
+"Insert.min" = min(df_insert_FFPE_tumor$Count),
+"Insert.max" = max(df_insert_FFPE_tumor$Count)
+)
+data_summary = rbind(data_summary, data_summary_tmp)
+
+data_summary_tmp = data.frame("Number" = "FFPE_TOP",
+"Raw_read_no.median" = median(df_summary_TOP$`Raw_read_no.`),
+"Raw_read_no.min" = min(df_summary_TOP$`Raw_read_no.`),
+"Raw_read_no.max" = max(df_summary_TOP$`Raw_read_no.`),
+"Mapped_read_ratio.median" = median(df_summary_TOP$`Mapped_read_ratio%`),
+"Mapped_read_ratio.min" = min(df_summary_TOP$`Mapped_read_ratio%`),
+"Mapped_read_ratio.max" = max(df_summary_TOP$`Mapped_read_ratio%`),
+"Unique_read_ratio.median" = median(df_summary_TOP$`Unique_read_ratio%`),
+"Unique_read_ratio.min" = min(df_summary_TOP$`Unique_read_ratio%`),
+"Unique_read_ratio.max" = max(df_summary_TOP$`Unique_read_ratio%`),
+"Mean_coverage.median" = median(df_summary_TOP$`Mean_coverage`),
+"Mean_coverage.min" = min(df_summary_TOP$`Mean_coverage`),
+"Mean_coverage.max" = max(df_summary_TOP$`Mean_coverage`),
+"Insert.median" = median(df_insert_TOP$Count),
+"Insert.min" = min(df_insert_TOP$Count),
+"Insert.max" = max(df_insert_TOP$Count)
+)
+data_summary = rbind(data_summary, data_summary_tmp)
+
+```
