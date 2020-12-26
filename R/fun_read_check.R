@@ -868,7 +868,7 @@ fun_read_check <- function(df_mutation,
                 low_quality_base + sum(df_qual < 51) / length(df_seq)
               df_qual_pre = df_qual[max(1, mut_position - 11):
                                     max(1, mut_position - 1)]
-              df_qual_post = df_qual[mut_position:
+              df_qual_post = df_qual[(mut_position + 1):
                                     min(length(df_seq), mut_position + 10)]
               pre_mutation_quality_score <-
                 pre_mutation_quality_score + sum(df_qual_pre < 51)
@@ -1014,24 +1014,6 @@ fun_read_check <- function(df_mutation,
         if (flag_hairpin == 0) {
           homology_search <- rbind(homology_search, homology_search_tmp)
         }
-        # normal supporting status detection
-        for (depth in seq_len(length(df_bam_pos))) {
-          if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
-            support_depth <- fun_normal_support(df_bam_cigar[depth],
-                                                df_bam_pos[depth],
-                                                df_mutation[i, "Pos"],
-                                                alt_length,
-                                                indel_status)
-            if (support_depth[[3]] != -1) {
-              mut_depth_pre_tmp[support_depth[[1]] + 2] <-
-                mut_depth_pre_tmp[support_depth[[1]] + 2] + 1
-              mut_depth_post_tmp[support_depth[[2]] + 2] <-
-                mut_depth_post_tmp[support_depth[[2]] + 2] + 1
-              mut_depth_short_tmp[support_depth[[3]] + 2] <-
-                mut_depth_short_tmp[support_depth[[3]] + 2] + 1
-            }
-          }
-        }
       }
       if (total_read == 0) {
         msec_tmp <- df_mutation[i, ] %>% dplyr::mutate(
@@ -1060,6 +1042,27 @@ fun_read_check <- function(df_mutation,
           penalty_post = 0,
           caution = ""
         )
+      } else {
+        # normal supporting status detection
+        if (length(df_bam_pos) > 0) {
+          for (depth in seq_len(length(df_bam_pos))) {
+            if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+              support_depth <- fun_normal_support(df_bam_cigar[depth],
+                                                  df_bam_pos[depth],
+                                                  df_mutation[i, "Pos"],
+                                                  alt_length,
+                                                  indel_status)
+              if (support_depth[[3]] != -1) {
+                mut_depth_pre_tmp[support_depth[[1]] + 2] <-
+                  mut_depth_pre_tmp[support_depth[[1]] + 2] + 1
+                mut_depth_post_tmp[support_depth[[2]] + 2] <-
+                  mut_depth_post_tmp[support_depth[[2]] + 2] + 1
+                mut_depth_short_tmp[support_depth[[3]] + 2] <-
+                  mut_depth_short_tmp[support_depth[[3]] + 2] + 1
+              }
+            }
+          }
+        }
       }
       mut_depth_pre_tmp <- t(cumsum(mut_depth_pre_tmp))
       mut_depth_post_tmp <- t(cumsum(mut_depth_post_tmp))
