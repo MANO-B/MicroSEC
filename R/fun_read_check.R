@@ -1032,16 +1032,6 @@ fun_read_check <- function(df_mutation,
             }
           }
         }
-        
-        mut_depth_pre_tmp <- t(cumsum(mut_depth_pre_tmp))
-        mut_depth_post_tmp <- t(cumsum(mut_depth_post_tmp))
-        mut_depth_short_tmp <- t(cumsum(mut_depth_short_tmp))
-        mut_depth_pre <- rbind(mut_depth_pre, mut_depth_pre_tmp)
-        mut_depth_post <- rbind(mut_depth_post, mut_depth_post_tmp)
-        mut_depth_short <- rbind(mut_depth_short, mut_depth_short_tmp)
-        colnames(mut_depth_pre_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
-        colnames(mut_depth_post_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
-        colnames(mut_depth_short_tmp) <- c("Zero", paste("Depth", 0:99, sep = ""))
       }
       if (total_read == 0) {
         msec_tmp <- df_mutation[i, ] %>% dplyr::mutate(
@@ -1071,6 +1061,15 @@ fun_read_check <- function(df_mutation,
           caution = ""
         )
       }
+      mut_depth_pre_tmp <- t(cumsum(mut_depth_pre_tmp))
+      mut_depth_post_tmp <- t(cumsum(mut_depth_post_tmp))
+      mut_depth_short_tmp <- t(cumsum(mut_depth_short_tmp))
+      colnames(mut_depth_pre_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
+      colnames(mut_depth_post_tmp) <- c("Zero", paste("Depth", 0:199, sep = ""))
+      colnames(mut_depth_short_tmp) <- c("Zero", paste("Depth", 0:99, sep = ""))
+      mut_depth_pre <- rbind(mut_depth_pre, mut_depth_pre_tmp)
+      mut_depth_post <- rbind(mut_depth_post, mut_depth_post_tmp)
+      mut_depth_short <- rbind(mut_depth_short, mut_depth_short_tmp)
       msec <- rbind(msec, msec_tmp)
     }
     mut_depth <- list(mut_depth_pre, mut_depth_post, mut_depth_short)
