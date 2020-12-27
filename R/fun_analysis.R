@@ -286,6 +286,11 @@ fun_analysis <- function(msec,
                TRUE, FALSE),
       filter_7_mutation_at_homopolymer =
         ifelse((homopolymer_status  >= homopolymer_length),
+               TRUE, FALSE),
+      filter_8_low_quality =
+        ifelse((low_quality_base_rate_under_q18 >= threshold_low_quality_rate |
+                low_quality_pre >= threshold_low_quality_rate |
+                low_quality_post >= threshold_low_quality_rate),
                TRUE, FALSE)
     )
     msec <- msec %>% mutate(
@@ -353,7 +358,8 @@ fun_analysis <- function(msec,
           filter_4_highly_homologous_region |
           filter_5_simple_repeat |
           filter_6_c_to_t_artifact |
-          filter_7_mutation_at_homopolymer,
+          filter_7_mutation_at_homopolymer |
+          filter_8_low_quality,
           "Artifact suspicious", ""),
         comment = caution
       )

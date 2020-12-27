@@ -44,7 +44,6 @@ files_R2_2 = data.frame(file = list.files(paste(wd, "/source/validation_2", sep 
 ```{r}
 
 for(i in 1:length(files_R1$file)){
-  print(i)
   Sample_name = as.character(files_R1$file[i])
   Sample_name = str_split(str_split(Sample_name, pattern = "/")[[1]][7], "_S")[[1]][1]
   Sample_name = str_replace_all(Sample_name, pattern = "-", replacement = "_")
@@ -60,7 +59,6 @@ for(i in 1:length(files_R1$file)){
                   sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)))
 }
 for(i in 1:length(files_R1_2$file)){
-  print(i)
   Sample_name = as.character(files_R1_2$file[i])
   Sample_name = str_split(str_split(Sample_name, pattern = "/")[[1]][7], "_GAGA")[[1]][1]
   Sample_name = str_split(Sample_name, "_CTGA")[[1]][1]

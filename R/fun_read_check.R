@@ -869,7 +869,7 @@ fun_read_check <- function(df_mutation,
                 low_quality_base + sum(df_qual < 51) / length(df_seq)
               df_qual_pre = df_qual[max(1, mut_position - 11):
                                     max(1, mut_position - 1)]
-              df_qual_post = df_qual[(mut_position + 1):
+              df_qual_post = df_qual[min(length(df_seq), mut_position + 1):
                                     min(length(df_seq), mut_position + 10)]
               pre_mutation_quality_score <-
                 pre_mutation_quality_score + sum(df_qual_pre < 51)
@@ -999,9 +999,9 @@ fun_read_check <- function(df_mutation,
           low_quality_base_rate_under_q18 =
             fun_zero(low_quality_base, total_read),
           low_quality_pre =
-            pre_mutation_quality_score / pre_mutation_quality_num,
+            fun_zero(pre_mutation_quality_score / pre_mutation_quality_num),
           low_quality_post =
-            post_mutation_quality_score / post_mutation_quality_num,
+            fun_zero(post_mutation_quality_score / post_mutation_quality_num),
           pre_rep_status = pre_rep_status,
           post_rep_status = post_rep_status,
           homopolymer_status = homopolymer_status,
