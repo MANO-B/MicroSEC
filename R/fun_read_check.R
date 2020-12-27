@@ -999,9 +999,9 @@ fun_read_check <- function(df_mutation,
           low_quality_base_rate_under_q18 =
             fun_zero(low_quality_base, total_read),
           low_quality_pre =
-            fun_zero(pre_mutation_quality_score / pre_mutation_quality_num),
+            fun_zero(pre_mutation_quality_score, pre_mutation_quality_num),
           low_quality_post =
-            fun_zero(post_mutation_quality_score / post_mutation_quality_num),
+            fun_zero(post_mutation_quality_score, post_mutation_quality_num),
           pre_rep_status = pre_rep_status,
           post_rep_status = post_rep_status,
           homopolymer_status = homopolymer_status,
