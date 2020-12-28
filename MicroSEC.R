@@ -43,7 +43,7 @@
 # Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
 # Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
 # Filter 3-3: <10% of bases are low quality (Quality score <18).
-# Filter 4  : >=20% mutations were called by chimeric reads comprising two distant regions.
+# Filter 4  : >=15% mutations were called by chimeric reads comprising two distant regions.
 # Filter 5  : Mutations locating at simple repeat sequences.
 # Filter 6  : C>T_g false positive calls in FFPE samples.
 # Filter 7  : Mutations locating at a >=15 homopolymer.

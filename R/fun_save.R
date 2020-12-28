@@ -57,7 +57,7 @@ fun_save <- function(msec, sample_info, wd) {
     filter_3_microhomology_induced_mutation =
       "3'-/5'-supporting lengths are too densely distributed to occur.",
     filter_4_highly_homologous_region = paste(
-      ">=20% mutations were called by chimeric reads comprising two distant",
+      ">=15% mutations were called by chimeric reads comprising two distant",
       "regions"),
     filter_5_simple_repeat = "Mutations locating at simple repeat sequences",
     filter_6_c_to_t_artifact = "C>T_g false positive calls in FFPE samples",
