@@ -9,8 +9,6 @@
 #'   search.
 #' @param threshold_p The largest p value of significant errors.
 #' @param threshold_hairpin_ratio The smallest hairpin read ratio.
-#' @param threshold_soft_clip_ratio The smallest rate of significantly
-#'   soft-clipped reads.
 #' @param threshold_short_length Reads shorter than that are analyzed.
 #' @param threshold_distant_homology The smallest rate of reads from other
 #'   regions.
@@ -28,9 +26,8 @@
 #'              min_homology_search = 40,
 #'              threshold_p = 10 ^ (-6),
 #'              threshold_hairpin_ratio = 0.50,
-#'              threshold_soft_clip_ratio = 0.90,
 #'              threshold_short_length = 0.8,
-#'              threshold_distant_homology = 0.2,
+#'              threshold_distant_homology = 0.15,
 #'              threshold_low_quality_rate = 0.1,
 #'              homopolymer_length = 15)
 #' @export
@@ -40,7 +37,6 @@ fun_analysis <- function(msec,
                         min_homology_search ,
                         threshold_p,
                         threshold_hairpin_ratio,
-                        threshold_soft_clip_ratio,
                         threshold_short_length,
                         threshold_distant_homology,
                         threshold_low_quality_rate,

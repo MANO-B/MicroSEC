@@ -93,7 +93,8 @@ This pipeline contains 8 filtering processes.
 - Filter 5  : Mutations locating at simple repeat sequences.  
 - Filter 6  : C>T_g false positive calls in FFPE samples.  
 - Filter 7  : Indel mutations locating at a >=15 homopolymer.  
- 
+- Filter 8  : >=10% low quality bases in the mutation supporting reads.  
+
 Supporting lengths are adjusted considering small repeat sequences around the mutations.  
   
 Results are saved in a excel file.  
@@ -185,7 +186,7 @@ See also https://rdrr.io/cran/MicroSEC/
 install.packages("MicroSEC")
 
 # Developmental stable version from github (recommended)
-devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.15")
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.16")
 
 # Developmental unstable version from github (not recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")

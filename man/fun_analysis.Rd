@@ -11,7 +11,6 @@ fun_analysis(
   min_homology_search,
   threshold_p,
   threshold_hairpin_ratio,
-  threshold_soft_clip_ratio,
   threshold_short_length,
   threshold_distant_homology,
   threshold_low_quality_rate,
@@ -31,9 +30,6 @@ search.}
 \item{threshold_p}{The largest p value of significant errors.}
 
 \item{threshold_hairpin_ratio}{The smallest hairpin read ratio.}
-
-\item{threshold_soft_clip_ratio}{The smallest rate of significantly
-soft-clipped reads.}
 
 \item{threshold_short_length}{Reads shorter than that are analyzed.}
 
@@ -57,9 +53,8 @@ fun_analysis(msec = msec_summarized,
              min_homology_search = 40,
              threshold_p = 10 ^ (-6),
              threshold_hairpin_ratio = 0.50,
-             threshold_soft_clip_ratio = 0.90,
              threshold_short_length = 0.8,
-             threshold_distant_homology = 0.2,
+             threshold_distant_homology = 0.15,
              threshold_low_quality_rate = 0.1,
              homopolymer_length = 15)
 }

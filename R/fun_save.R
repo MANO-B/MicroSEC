@@ -63,6 +63,8 @@ fun_save <- function(msec, sample_info, wd) {
     filter_6_c_to_t_artifact = "C>T_g false positive calls in FFPE samples",
     filter_7_mutation_at_homopolymer =
       "Indel mutations located inside a >=15 homopolymer",
+    filter_8_low_quality =
+      ">=10% low quality bases in the mutation supporting reads",
     msec_filter_123 = "One or more filters of Fitler 1, 2, or 3 are TRUE",
     msec_filter_1234 =
       "One or more filters of Fitler 1, 2, 3, or 4 are TRUE",

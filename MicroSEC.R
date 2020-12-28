@@ -47,6 +47,7 @@
 # Filter 5  : Mutations locating at simple repeat sequences.
 # Filter 6  : C>T_g false positive calls in FFPE samples.
 # Filter 7  : Mutations locating at a >=15 homopolymer.
+# Filter 8  : >=10% low quality bases in the mutation supporting reads.
 #
 # Supporting lengths are adjusted considering small repeat sequences around the mutations.
 #
@@ -147,9 +148,8 @@ if (args[3] == "N" | args[3] == "Y") {
                       min_homology_search = 40,
                       threshold_p = 10 ^ (-6),
                       threshold_hairpin_ratio = 0.50,
-                      threshold_soft_clip_ratio = 0.90,
                       threshold_short_length = 0.8,
-                      threshold_distant_homology = 0.2,
+                      threshold_distant_homology = 0.15,
                       threshold_low_quality_rate = 0.1,
                       homopolymer_length = 15)
   
@@ -207,9 +207,8 @@ if (args[3] == "N" | args[3] == "Y") {
                       min_homology_search = 40,
                       threshold_p = 10 ^ (-6),
                       threshold_hairpin_ratio = 0.50,
-                      threshold_soft_clip_ratio = 0.90,
                       threshold_short_length = 0.8,
-                      threshold_distant_homology = 0.2,
+                      threshold_distant_homology = 0.15,
                       threshold_low_quality_rate = 0.1,
                       homopolymer_length = 15)
   

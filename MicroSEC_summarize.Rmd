@@ -56,11 +56,11 @@ df_read_summary_TOP$Sample = paste(str_sub(df_read_summary_TOP$Sample, 1, -6), "
 df_frozen_normal = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "Frozen" & (Tumor.or.Normal == "Normal(true)" | Tumor.or.Normal == "Normal(susp)"))
 df_FFPE_normal = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" & (Tumor.or.Normal == "Normal(true)" | Tumor.or.Normal == "Normal(susp)"))
 df_frozen_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "Frozen" & (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
-df_FFPE_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" & (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
+df_FFPE_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" &2 (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
 
 MUTATION_LIST_1 = "/mnt/HDD8TB/MicroSEC/source/summary_1112.tsv"
 MUTATION_LIST_5 = "/mnt/HDD8TB/MicroSEC/source/summary_1114.tsv"
-#MUTATION_LIST_5 = "/mnt/HDD8TB/MicroSEC/source/summary_1201.tsv"
+MUTATION_LIST_5 = "/mnt/HDD8TB/MicroSEC/source/summary_1201.tsv"
 MUTATION_LIST_match = "/mnt/HDD8TB/MicroSEC/source/summary_1217.tsv"
 MUTATION_LIST_TOP = "/mnt/HDD8TB/MicroSEC/source/summary_TOP.tsv"
 
@@ -91,6 +91,13 @@ df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(Transition =
 
 df_mutation = df_mutation %>% dplyr::mutate(filter_6_c_to_t_artifact =
             ifelse(is.na(filter_6_c_to_t_artifact), FALSE, filter_6_c_to_t_artifact))
+df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(filter_6_c_to_t_artifact =
+            ifelse(is.na(filter_6_c_to_t_artifact), FALSE, filter_6_c_to_t_artifact))
+
+df_mutation = df_mutation %>% dplyr::mutate(filter_4_highly_homologous_region =
+            ifelse(distant_homology_rate < 0.2 & distant_homology_rate >= 0.15), TRUE, filter_4_highly_homologous_region)
+df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(filter_4_highly_homologous_region =
+            ifelse(distant_homology_rate < 0.2 & distant_homology_rate >= 0.15), TRUE, filter_4_highly_homologous_region)
 
 matched_FFPE = c("SL_0004_L_FFPE_TUMOR-B", "SL_0005_L_FFPE_TUMOR-B", "SL_0007_L_FFPE_TUMOR-B", "SL_0008_L_FFPE_TUMOR-B", "SL_0009_L_FFPE_TUMOR-B", "SL_0011_R_FFPE_TUMOR-B", "SL_0012_R_FFPE_TUMOR-B", "SL_0013_R_FFPE_TUMOR-B")
 matched_frozen = c("SL_0004-LT-8-B",  "SL_0005-LT-4-B", "SL_0007_LT_3-B", "SL_0008_LT_8-B", "SL_0009-LT_3-B", "SL_0011-LT_2-B", "SL_0012_RT_4-B", "SL_0013_RT_4-B")

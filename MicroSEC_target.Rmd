@@ -48,15 +48,23 @@ for(i in 1:length(files_R1$file)){
   Sample_name = str_split(str_split(Sample_name, pattern = "/")[[1]][7], "_S")[[1]][1]
   Sample_name = str_replace_all(Sample_name, pattern = "-", replacement = "_")
   info_tmp = target_info %>% dplyr::filter(Sample_gene == Sample_name)
-  seq_alt_f = DNAString(info_tmp$Neighborhood_sequence)
+  forward = nchar(info_tmp$forward)
+  reverse = nchar(info_tmp$reverse)
+  Alt = nchar(info_tmp$Alt_all)
+  Ref = nchar(info_tmp$Ref_all)
+  seq_alt_f = DNAString(info_tmp$Alt_all)[(forward - 3):(Alt - reverse + 4)]
   seq_alt_r = reverseComplement(seq_alt_f)
-  seq_ref_f = c(seq_alt_f[1:20], DNAString(info_tmp$Ref), DNAString(str_sub(info_tmp$Neighborhood_sequence, -20, -1)))
-  seq_ref_r = reverseComplement(seq_alt_f)
+  seq_ref_f = DNAString(info_tmp$Ref_all)[(forward - 3):(Ref - reverse + 4)]
+  seq_ref_r = reverseComplement(seq_ref_f)
   df_fastq = c(readDNAStringSet(as.character(files_R1$file[i]), format="fastq"),  readDNAStringSet(as.character(files_R2$file[i]), format="fastq"))
   print(paste(Sample_name, "ref:", sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
                   sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0),
                 "alt:", sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
                   sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)))
+  target_info[target_info$Sample_gene == Sample_name, "Ref_no"] = sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0)
+  target_info[target_info$Sample_gene == Sample_name, "Alt_no"] = sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)
 }
 for(i in 1:length(files_R1_2$file)){
   Sample_name = as.character(files_R1_2$file[i])
@@ -65,23 +73,31 @@ for(i in 1:length(files_R1_2$file)){
   Sample_name = str_split(Sample_name, "_ATTC")[[1]][1]
   Sample_name = str_split(Sample_name, "_GAAT")[[1]][1]
   Sample_name = str_split(Sample_name, "_TAAT")[[1]][1]
-  #Sample_name = str_split(Sample_name, "_SL")[[1]][2]
-  #Sample_name = paste("SL", Sample_name, sep="")
   Sample_name = str_replace_all(Sample_name, pattern = "-", replacement = "_")
   info_tmp = target_info %>% dplyr::filter(Sample_gene == Sample_name)
-  seq_alt_f = DNAString(info_tmp$Neighborhood_sequence)
+  forward = nchar(info_tmp$forward)
+  reverse = nchar(info_tmp$reverse)
+  Alt = nchar(info_tmp$Alt_all)
+  Ref = nchar(info_tmp$Ref_all)
+  seq_alt_f = DNAString(info_tmp$Alt_all)[(forward - 3):(Alt - reverse + 4)]
   seq_alt_r = reverseComplement(seq_alt_f)
-  seq_ref_f = c(seq_alt_f[1:20], DNAString(info_tmp$Ref), DNAString(str_sub(info_tmp$Neighborhood_sequence, -20, -1)))
-  seq_ref_r = reverseComplement(seq_alt_f)
+  seq_ref_f = DNAString(info_tmp$Ref_all)[(forward - 3):(Ref - reverse + 4)]
+  seq_ref_r = reverseComplement(seq_ref_f)
   df_fastq = c(readDNAStringSet(as.character(files_R1_2$file[i]), format="fastq"),  readDNAStringSet(as.character(files_R2_2$file[i]), format="fastq"))
   print(paste(Sample_name, "ref:", sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
                   sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0),
                 "alt:", sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
                   sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)))
+  target_info[target_info$Sample_gene == Sample_name, "Ref_no"] = sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0)
+  target_info[target_info$Sample_gene == Sample_name, "Alt_no"] = sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)
 }
 
 
-
+utils::write.table(target_info, "output/target_seq_result.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+ 
 ```
 
 ```{r}
