@@ -148,7 +148,7 @@ if (args[3] == "N" | args[3] == "Y") {
                       min_homology_search = 40,
                       threshold_p = 10 ^ (-6),
                       threshold_hairpin_ratio = 0.50,
-                      threshold_short_length = 0.8,
+                      threshold_short_length = 0.75,
                       threshold_distant_homology = 0.15,
                       threshold_low_quality_rate = 0.1,
                       homopolymer_length = 15)
@@ -207,7 +207,7 @@ if (args[3] == "N" | args[3] == "Y") {
                       min_homology_search = 40,
                       threshold_p = 10 ^ (-6),
                       threshold_hairpin_ratio = 0.50,
-                      threshold_short_length = 0.8,
+                      threshold_short_length = 0.75,
                       threshold_distant_homology = 0.15,
                       threshold_low_quality_rate = 0.1,
                       homopolymer_length = 15)

@@ -179,6 +179,8 @@ fun_read_check <- function(df_mutation,
         post_minimum_length <- read_length
         pre_rep_status <- 0
         post_rep_status <- 0
+        pre_rep_short <- 0
+        post_rep_short <- 0
         homopolymer_status <- 0
         flag_hairpin <- 0
         hairpin_length <- 0
@@ -198,7 +200,7 @@ fun_read_check <- function(df_mutation,
                                   end = -1)
         mut_read_strand <- gsub("r", "-", gsub("f", "+", mut_read_strand))
         id_no <- (df_bam_pos_chr > (df_mutation[i, "Pos"] - 200) &
-                    df_bam_pos_chr < (df_mutation[i, "Pos"] + 10))
+                    df_bam_pos_chr < (df_mutation[i, "Pos"] + 1))
         df_bam_qname <- df_bam_qname_chr[id_no]
         df_bam_seq <- df_bam_seq_chr[id_no]
         df_bam_strand <- df_bam_strand_chr[id_no]
@@ -251,7 +253,9 @@ fun_read_check <- function(df_mutation,
             del = 0)
           pre_rep_status <- rep_status[[1]]
           post_rep_status <- rep_status[[2]]
-          homopolymer_status <- max(homopolymer_status, rep_status[[3]])
+          pre_rep_short <- rep_status[[3]]
+          post_rep_short <- rep_status[[4]]
+          homopolymer_status <- max(homopolymer_status, rep_status[[5]])
         } else if (mut_type == "del") {
           rep_status <- fun_repeat_check(
             rep_a = DNAString(df_mutation[i, "Alt"]),
@@ -261,7 +265,9 @@ fun_read_check <- function(df_mutation,
             del = 1)
           pre_rep_status <- rep_status[[1]]
           post_rep_status <- rep_status[[2]]
-          homopolymer_status <- max(homopolymer_status, rep_status[[3]])
+          pre_rep_short <- rep_status[[3]]
+          post_rep_short <- rep_status[[4]]
+          homopolymer_status <- max(homopolymer_status, rep_status[[5]])
         }
         if (progress_bar == "Y") {
           pb <- utils::txtProgressBar(min = 0,
@@ -595,6 +601,8 @@ fun_read_check <- function(df_mutation,
                     del = 1)
                   pre_rep_status <- max(pre_rep_status, rep_status[[1]])
                   post_rep_status <- max(post_rep_status, rep_status[[2]])
+                  pre_rep_short <- max(pre_rep_short, rep_status[[3]])
+                  post_rep_short <- max(post_rep_short, rep_status[[4]])
                   homopolymer_status <- max(homopolymer_status, rep_status[[3]])
                 } else if (str_count(as.character(as.data.frame(
                              mutation_supporting_1)[1]), "N") < 10 &
@@ -641,6 +649,8 @@ fun_read_check <- function(df_mutation,
                     del = 0)
                   pre_rep_status <- max(pre_rep_status, rep_status[[1]])
                   post_rep_status <- max(post_rep_status, rep_status[[2]])
+                  pre_rep_short <- max(pre_rep_short, rep_status[[3]])
+                  post_rep_short <- max(post_rep_short, rep_status[[4]])
                   homopolymer_status <- max(homopolymer_status, rep_status[[3]])
               } else if (str_count(as.character(as.data.frame(
                 mutation_supporting_1)[1]), "N") < 10 &
@@ -885,19 +895,19 @@ fun_read_check <- function(df_mutation,
                   pre_homology_search_seq <- df_seq[1:
                     min(length(df_seq),
                         mut_position + short_homology_search_length +
-                                       post_rep_status + alt_length - 1)]
+                                       post_rep_short + alt_length - 1)]
                   post_homology_search_seq <- df_seq[
                     max(1, mut_position - short_homology_search_length
-                                        - pre_rep_status):
+                                        - pre_rep_short):
                     length(df_seq)]
                 } else if (indel_flag == 1) {
                     pre_homology_search_seq <- df_seq[1:
                           min(length(df_seq),
                               mut_position + short_homology_search_length +
-                                  post_rep_status + alt_length)]
+                                  post_rep_short + alt_length)]
                     post_homology_search_seq <- df_seq[
                       max(1, mut_position - short_homology_search_length
-                          - pre_rep_status):
+                          - pre_rep_short):
                         length(df_seq)]
                 } else {
                   pre_homology_search_seq <- df_seq[1:

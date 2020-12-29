@@ -7,7 +7,8 @@
 #' @param ref_seq Reference sequence around the mutation.
 #' @param ref_width Search length for ref_seq.
 #' @param del Insertion: 0, Deletion: 1
-#' @return list(pre_rep_status, post_rep_status, homopolymer_status)
+#' @return list(pre_rep_status, post_rep_status, pre_rep_short,
+#'              post_rep_short, homopolymer_status)
 #' @importFrom Biostrings DNAString
 #' @importFrom BiocGenerics as.data.frame
 fun_repeat_check <- function(rep_a, rep_b, ref_seq, ref_width, del) {
@@ -31,6 +32,9 @@ fun_repeat_check <- function(rep_a, rep_b, ref_seq, ref_width, del) {
         check_rep <- FALSE
       }
     }
+    if (q == 1) {
+      post_rep_short <- post_rep_status_tmp
+    }
     if (post_rep_status_tmp >= length(rep_seq)) {
       post_rep_status <- max(post_rep_status, post_rep_status_tmp)
       if (gsub(as.character(rep_seq[1]), "", as.character(rep_seq)) == "") {
@@ -52,6 +56,9 @@ fun_repeat_check <- function(rep_a, rep_b, ref_seq, ref_width, del) {
         check_rep <- FALSE
       }
     }
+    if (q == length(rep_b)) {
+      pre_rep_short <- pre_rep_status_tmp
+    }
     if (pre_rep_status_tmp >= length(rep_seq)) {
       pre_rep_status <- max(pre_rep_status, pre_rep_status_tmp)
       if (gsub(as.character(rep_seq[1]), "", as.character(rep_seq)) == "") {
@@ -64,7 +71,8 @@ fun_repeat_check <- function(rep_a, rep_b, ref_seq, ref_width, del) {
       gsub(as.character(rep_b[1]), "", as.character(rep_b)) == "") {
     homopolymer_status <- homo_tmp_1 + homo_tmp_2 - length(rep_b)
   }
-  return(list(pre_rep_status, post_rep_status, homopolymer_status))
+  return(list(pre_rep_status, post_rep_status,
+              pre_rep_short, post_rep_short, homopolymer_status))
 }
 
 # The following block is used by usethis to automatically manage

@@ -18,7 +18,8 @@ fun_repeat_check(rep_a, rep_b, ref_seq, ref_width, del)
 \item{del}{Insertion: 0, Deletion: 1}
 }
 \value{
-list(pre_rep_status, post_rep_status, homopolymer_status)
+list(pre_rep_status, post_rep_status, pre_rep_short,
+post_rep_short, homopolymer_status)
 }
 \description{
 This function attempts to check the repetitive sequence around the mutation.
