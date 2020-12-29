@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2020-12-28" />
+<meta name="date" content="2020-12-29" />
 
 <title>MicroSEC: Sequence artifact filtering pipeline for FFPE samples</title>
 
@@ -367,7 +367,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">MicroSEC: Sequence artifact filtering pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2020-12-28</h4>
+<h4 class="date">2020-12-29</h4>
 
 
 
@@ -409,7 +409,7 @@ Filter 3 : 3’-/5’-supporting lengths are too densely distributed to occur (3
 Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).<br />
 Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.<br />
 Filter 3-3: &lt;10% of bases are low quality (Quality score &lt;18).<br />
-Filter 4 : &gt;=20% mutations were called by chimeric reads comprising two distant regions.<br />
+Filter 4 : &gt;=15% mutations were called by chimeric reads comprising two distant regions.<br />
 Filter 5 : Mutations locating at simple repeat sequences.<br />
 Filter 6 : C&gt;T_g positive artifacts in FFPE samples.<br />
 Filter 7 : Indel mutations locating at a &gt;=15 homopolymer.<br />

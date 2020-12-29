@@ -89,7 +89,7 @@ This pipeline contains 8 filtering processes.
         - Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
         - Filter 3-2: The distributions of 3'-/5'-supporting lengths are shorter than 80% of the read length.  
         - Filter 3-3: <10% of bases are low quality (Quality score <18).  
-- Filter 4  : >=20% mutations were called by chimeric reads comprising two distant regions.  
+- Filter 4  : >=15% mutations were called by chimeric reads comprising two distant regions.  
 - Filter 5  : Mutations locating at simple repeat sequences.  
 - Filter 6  : C>T_g false positive calls in FFPE samples.  
 - Filter 7  : Indel mutations locating at a >=15 homopolymer.  
@@ -186,7 +186,7 @@ See also https://rdrr.io/cran/MicroSEC/
 install.packages("MicroSEC")
 
 # Developmental stable version from github (recommended)
-devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.16")
+devtools::install_github("MANO-B/MicroSEC", upgrade="never", ref="v1.1.17")
 
 # Developmental unstable version from github (not recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
@@ -286,7 +286,7 @@ msec = fun_analysis(msec,
                     min_homology_search = 40,
                     threshold_p = 10 ^ (-6),
                     threshold_hairpin_ratio = 0.50,
-                    threshold_short_length = 0.8,
+                    threshold_short_length = 0.75,
                     threshold_distant_homology = 0.15,
                     threshold_low_quality_rate = 0.1,
                     homopolymer_length = 15)
