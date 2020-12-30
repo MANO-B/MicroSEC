@@ -90,14 +90,9 @@ df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(Transition =
             ifelse(Mut_type == "1-snv" & (str_sub(Neighborhood_sequence, 21, 22) == "TG" & Ref == "C") | (str_sub(Neighborhood_sequence, 20, 21) == "CA" & Ref == "G"), "C>T_g", Transition))
 
 df_mutation = df_mutation %>% dplyr::mutate(filter_6_c_to_t_artifact =
-            ifelse(is.na(filter_6_c_to_t_artifact), FALSE, filter_6_c_to_t_artifact))
+            ifelse(Transition == "C>T_g", TRUE, FALSE))
 df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(filter_6_c_to_t_artifact =
-            ifelse(is.na(filter_6_c_to_t_artifact), FALSE, filter_6_c_to_t_artifact))
-
-df_mutation = df_mutation %>% dplyr::mutate(filter_4_highly_homologous_region =
-            ifelse(distant_homology_rate < 0.2 & distant_homology_rate >= 0.15), TRUE, filter_4_highly_homologous_region)
-df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(filter_4_highly_homologous_region =
-            ifelse(distant_homology_rate < 0.2 & distant_homology_rate >= 0.15), TRUE, filter_4_highly_homologous_region)
+            ifelse(Transition == "C>T_g", TRUE, FALSE))
 
 matched_FFPE = c("SL_0004_L_FFPE_TUMOR-B", "SL_0005_L_FFPE_TUMOR-B", "SL_0007_L_FFPE_TUMOR-B", "SL_0008_L_FFPE_TUMOR-B", "SL_0009_L_FFPE_TUMOR-B", "SL_0011_R_FFPE_TUMOR-B", "SL_0012_R_FFPE_TUMOR-B", "SL_0013_R_FFPE_TUMOR-B")
 matched_frozen = c("SL_0004-LT-8-B",  "SL_0005-LT-4-B", "SL_0007_LT_3-B", "SL_0008_LT_8-B", "SL_0009-LT_3-B", "SL_0011-LT_2-B", "SL_0012_RT_4-B", "SL_0013_RT_4-B")
@@ -163,6 +158,16 @@ data_mutations = data.frame("Number" = "ALL_samples_No_filter",
                           "FFPE_TOP_median"= mean(c((sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 31])[1],
                                                     (sort(rle(sort(df_filter_TOP$Sample))$lengths)[length(sort(rle(sort(df_filter_TOP$Sample))$lengths)) - 30])[1]))
                           )
+utils::write.table(df_filter_frozen_normal, "output/df_filter_frozen_normal.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+utils::write.table(df_filter_FFPE_normal, "output/df_filter_FFPE_normal.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+utils::write.table(df_filter_frozen_tumor, "output/df_filter_frozen_tumor.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+utils::write.table(df_filter_FFPE_tumor, "output/df_filter_FFPE_tumor.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+utils::write.table(df_filter_TOP, "output/df_filter_TOP.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
 
 ```
 
@@ -643,9 +648,9 @@ data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_notC>T",
                           )
 data_mutations = rbind(data_mutations, data_mutations_tmp)
 
-utils::write.table(data_matched, "output/data_matched_result.tsv", sep = "\t", na = "",
+utils::write.table(data_matched, "output/data_matched.tsv", sep = "\t", na = "",
               row.names = FALSE, col.names = TRUE, quote = FALSE)
-utils::write.table(data_mutations, "output/data_mutations_result.tsv", sep = "\t", na = "",
+utils::write.table(data_mutations, "output/data_mutations.tsv", sep = "\t", na = "",
               row.names = FALSE, col.names = TRUE, quote = FALSE)
 
 ```
