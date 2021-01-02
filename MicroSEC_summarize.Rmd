@@ -56,15 +56,18 @@ df_read_summary_TOP$Sample = paste(str_sub(df_read_summary_TOP$Sample, 1, -6), "
 df_frozen_normal = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "Frozen" & (Tumor.or.Normal == "Normal(true)" | Tumor.or.Normal == "Normal(susp)"))
 df_FFPE_normal = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" & (Tumor.or.Normal == "Normal(true)" | Tumor.or.Normal == "Normal(susp)"))
 df_frozen_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "Frozen" & (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
-df_FFPE_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" &2 (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
+df_FFPE_tumor = df_sample_list %>% dplyr::filter(Frozen.or.FFPE.or.Blood == "FFPE" & (Tumor.or.Normal == "Tumor" | Tumor.or.Normal == "Tumor(surrounding)" | Tumor.or.Normal == "Tumor(non_pathogenic)"))
 
 MUTATION_LIST_1 = "/mnt/HDD8TB/MicroSEC/source/summary_1112.tsv"
-#MUTATION_LIST_5 = "/mnt/HDD8TB/MicroSEC/source/summary_1114.tsv"
+MUTATION_LIST_2 = "/mnt/HDD8TB/MicroSEC/source/summary_1114.tsv"
+MUTATION_LIST_3 = "/mnt/HDD8TB/MicroSEC/source/summary_0102.tsv"
 MUTATION_LIST_5 = "/mnt/HDD8TB/MicroSEC/source/summary_1201.tsv"
 MUTATION_LIST_match = "/mnt/HDD8TB/MicroSEC/source/summary_1217.tsv"
 MUTATION_LIST_TOP = "/mnt/HDD8TB/MicroSEC/source/summary_TOP.tsv"
 
 df_mutation_1 =  read.csv(MUTATION_LIST_1, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+df_mutation_2 =  read.csv(MUTATION_LIST_2, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
+df_mutation_3 =  read.csv(MUTATION_LIST_3, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
 df_mutation_5 =  read.csv(MUTATION_LIST_5, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
 df_mutation_match =  read.csv(MUTATION_LIST_match, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
 df_mutation_TOP =  read.csv(MUTATION_LIST_TOP, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
@@ -72,17 +75,7 @@ df_mutation_TOP =  read.csv(MUTATION_LIST_TOP, stringsAsFactors=FALSE, header=TR
 
 # analysis
 ```{r}
-LQ_threshold = 0.1
-
-df_mutation = rbind(df_mutation_1, df_mutation_5, df_mutation_match)
-df_mutation = df_mutation %>% dplyr::mutate(LQ =
-              low_quality_base_rate_under_q18 >= LQ_threshold)
-df_mutation = df_mutation %>% dplyr::mutate(LQ_local =
-              (low_quality_pre >= LQ_threshold | low_quality_post >= LQ_threshold))
-df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(LQ =
-              low_quality_base_rate_under_q18 >= LQ_threshold)
-df_mutation_TOP = df_mutation_TOP %>% dplyr::mutate(LQ_local =
-              (low_quality_pre >= LQ_threshold | low_quality_post >= LQ_threshold))
+df_mutation = rbind(df_mutation_1, df_mutation_2, df_mutation_3, df_mutation_5, df_mutation_match) %>% dplyr::distinct()
 
 df_mutation = df_mutation %>% dplyr::mutate(Transition =
             ifelse(Mut_type == "1-snv" & (str_sub(Neighborhood_sequence, 21, 22) == "TG" & Ref == "C") | (str_sub(Neighborhood_sequence, 20, 21) == "CA" & Ref == "G"), "C>T_g", Transition))
@@ -101,8 +94,8 @@ df_filter = df_mutation %>% dplyr::filter(total_read >= 10, SimpleRepeat_TRF == 
 #df_filter = df_mutation %>% dplyr::filter(total_read >= 5, SimpleRepeat_TRF == "N")
 df_TOP = df_mutation_TOP %>% dplyr::filter(total_read >= 10, SimpleRepeat_TRF == "N")
 
-df_filter = df_filter %>% dplyr::filter(filter_7_mutation_at_homopolymer == FALSE & !LQ & !LQ_local)
-df_TOP = df_TOP %>% dplyr::filter(filter_7_mutation_at_homopolymer == FALSE & !LQ & !LQ_local)
+df_filter = df_filter %>% dplyr::filter(filter_7_mutation_at_homopolymer == FALSE & !filter_8_low_quality)
+df_TOP = df_TOP %>% dplyr::filter(filter_7_mutation_at_homopolymer == FALSE & !filter_8_low_quality)
 
 df_filter = df_filter %>% dplyr::filter(`%Alt` >= 5)
 df_TOP = df_TOP %>% dplyr::filter(`%Alt` >= 5)

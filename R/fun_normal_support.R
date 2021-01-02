@@ -31,8 +31,8 @@ fun_normal_support <- function(df_cigar,
     return(list(0, 0, -1))
   } else {
     return(list(min(mut_position - df_pos, 199),
-                min(tmp_pos - mut_position, 199),
-                min(mut_position - df_pos, tmp_pos - mut_position, 99)))
+                max(0, min(tmp_pos - mut_position, 199)),
+                max(0, min(mut_position - df_pos, tmp_pos - mut_position, 99))))
   }
 }
 

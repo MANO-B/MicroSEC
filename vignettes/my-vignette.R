@@ -7,7 +7,9 @@ knitr::opts_chunk$set(collapse = TRUE,
                       warning = FALSE,
                       message = TRUE,
                       comment = "#>")
-options(rmarkdown.html_vignette.check_title = FALSE, show.error.messages = FALSE, warn = -1)
+options(rmarkdown.html_vignette.check_title = FALSE,
+        show.error.messages = FALSE,
+        warn = -1)
 
 progress_bar = "N"
 
@@ -67,7 +69,7 @@ msec = fun_analysis(msec,
                     min_homology_search = 40,
                     threshold_p = 10 ^ (-6),
                     threshold_hairpin_ratio = 0.50,
-                    threshold_short_length = 0.8,
+                    threshold_short_length = 0.75,
                     threshold_distant_homology = 0.15,
                     threshold_low_quality_rate = 0.1,
                     homopolymer_length = 15)

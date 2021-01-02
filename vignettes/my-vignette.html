@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2020-12-29" />
+<meta name="date" content="2021-01-02" />
 
 <title>MicroSEC: Sequence artifact filtering pipeline for FFPE samples</title>
 
@@ -367,7 +367,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">MicroSEC: Sequence artifact filtering pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2020-12-29</h4>
+<h4 class="date">2021-01-02</h4>
 
 
 
@@ -429,9 +429,11 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb4-6"><a href="#cb4-6"></a>                      <span class="dt">warning =</span> <span class="ot">FALSE</span>,</span>
 <span id="cb4-7"><a href="#cb4-7"></a>                      <span class="dt">message =</span> <span class="ot">TRUE</span>,</span>
 <span id="cb4-8"><a href="#cb4-8"></a>                      <span class="dt">comment =</span> <span class="st">&quot;#&gt;&quot;</span>)</span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="kw">options</span>(<span class="dt">rmarkdown.html_vignette.check_title =</span> <span class="ot">FALSE</span>, <span class="dt">show.error.messages =</span> <span class="ot">FALSE</span>, <span class="dt">warn =</span> <span class="dv">-1</span>)</span>
-<span id="cb4-10"><a href="#cb4-10"></a></span>
-<span id="cb4-11"><a href="#cb4-11"></a>progress_bar =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="kw">options</span>(<span class="dt">rmarkdown.html_vignette.check_title =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb4-10"><a href="#cb4-10"></a>        <span class="dt">show.error.messages =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb4-11"><a href="#cb4-11"></a>        <span class="dt">warn =</span> <span class="dv">-1</span>)</span>
+<span id="cb4-12"><a href="#cb4-12"></a></span>
+<span id="cb4-13"><a href="#cb4-13"></a>progress_bar =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
 </div>
 <div id="necessary-packages" class="section level2">
 <h2>Necessary packages</h2>
@@ -491,7 +493,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb6-50"><a href="#cb6-50"></a>                    <span class="dt">min_homology_search =</span> <span class="dv">40</span>,</span>
 <span id="cb6-51"><a href="#cb6-51"></a>                    <span class="dt">threshold_p =</span> <span class="dv">10</span> <span class="op">^</span><span class="st"> </span>(<span class="op">-</span><span class="dv">6</span>),</span>
 <span id="cb6-52"><a href="#cb6-52"></a>                    <span class="dt">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
-<span id="cb6-53"><a href="#cb6-53"></a>                    <span class="dt">threshold_short_length =</span> <span class="fl">0.8</span>,</span>
+<span id="cb6-53"><a href="#cb6-53"></a>                    <span class="dt">threshold_short_length =</span> <span class="fl">0.75</span>,</span>
 <span id="cb6-54"><a href="#cb6-54"></a>                    <span class="dt">threshold_distant_homology =</span> <span class="fl">0.15</span>,</span>
 <span id="cb6-55"><a href="#cb6-55"></a>                    <span class="dt">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
 <span id="cb6-56"><a href="#cb6-56"></a>                    <span class="dt">homopolymer_length =</span> <span class="dv">15</span>)</span>
@@ -634,7 +636,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; </span></span>
 <span id="cb8-21"><a href="#cb8-21"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.1.16</span></span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.1.17</span></span>
 <span id="cb8-23"><a href="#cb8-23"></a><span class="co">#&gt; </span></span>
 <span id="cb8-24"><a href="#cb8-24"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span id="cb8-25"><a href="#cb8-25"></a><span class="co">#&gt;  [1] Biobase_2.46.0                    pkgload_1.1.0                    </span></span>

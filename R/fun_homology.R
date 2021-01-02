@@ -65,16 +65,16 @@ fun_homology <- function(msec,
     df_distant <- df_distant[!str_detect(df_distant$fixed_seq, pattern = "N"), ]
     search_seq_f <- DNAStringSet(df_distant$fixed_seq)
     search_seq_r <- reverseComplement(search_seq_f)
-    search_seq_f <- PDict(search_seq_f)
-    search_seq_r <- PDict(search_seq_r)
-    distant_homology <- rep(0, length(search_seq_f))
-    if (progress_bar == "Y") {
-      pb <- utils::txtProgressBar(min = 0,
-                          max = chr_no,
-                          width = 20,
-                          style = 3)
-    }
     if (length(search_seq_f) > 0) {
+      search_seq_f <- PDict(search_seq_f)
+      search_seq_r <- PDict(search_seq_r)
+      distant_homology <- rep(0, length(search_seq_f))
+      if (progress_bar == "Y") {
+        pb <- utils::txtProgressBar(min = 0,
+                            max = chr_no,
+                            width = 20,
+                            style = 3)
+      }
       for (seqname in 1:chr_no) {
         if (progress_bar == "Y") {
           utils::setTxtProgressBar(pb, seqname)

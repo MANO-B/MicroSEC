@@ -39,7 +39,7 @@ fun_read_check(
 \item{progress_bar}{"Y": You can see the progress visually.}
 }
 \value{
-list(msec, homology_search)
+list(msec, homology_search, mut_depth)
 }
 \description{
 This function attempts to check the mutation profile in each read.

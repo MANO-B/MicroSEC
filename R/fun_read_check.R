@@ -12,7 +12,7 @@
 #' @param adapter_2 The Read 2 adapter sequence of the library.
 #' @param short_homology_search_length Small sequence for homology search.
 #' @param progress_bar "Y": You can see the progress visually.
-#' @return list(msec, homology_search)
+#' @return list(msec, homology_search, mut_depth)
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
@@ -315,7 +315,7 @@ fun_read_check <- function(df_mutation,
           }
           df_seq <- df_seq[[1]]
           df_qual <- as.vector(asc(as.character(df_qual[1])))
-          if (length(df_seq) > 0) {
+          if (length(df_seq) > 20) {
             # determine mutation position in each read
             mutation_supporting_1 <-
               matchPattern(peri_seq_1,
@@ -586,6 +586,7 @@ fun_read_check <- function(df_mutation,
                 mut_position <- mut_position_1
               } else if (mut_position_1 < mut_position_2) {
                 if (mut_position_1 > (mut_position_2 - 5) &
+                    mut_position_1 < length(df_seq) &
                     str_count(as.character(as.data.frame(
                       mutation_supporting_1)[1]), "N") < 10 &
                     str_count(as.character(as.data.frame(
@@ -633,6 +634,7 @@ fun_read_check <- function(df_mutation,
                   }
                 }
               } else if (mut_position_2 < mut_position_1 &
+                         mut_position_2 < length(df_seq) &
                          mut_position_2 > (mut_position_1 - 5) &
                          str_count(as.character(as.data.frame(
                            mutation_supporting_1)[1]), "N") < 10 &
@@ -698,7 +700,7 @@ fun_read_check <- function(df_mutation,
                     pre_search_length - alt_length + 1)
               }
             }
-            if (mut_position > 0) {
+            if (mut_position > 0 & mut_position <= length(df_seq)) {
               total_read <- total_read + 1
               flag_hairpin_tmp <- 0
 
