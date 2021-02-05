@@ -34,36 +34,35 @@ fun_load_mutation <- function(mutation_file,
   Transition <- NULL
   
   # load somatic mutation list
-  df_mutation <- read.xlsx(mutation_file, sheet = 1)
+  df_mutation <<- read.xlsx(mutation_file, sheet = 1)
   # data formatting
   if (!"HGVS.c" %in% colnames(df_mutation)) {
-    df_mutation$HGVS.c <- "NA"
+    df_mutation$HGVS.c <<- "NA"
   }
   if (!"HGVS.p" %in% colnames(df_mutation)) {
-    df_mutation$HGVS.p <- "NA"
+    df_mutation$HGVS.p <<- "NA"
   }
   if (!"HGVS.c" %in% colnames(df_mutation)) {
-    df_mutation$`Total_QV>=20` <- "NA"
+    df_mutation$`Total_QV>=20` <<- "NA"
   }
   if (!"%Alt" %in% colnames(df_mutation)) {
-    df_mutation$`%Alt` <- "NA"
+    df_mutation$`%Alt` <<- "NA"
   }
   if (!"SimpleRepeat_TRF" %in% colnames(df_mutation)) {
-    df_mutation$SimpleRepeat_TRF <- "NA"
+    df_mutation$SimpleRepeat_TRF <<- "NA"
   }
   if (!"Transition" %in% colnames(df_mutation)) {
-    df_mutation$Transition <- "NA"
+    df_mutation$Transition <<- "NA"
   }
-  df_mutation <- df_mutation %>%
+  df_mutation <<- df_mutation %>%
     select(Sample, Gene, HGVS.c, HGVS.p, Mut_type, `Total_QV>=20`, `%Alt`, Chr,
            Pos, Ref, Alt, SimpleRepeat_TRF, Neighborhood_sequence, Transition)
-  df_mutation$Pos <- as.integer(df_mutation$Pos)
-  df_mutation <- df_mutation %>%
+  df_mutation$Pos <<- as.integer(df_mutation$Pos)
+  df_mutation <<- df_mutation %>%
     filter(Sample == sample_name) %>%
     mutate(Ref = toupper(Ref)) %>%
     mutate(Alt = toupper(Alt)) %>%
     mutate(Neighborhood_sequence = toupper(Neighborhood_sequence))
-  return(df_mutation)
 }
 
 # The following block is used by usethis to automatically manage

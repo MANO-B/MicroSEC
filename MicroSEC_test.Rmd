@@ -3,7 +3,7 @@
 ## Setting
 ```{r, eval=FALSE}
 wd = "/mnt/HDD8TB/MicroSEC"
-knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, warning=FALSE, message=TRUE, comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, warning=TRUE, message=TRUE, comment = "#>")
 knitr::opts_knit$set(root.dir = wd)
 options(rmarkdown.html_vignette.check_title = FALSE)
 fun_zero <- function(a, b)ifelse(b == 0, 0, a / b)
@@ -46,40 +46,49 @@ sample_info = read.csv(sample_list,
 msec = NULL
 homology_search = NULL
 mut_depth = NULL
-#for (sample in 1:dim(sample_info)[1]) {
-for (sample in 2) {
+for (sample in 1:dim(sample_info)[1]) {
   sample_name = sample_info[sample, 1]
   mutation_file = sample_info[sample, 2]
   bam_file = sample_info[sample, 3]
-  read_list = sample_info[sample, 4]
-  read_length = as.integer(sample_info[sample, 5])
-  adapter_1 = sample_info[sample, 6]
-  if(sample_info[sample, 7] %in% c("Human", "Mouse", "hg19", "hg38", "mm10")){
-    adapter_2 = adapter_1
-    organism = sample_info[sample, 7]
-  } else{
-    adapter_2 = sample_info[sample, 7]
-    organism = sample_info[sample, 8]
+  if (is.character(sample_info[sample, 4]) == TRUE) {
+    list_exist <- TRUE
+    read_list <- sample_info[sample, 4]
+    read_length <- as.integer(sample_info[sample, 5])
+    adapter_1 <- sample_info[sample, 6]
+    if (sample_info[sample, 7] %in%
+        c("Human", "Mouse", "hg19", "hg38", "mm10")) {
+      adapter_2 <- adapter_1
+      organism <- sample_info[sample, 7]
+    } else{
+      adapter_2 <- sample_info[sample, 7]
+      organism <- sample_info[sample, 8]
+    }
+  } else {
+    list_exist <- FALSE
+    read_length <- as.integer(sample_info[sample, 4])
+    adapter_1 <- sample_info[sample, 5]
+    if (sample_info[sample, 6] %in%
+        c("Human", "Mouse", "hg19", "hg38", "mm10")) {
+      adapter_2 <- adapter_1
+      organism <- sample_info[sample, 6]
+    } else{
+      adapter_2 <- sample_info[sample, 6]
+      organism <- sample_info[sample, 7]
+    }
   }
   # load mutation information
-  df_mutation = fun_load_mutation(mutation_file, sample_name)
-  df_bam = fun_load_bam(bam_file)
-  df_mut_call = fun_load_id(read_list)
+  fun_load_mutation(mutation_file, sample_name) # df_mutation
+  fun_load_bam(bam_file) # df_bam
+  if (list_exist) {
+    fun_load_id(read_list) # df_mut_call
+  }
+
   # load genomic sequence
-  ref_genome = fun_load_genome(organism)
-  chr_no = fun_load_chr_no(organism)
+  fun_load_genome(organism) # ref_genome
+  fun_load_chr_no(organism) # chr_no
+  
   # analysis
-   result = fun_read_check(df_mutation = df_mutation,
-                          df_bam =  df_bam,
-                          df_mut_call = df_mut_call,
-                          ref_genome = ref_genome,
-                          sample_name = sample_name,
-                          read_length = read_length,
-                          adapter_1 = adapter_1,
-                          adapter_2 = adapter_2,
-                          short_homology_search_length = 4,
-                          progress_bar = progress_bar)
-  msec = rbind(msec, result[[1]])
+  result = fun_read_check(short_homology_search_length = 4)
   msec = rbind(msec, result[[1]])
   homology_search = rbind(homology_search, result[[2]])
   mut_depth = rbind(mut_depth, result[[3]])
@@ -87,10 +96,7 @@ for (sample in 2) {
 # search homologous sequences
 msec = fun_homology(msec,
                     homology_search,
-                    min_homology_search = 40,
-                    ref_genome,
-                    chr_no,
-                    progress_bar = progress_bar)
+                    min_homology_search = 40)
 # statistical analysis
 msec = fun_summary(msec)
 msec_ = fun_analysis(msec,

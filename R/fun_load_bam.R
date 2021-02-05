@@ -14,9 +14,9 @@
 #' @export
 fun_load_bam <- function(bam_file) {
   file_bam <- BamFile(bam_file)
-  df_bam <- scanBam(file_bam)[[1]]
-  df_bam <- df_bam[c("qname", "rname", "strand", "cigar", "seq", "qual", "pos")]
-  return(df_bam)
+  df_bam <<- scanBam(file_bam)[[1]]
+  df_bam <<- df_bam[c("qname", "rname", "strand", "cigar",
+                      "seq", "qual", "pos")]
 }
 
 # The following block is used by usethis to automatically manage

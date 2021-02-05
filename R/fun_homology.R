@@ -25,20 +25,23 @@
 #' \donttest{
 #' fun_homology(msec = msec_read_checked,
 #'              df_distant = homology_searched,
-#'              min_homology_search = 40,
-#'              ref_genome = BSgenome.Hsapiens.UCSC.hg38::
-#'                             BSgenome.Hsapiens.UCSC.hg38,
-#'              chr_no = 24,
-#'              progress_bar = "Y")
+#'              min_homology_search = 40)
 #' }
 #' @export
 fun_homology <- function(msec,
                          df_distant,
-                         min_homology_search,
-                         ref_genome,
-                         chr_no,
-                         progress_bar) {
+                         min_homology_search) {
   # initialize
+  if (exists("ref_genome")) {
+    ref_genome <<- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+  }
+  if (exists("chr_no")) {
+    chr_no <<- 24
+  }
+  if (exists("progress_bar")) {
+    progress_bar <<- "Y"
+  }
+
   Seq <- NULL
   Direction <- NULL
   fixed_seq_pre <- NULL
@@ -80,10 +83,13 @@ fun_homology <- function(msec,
           utils::setTxtProgressBar(pb, seqname)
           cat(paste(" Chromosome screening:", seqname, "/", chr_no, "  "))
         }
-  
         target <- ref_genome[[seqnames(ref_genome)[[seqname]]]]
         distant_homology <- distant_homology + countPDict(search_seq_f, target)
         distant_homology <- distant_homology + countPDict(search_seq_r, target)
+        rm(ref_genome)
+        gc()
+        gc()
+        fun_load_genome(organism)
       }
       df_distant$distant_homology <- distant_homology
       if (progress_bar == "Y") {

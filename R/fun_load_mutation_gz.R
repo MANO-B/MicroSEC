@@ -19,7 +19,7 @@ fun_load_mutation_gz <- function(mutation_file) {
   Neighborhood_sequence <- NULL
   
   # load somatic mutation list
-  df_mutation <- utils::read.csv(mutation_file,
+  df_mutation <<- utils::read.csv(mutation_file,
                           stringsAsFactors = FALSE,
                           header = TRUE,
                           check.names = F,
@@ -27,25 +27,24 @@ fun_load_mutation_gz <- function(mutation_file) {
   # data formatting
   if (dim(df_mutation)[1] > 1) {
     if (!"SimpleRepeat_TRF" %in% colnames(df_mutation)) {
-      df_mutation$SimpleRepeat_TRF <- "NA"
+      df_mutation$SimpleRepeat_TRF <<- "NA"
     }
     if (!"Transition" %in% colnames(df_mutation)) {
-      df_mutation$Transition <- "NA"
+      df_mutation$Transition <<- "NA"
     }
-    df_mutation$Pos <- as.integer(df_mutation$Pos)
-    df_mutation <- df_mutation %>%
+    df_mutation$Pos <<- as.integer(df_mutation$Pos)
+    df_mutation <<- df_mutation %>%
       mutate(Ref = toupper(Ref)) %>%
       mutate(Alt = toupper(Alt)) %>%
       mutate(Neighborhood_sequence = toupper(Neighborhood_sequence))
   } else {
     if (!"SimpleRepeat_TRF" %in% colnames(df_mutation)) {
-      df_mutation$SimpleRepeat_TRF <- character(0)
+      df_mutation$SimpleRepeat_TRF <<- character(0)
     }
     if (!"Transition" %in% colnames(df_mutation)) {
-      df_mutation$Transition <- character(0)
+      df_mutation$Transition <<- character(0)
     }
   }
-  return(df_mutation)
 }
 
 # The following block is used by usethis to automatically manage

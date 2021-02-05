@@ -9,7 +9,7 @@
 #' @param sample_name Sample name (character)
 #' @param read_length The read length in the sequence.
 #' @param adapter_1 The Read 1 adapter sequence of the library.
-#' @param adapter_2 The Read 2 adapter sequence of the library.
+#' @param adapter_2 The Read 2 adapter sequence of the library.　
 #' @param short_homology_search_length Small sequence for homology search.
 #' @param progress_bar "Y": You can see the progress visually.
 #' @return list(msec, homology_search, mut_depth)
@@ -37,29 +37,45 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
 #' \donttest{
-#' fun_read_check(df_mutation = exampleMutation,
-#'                df_bam =  exampleBAM,
-#'                df_mut_call = exampleMutCall,
-#'                ref_genome = BSgenome.Hsapiens.UCSC.hg38::
-#'                               BSgenome.Hsapiens.UCSC.hg38,
-#'                sample_name = "H15-11943-1-T_TDv3",
-#'                read_length = 151,
-#'                adapter_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
-#'                adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
-#'                short_homology_search_length = 4,
-#'                progress_bar = "Y")
+#' fun_read_check(short_homology_search_length = 4)
 #' }
 #' @export
-fun_read_check <- function(df_mutation,
-                          df_bam,
-                          df_mut_call,
-                          ref_genome,
-                          sample_name,
-                          read_length,
-                          adapter_1,
-                          adapter_2,
-                          short_homology_search_length,
-                          progress_bar) {
+fun_read_check <- function(short_homology_search_length) {
+  if (!exists("df_mutation")) {
+    df_mutation <<- exampleMutation
+  }
+  if (!exists("df_bam")) {
+    df_bam <<- exampleBAM
+  }
+  if (!exists("df_mut_call")) {
+    df_mut_call <<- exampleMutCall
+  }
+  if (!exists("organism")) {
+    organism <<- "hg38"
+  }
+  if (!exists("ref_genome")) {
+    ref_genome <<- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+  }
+  if (!exists("sample_name")) {
+    sample_name <<- "H15-11943-1-T_TDv3"
+  }
+  if (!exists("read_length")) {
+    read_length <<- 151
+  }
+  if (!exists("adapter_1")) {
+    adapter_1 <<- "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+  }
+  if (!exists("adapter_2")) {
+    adapter_2 <<- "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
+  }
+  if (!exists("progress_bar")) {
+    progress_bar <<- "Y"
+  }
+  if (!exists("list_exist")) {
+    list_exist <<- TRUE
+  } else if (!list_exist) {
+    df_mut_call <<- exampleMutCall %>% dplyr::filter(Pos == -1)
+  }
   Chr <- NULL
   Pos <- NULL
   options(show.error.messages = FALSE, warn = -1)
@@ -83,7 +99,7 @@ fun_read_check <- function(df_mutation,
     max_mutation_search <- 50
     neighbor_length <- 20
     laxness <- 1
-
+    
     # analyze each somatic mutation
     for (i in seq_len(length(df_mutation[, 1]))) {
       total_read <- 0
@@ -92,6 +108,7 @@ fun_read_check <- function(df_mutation,
       indel_length <- 0
       mut_call <- logical(0)
       mut_read <- matrix(logical(0))
+      mut_read_id_list <- character(0)
       df_bam_pos <- logical(0)
       co_mut_pre <- 3
       co_mut_post <- 3
@@ -120,53 +137,272 @@ fun_read_check <- function(df_mutation,
         df_bam_cigar_chr <- df_bam$cigar[id_no]
         df_bam_qual_chr <- df_bam$qual[id_no]
         df_bam_pos_chr <- df_bam$pos[id_no]
+        ref_genome <<- NULL
+        gc()
+        gc()
+        fun_load_genome(organism)
       }
       mut_type <- str_split(df_mutation[i, "Mut_type"], "-")[[1]][[2]]
-      if (mut_type == "snv") {
-        mut_read <- df_mut_call %>%
-        filter(Chr == df_mutation[i, "Chr"] & Pos == df_mutation[i, "Pos"])
-        if (dim(mut_read)[1] > 0) {
-          mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-          mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
-          mut_call <- which(mut_detail == str_sub(df_mutation[i, "Alt"],
-                                                    start = 1, end = 1))
-        }
-      } else if (mut_type == "ins") {
-        indel_length <- nchar(df_mutation[i, "Alt"]) - 1
-        indel_status <- 1
-        for (tmp in 0:max_mutation_search) {
-          if (length(mut_call) == 0) {
-            mut_read <- df_mut_call %>%
-              filter(Chr == df_mutation[i, "Chr"] &
-                       Pos == (df_mutation[i, "Pos"] - tmp))
-            pos_err <- tmp
-            if (dim(mut_read)[[1]] > 0) {
-              mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-              mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
-              mut_call <- which(mut_detail ==
-                                  str_replace(df_mutation[i, "Alt"],
-                                              pattern = df_mutation[i, "Ref"],
-                                              replacement = ".+"))
+      if (list_exist) {
+        if (mut_type == "snv") {
+          mut_read <- df_mut_call %>%
+          filter(Chr == df_mutation[i, "Chr"] & Pos == df_mutation[i, "Pos"])
+          if (dim(mut_read)[1] > 0) {
+            mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
+            mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+            mut_call <- which(mut_detail == str_sub(df_mutation[i, "Alt"],
+                                                      start = 1, end = 1))
+          }
+        } else if (mut_type == "ins") {
+          indel_length <- nchar(df_mutation[i, "Alt"]) - 1
+          indel_status <- 1
+          for (tmp in 0:max_mutation_search) {
+            if (length(mut_call) == 0) {
+              mut_read <- df_mut_call %>%
+                filter(Chr == df_mutation[i, "Chr"] &
+                         Pos == (df_mutation[i, "Pos"] - tmp))
+              pos_err <- tmp
+              if (dim(mut_read)[[1]] > 0) {
+                mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
+                mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+                mut_call <- which(mut_detail ==
+                                    str_replace(df_mutation[i, "Alt"],
+                                                pattern = df_mutation[i, "Ref"],
+                                                replacement = ".+"))
+              }
+            }
+          }
+        } else if (mut_type == "del") {
+          indel_length <- nchar(df_mutation[i, "Ref"]) - 1
+          indel_status <- 1
+          for (tmp in 0:max_mutation_search) {
+            if (length(mut_call) == 0) {
+              mut_read <- df_mut_call %>%
+                filter(Chr == df_mutation[i, "Chr"] &
+                         Pos == (df_mutation[i, "Pos"] - tmp))
+              pos_err <- tmp
+              if (dim(mut_read)[[1]] > 0) {
+                mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
+                mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+                mut_call <- which(mut_detail ==
+                                  str_replace(df_mutation[i, "Ref"],
+                                              pattern = df_mutation[i, "Alt"],
+                                              replacement = ".-"))
+              }
             }
           }
         }
-      } else if (mut_type == "del") {
-        indel_length <- nchar(df_mutation[i, "Ref"]) - 1
-        indel_status <- 1
-        for (tmp in 0:max_mutation_search) {
-          if (length(mut_call) == 0) {
-            mut_read <- df_mut_call %>%
-              filter(Chr == df_mutation[i, "Chr"] &
-                       Pos == (df_mutation[i, "Pos"] - tmp))
-            pos_err <- tmp
-            if (dim(mut_read)[[1]] > 0) {
-              mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-              mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
-              mut_call <- which(mut_detail ==
-                                str_replace(df_mutation[i, "Ref"],
-                                            pattern = df_mutation[i, "Alt"],
-                                            replacement = ".-"))
+      } else {
+        id_no <- (df_bam_pos_chr > (df_mutation[i, "Pos"] - 200) &
+                    df_bam_pos_chr < (df_mutation[i, "Pos"] + 1))
+        df_bam_qname <- df_bam_qname_chr[id_no]
+        df_bam_seq <- df_bam_seq_chr[id_no]
+        df_bam_strand <- df_bam_strand_chr[id_no]
+        df_bam_cigar <- df_bam_cigar_chr[id_no]
+        df_bam_pos <- df_bam_pos_chr[id_no]
+        check_first <- TRUE
+        mut_position_cigar <- logical(0)
+        if (length(df_bam_pos) > 0) {
+          if (mut_type == "snv") {
+            alt <- nchar(df_mutation[i, "Alt"])
+            for (depth in seq_len(length(df_bam_pos))) {
+              if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+                cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                  "[:upper:]")[[1]])
+                cigar_type <- str_split(df_bam_cigar[depth],
+                                        "[:digit:]+")[[1]][-1]
+                cigar_pos <- df_bam_pos[depth]
+                cigar_seq <- df_bam_seq[depth][[1]]
+                cigar_qname <- df_bam_qname[depth]
+                cigar_strand <- gsub("\\-", "r",
+                                     gsub("\\+", "f", df_bam_strand[depth]))
+                read_pos <- 1
+                for (k in seq_len(length(cigar_type))) {
+                  if ((cigar_pos <= df_mutation[i, "Pos"]) &
+                      ((cigar_pos + cigar_num[k]) >= df_mutation[i, "Pos"]) &
+                      cigar_type[k] == "M") {
+                    snv_pos <- read_pos + df_mutation[i, "Pos"] - cigar_pos
+                    if (snv_pos > 0 &
+                        (snv_pos + alt - 1) <= length(cigar_seq)) {
+                      if (as.character(
+                           cigar_seq[snv_pos:(snv_pos + alt - 1)]) ==
+                          df_mutation[i, "Alt"]) {
+                        if (check_first) {
+                          mut_read_id_list <- paste(cigar_qname,
+                                                    cigar_strand, sep = "")
+                          check_first <- FALSE
+                        } else {
+                          mut_read_id_list <- paste(mut_read_id_list,
+                                                        ",",
+                                                        cigar_qname,
+                                                        cigar_strand, sep ="")
+                        }
+                        mut_position_cigar <- c(mut_position_cigar, snv_pos) 
+                        mut_call <- 1
+                      }
+                    }
+                  }
+                  if (cigar_type[k] == "D") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                  if (cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                  if (cigar_type[k] != "D" & cigar_type[k] != "H") {
+                    read_pos <- read_pos + cigar_num[k]
+                  }
+                }
+              }
             }
+            mut_read_id_list = list(mut_read_id_list)
+          } else if (mut_type == "ins") {
+            alt <- nchar(df_mutation[i, "Alt"]) - 1
+            mut_pos <- NULL
+            for (depth in seq_len(length(df_bam_pos))) {
+              if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+                cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                  "[:upper:]")[[1]])
+                cigar_type <- str_split(df_bam_cigar[depth],
+                                        "[:digit:]+")[[1]][-1]
+                cigar_pos <- df_bam_pos[depth]
+                mut_pos_tmp <- NULL
+                for (k in seq_len(length(cigar_type))) {
+                  if ((cigar_num[k] == alt) &
+                      cigar_type[k] == "I") {
+                    cigar_seq <- df_bam_seq[depth][[1]]
+                    if (as.character(
+                         cigar_seq[read_pos:(read_pos + alt - 1)]) ==
+                        str_sub(df_mutation[i, "Alt"], start = 2, end = -1)) {
+                      mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
+                    }
+                  }
+                  if (cigar_type[k] == "D") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  } else if (cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                }
+                if (cigar_pos >= (df_mutation[i, "Pos"] + alt + 1)) {
+                  mut_pos <- c(mut_pos, mut_pos_tmp)
+                }
+              }
+            }
+            mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
+            for (depth in seq_len(length(df_bam_pos))) {
+              if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+                cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                  "[:upper:]")[[1]])
+                cigar_type <- str_split(df_bam_cigar[depth],
+                                        "[:digit:]+")[[1]][-1]
+                cigar_pos <- df_bam_pos[depth]
+                read_pos <- 1
+                for (k in seq_len(length(cigar_type))) {
+                  duplication <- 0
+                  if ((cigar_pos == mut_pos) &
+                      (cigar_num[k] == alt) &
+                      cigar_type[k] == "I") {
+                    cigar_seq <- df_bam_seq[depth][[1]]
+                    cigar_qname <- df_bam_qname[depth]
+                    cigar_strand <- gsub("\\-", "r",
+                                         gsub("\\+", "f", df_bam_strand[depth]))
+                    if (cigar_seq[read_pos:(read_pos + alt - 1)] ==
+                        str_sub(df_mutation[i, "Alt"], start = 2, end = -1)) {
+                      if (check_first) {
+                        mut_read_id_list <- paste(cigar_qname,
+                                                  cigar_strand, sep = "")
+                        check_first <- FALSE
+                      } else {
+                        mut_read_id_list <- paste(mut_read_id_list,
+                                                      ",",
+                                                      cigar_qname,
+                                                      cigar_strand, sep ="")
+                      }
+                      mut_call <- 1
+                      mut_position_cigar <- c(mut_position_cigar,
+                            read_pos + df_mutation[i, "Pos"] - mut_pos) 
+                    }
+                  }
+                  if (cigar_type[k] == "D") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                    read_pos <- read_pos - cigar_num[k]
+                  } else if (cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                  read_pos <- read_pos + cigar_num[k]
+                }
+              }
+            }
+            mut_read_id_list = list(mut_read_id_list)
+          } else if (mut_type == "del") {
+            alt <- nchar(df_mutation[i, "Ref"]) - 1
+            mut_pos <- NULL
+            for (depth in seq_len(length(df_bam_pos))) {
+              if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+                cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                  "[:upper:]")[[1]])
+                cigar_type <- str_split(df_bam_cigar[depth],
+                                        "[:digit:]+")[[1]][-1]
+                cigar_pos <- df_bam_pos[depth]
+                mut_pos_tmp <- NULL
+                for (k in seq_len(length(cigar_type))) {
+                  if ((cigar_num[k] == alt) &
+                      cigar_type[k] == "D") {
+                    mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
+                  }
+                  if (cigar_type[k] == "D") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  } else if (cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                }
+                if (cigar_pos >= (df_mutation[i, "Pos"] + alt + 1)) {
+                  mut_pos <- c(mut_pos, mut_pos_tmp)
+                }
+              }
+            }
+            mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
+            for (depth in seq_len(length(df_bam_pos))) {
+              if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+                cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                  "[:upper:]")[[1]])
+                cigar_type <- str_split(df_bam_cigar[depth],
+                                        "[:digit:]+")[[1]][-1]
+                cigar_pos <- df_bam_pos[depth]
+                read_pos <- 1
+                for (k in seq_len(length(cigar_type))) {
+                  duplication <- 0
+                  if ((cigar_pos == mut_pos) &
+                      (cigar_num[k] == alt) &
+                      cigar_type[k] == "D") {
+                    cigar_seq <- df_bam_seq[depth][[1]]
+                    cigar_qname <- df_bam_qname[depth]
+                    cigar_strand <- gsub("\\-", "r",
+                                         gsub("\\+", "f", df_bam_strand[depth]))
+                    if (check_first) {
+                      mut_read_id_list <- paste(cigar_qname,
+                                            cigar_strand, sep = "")
+                      check_first <- FALSE
+                    } else {
+                      mut_read_id_list <- paste(mut_read_id_list,
+                                                ",",
+                                                cigar_qname,
+                                                cigar_strand, sep ="")
+                    }
+                    mut_call <- 1
+                    mut_position_cigar <- c(mut_position_cigar,
+                                  read_pos + df_mutation[i, "Pos"] - mut_pos) 
+                  }
+                  if (cigar_type[k] == "D") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                    read_pos <- read_pos - cigar_num[k]
+                  } else if (cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                  read_pos <- read_pos + cigar_num[k]
+                }
+              }
+            }
+            mut_read_id_list = list(mut_read_id_list)
           }
         }
       }
@@ -310,78 +546,25 @@ fun_read_check <- function(df_mutation,
           df_qual <- df_qual[df_strand == mut_read_strand[[j]]]
           if (length(df_seq) > 1) {
             df_cigar <- df_cigar[which.max(width(df_seq))]
-            df_qual <- df_qual[which.max(width(df_seq)), ]
-            df_seq <- df_seq[which.max(width(df_seq)), ]
+            df_qual <- df_qual[which.max(width(df_seq))]
+            df_seq <- df_seq[which.max(width(df_seq))]
           }
           df_seq <- df_seq[[1]]
           df_qual <- as.vector(asc(as.character(df_qual[1])))
           if (length(df_seq) > 20) {
             # determine mutation position in each read
-            mutation_supporting_1 <-
-              matchPattern(peri_seq_1,
-                           df_seq,
-                           max.mismatch = mut_near_1,
-                           min.mismatch = 0,
-                           with.indels = FALSE,
-                           fixed = FALSE)
-            if (length(mutation_supporting_1) != 1) {
-              length_flag <- 1
-              for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 0:3) {
-                  if (length(mutation_supporting_1) != 1) {
-                    search_status_1 <- search_status_1 + 1
-                    setting <- fun_setting(
-                      pre = pre_search_length_default,
-                      post = post_search_length_default - Lax_1 * laxness,
-                      neighbor_seq = neighbor_seq,
-                      neighbor_length = neighbor_length,
-                      alt_length = alt_length)
-                    pre_search_length <- setting[[1]]
-                    post_search_length <- setting[[2]]
-                    peri_seq_1 <- setting[[3]]
-                    peri_seq_2 <- setting[[4]]
-                    mutation_supporting_1 <- matchPattern(
-                      peri_seq_1,
-                      df_seq,
-                      max.mismatch = mut_near_1 + Lax_2 * laxness,
-                      min.mismatch = 0,
-                      with.indels = FALSE,
-                      fixed = FALSE)
-                  }
-                }
-              }
-            }
-            if (length(mutation_supporting_1) != 1) {
-              for (Lax_1 in seq(5, 15, length = 3)) {
-                for (Lax_2 in 0:3) {
-                  if (length(mutation_supporting_1) != 1) {
-                    search_status_1 <- search_status_1 + 1
-                    setting <- fun_setting(
-                      pre = pre_search_length_default + Lax_1 * laxness,
-                      post = post_search_length_default,
-                      neighbor_seq = neighbor_seq,
-                      neighbor_length = neighbor_length,
-                      alt_length = alt_length)
-                    pre_search_length <- setting[[1]]
-                    post_search_length <- setting[[2]]
-                    peri_seq_1 <- setting[[3]]
-                    peri_seq_2 <- setting[[4]]
-                    mutation_supporting_1 <- matchPattern(
-                      peri_seq_1,
-                      df_seq,
-                      max.mismatch = mut_near_1 + Lax_2 * laxness,
-                      min.mismatch = 0,
-                      with.indels = FALSE,
-                      fixed = FALSE)
-                  }
-                }
-              }
-            }
-            if (length(mutation_supporting_1) != 1) {
-              length_flag <- 1
-              if (length(mutation_supporting_1) == 0) {
+            if (list_exist) {
+              mutation_supporting_1 <-
+                matchPattern(peri_seq_1,
+                             df_seq,
+                             max.mismatch = mut_near_1,
+                             min.mismatch = 0,
+                             with.indels = FALSE,
+                             fixed = FALSE)
+              if (length(mutation_supporting_1) != 1) {
+                length_flag <- 1
                 for (Lax_1 in seq(0, 9, length = 4)) {
-                  for (Lax_2 in 4:5) {
+                  for (Lax_2 in 0:3) {
                     if (length(mutation_supporting_1) != 1) {
                       search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
@@ -406,8 +589,8 @@ fun_read_check <- function(df_mutation,
                 }
               }
               if (length(mutation_supporting_1) != 1) {
-                for (Lax_1 in seq(5, 20, length = 3)) {
-                  for (Lax_2 in 4:5) {
+                for (Lax_1 in seq(5, 15, length = 3)) {
+                  for (Lax_2 in 0:3) {
                     if (length(mutation_supporting_1) != 1) {
                       search_status_1 <- search_status_1 + 1
                       setting <- fun_setting(
@@ -431,79 +614,107 @@ fun_read_check <- function(df_mutation,
                   }
                 }
               }
-            }
-            if (length(mutation_supporting_1) != 1) {
-              for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 0:3) {
-                  if (length(mutation_supporting_1) != 1) {
-                    search_status_1 <- search_status_1 + 1
-                    setting <- fun_setting(
-                      pre = pre_search_length_default,
-                      post = post_search_length_default - Lax_1 * laxness,
-                      neighbor_seq = neighbor_seq,
-                      neighbor_length = neighbor_length,
-                      alt_length = alt_length)
-                    pre_search_length <- setting[[1]]
-                    post_search_length <- setting[[2]]
-                    peri_seq_1 <- setting[[3]]
-                    peri_seq_2 <- setting[[4]]
-                    mutation_supporting_1 <- matchPattern(
-                      peri_seq_1,
-                      df_seq,
-                      max.mismatch = mut_near_1 + Lax_2 * laxness,
-                      min.mismatch = 0,
-                      with.indels = TRUE,
-                      fixed = FALSE)
+              if (length(mutation_supporting_1) != 1) {
+                length_flag <- 1
+                if (length(mutation_supporting_1) == 0) {
+                  for (Lax_1 in seq(0, 9, length = 4)) {
+                    for (Lax_2 in 4:5) {
+                      if (length(mutation_supporting_1) != 1) {
+                        search_status_1 <- search_status_1 + 1
+                        setting <- fun_setting(
+                          pre = pre_search_length_default,
+                          post = post_search_length_default - Lax_1 * laxness,
+                          neighbor_seq = neighbor_seq,
+                          neighbor_length = neighbor_length,
+                          alt_length = alt_length)
+                        pre_search_length <- setting[[1]]
+                        post_search_length <- setting[[2]]
+                        peri_seq_1 <- setting[[3]]
+                        peri_seq_2 <- setting[[4]]
+                        mutation_supporting_1 <- matchPattern(
+                          peri_seq_1,
+                          df_seq,
+                          max.mismatch = mut_near_1 + Lax_2 * laxness,
+                          min.mismatch = 0,
+                          with.indels = FALSE,
+                          fixed = FALSE)
+                      }
+                    }
+                  }
+                }
+                if (length(mutation_supporting_1) != 1) {
+                  for (Lax_1 in seq(5, 20, length = 3)) {
+                    for (Lax_2 in 4:5) {
+                      if (length(mutation_supporting_1) != 1) {
+                        search_status_1 <- search_status_1 + 1
+                        setting <- fun_setting(
+                          pre = pre_search_length_default + Lax_1 * laxness,
+                          post = post_search_length_default,
+                          neighbor_seq = neighbor_seq,
+                          neighbor_length = neighbor_length,
+                          alt_length = alt_length)
+                        pre_search_length <- setting[[1]]
+                        post_search_length <- setting[[2]]
+                        peri_seq_1 <- setting[[3]]
+                        peri_seq_2 <- setting[[4]]
+                        mutation_supporting_1 <- matchPattern(
+                          peri_seq_1,
+                          df_seq,
+                          max.mismatch = mut_near_1 + Lax_2 * laxness,
+                          min.mismatch = 0,
+                          with.indels = FALSE,
+                          fixed = FALSE)
+                      }
+                    }
                   }
                 }
               }
-            }
-            pre_search_length_1 <- pre_search_length
-            post_search_length_1 <- post_search_length
-            pre_search_length <- pre_search_length_default
-            post_search_length <- post_search_length_default
-            mutation_supporting_2 <-
-              matchPattern(peri_seq_2,
-                           df_seq,
-                           max.mismatch = mut_near_2,
-                           min.mismatch = 0,
-                           with.indels = FALSE,
-                           fixed = FALSE)
-            if (length(mutation_supporting_2) != 1) {
-              length_flag <- 1
-              for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 0:3) {
-                  if (length(mutation_supporting_2) != 1) {
-                    search_status_2 <- search_status_2 + 1
-                    setting <- fun_setting(
-                      pre = pre_search_length_default,
-                      post = post_search_length_default - Lax_1 * laxness,
-                      neighbor_seq = neighbor_seq,
-                      neighbor_length = neighbor_length,
-                      alt_length = alt_length)
-                    pre_search_length <- setting[[1]]
-                    post_search_length <- setting[[2]]
-                    peri_seq_1 <- setting[[3]]
-                    peri_seq_2 <- setting[[4]]
-                    mutation_supporting_2 <- matchPattern(
-                      peri_seq_2,
-                      df_seq,
-                      max.mismatch = mut_near_2 + Lax_2 * laxness,
-                      min.mismatch = 0,
-                      with.indels = FALSE,
-                      fixed = FALSE)
+              if (length(mutation_supporting_1) != 1) {
+                for (Lax_1 in seq(0, 9, length = 4)) {
+                  for (Lax_2 in 0:3) {
+                    if (length(mutation_supporting_1) != 1) {
+                      search_status_1 <- search_status_1 + 1
+                      setting <- fun_setting(
+                        pre = pre_search_length_default,
+                        post = post_search_length_default - Lax_1 * laxness,
+                        neighbor_seq = neighbor_seq,
+                        neighbor_length = neighbor_length,
+                        alt_length = alt_length)
+                      pre_search_length <- setting[[1]]
+                      post_search_length <- setting[[2]]
+                      peri_seq_1 <- setting[[3]]
+                      peri_seq_2 <- setting[[4]]
+                      mutation_supporting_1 <- matchPattern(
+                        peri_seq_1,
+                        df_seq,
+                        max.mismatch = mut_near_1 + Lax_2 * laxness,
+                        min.mismatch = 0,
+                        with.indels = TRUE,
+                        fixed = FALSE)
+                    }
                   }
                 }
               }
-            }
-            if (length(mutation_supporting_2) != 1) {
-                for (Lax_1 in seq(5, 15, length = 3)) {
+              pre_search_length_1 <- pre_search_length
+              post_search_length_1 <- post_search_length
+              pre_search_length <- pre_search_length_default
+              post_search_length <- post_search_length_default
+              mutation_supporting_2 <-
+                matchPattern(peri_seq_2,
+                             df_seq,
+                             max.mismatch = mut_near_2,
+                             min.mismatch = 0,
+                             with.indels = FALSE,
+                             fixed = FALSE)
+              if (length(mutation_supporting_2) != 1) {
+                length_flag <- 1
+                for (Lax_1 in seq(0, 9, length = 4)) {
                   for (Lax_2 in 0:3) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
-                        pre = pre_search_length_default + Lax_1 * laxness,
-                        post = post_search_length_default,
+                        pre = pre_search_length_default,
+                        post = post_search_length_default - Lax_1 * laxness,
                         neighbor_seq = neighbor_seq,
                         neighbor_length = neighbor_length,
                         alt_length = alt_length)
@@ -522,40 +733,40 @@ fun_read_check <- function(df_mutation,
                   }
                 }
               }
-            if (length(mutation_supporting_2) != 1) {
-              for (Lax_1 in seq(0, 9, length = 4)) {
-                for (Lax_2 in 4:5) {
-                  if (length(mutation_supporting_2) != 1) {
-                    search_status_2 <- search_status_2 + 1
-                    setting <- fun_setting(
-                      pre = pre_search_length_default,
-                      post = post_search_length_default - Lax_1 * laxness,
-                      neighbor_seq = neighbor_seq,
-                      neighbor_length = neighbor_length,
-                      alt_length = alt_length)
-                    pre_search_length <- setting[[1]]
-                    post_search_length <- setting[[2]]
-                    peri_seq_1 <- setting[[3]]
-                    peri_seq_2 <- setting[[4]]
-                    mutation_supporting_2 <- matchPattern(
-                      peri_seq_2,
-                      df_seq,
-                      max.mismatch = mut_near_2 + Lax_2 * laxness,
-                      min.mismatch = 0,
-                      with.indels = FALSE,
-                      fixed = FALSE)
+              if (length(mutation_supporting_2) != 1) {
+                  for (Lax_1 in seq(5, 15, length = 3)) {
+                    for (Lax_2 in 0:3) {
+                      if (length(mutation_supporting_2) != 1) {
+                        search_status_2 <- search_status_2 + 1
+                        setting <- fun_setting(
+                          pre = pre_search_length_default + Lax_1 * laxness,
+                          post = post_search_length_default,
+                          neighbor_seq = neighbor_seq,
+                          neighbor_length = neighbor_length,
+                          alt_length = alt_length)
+                        pre_search_length <- setting[[1]]
+                        post_search_length <- setting[[2]]
+                        peri_seq_1 <- setting[[3]]
+                        peri_seq_2 <- setting[[4]]
+                        mutation_supporting_2 <- matchPattern(
+                          peri_seq_2,
+                          df_seq,
+                          max.mismatch = mut_near_2 + Lax_2 * laxness,
+                          min.mismatch = 0,
+                          with.indels = FALSE,
+                          fixed = FALSE)
+                      }
+                    }
                   }
                 }
-              }
-            }
-            if (length(mutation_supporting_2) != 1) {
-                for (Lax_1 in seq(5, 20, length = 3)) {
+              if (length(mutation_supporting_2) != 1) {
+                for (Lax_1 in seq(0, 9, length = 4)) {
                   for (Lax_2 in 4:5) {
                     if (length(mutation_supporting_2) != 1) {
                       search_status_2 <- search_status_2 + 1
                       setting <- fun_setting(
-                        pre = pre_search_length_default + Lax_1 * laxness,
-                        post = post_search_length_default,
+                        pre = pre_search_length_default,
+                        post = post_search_length_default - Lax_1 * laxness,
                         neighbor_seq = neighbor_seq,
                         neighbor_length = neighbor_length,
                         alt_length = alt_length)
@@ -574,41 +785,116 @@ fun_read_check <- function(df_mutation,
                   }
                 }
               }
-            if (length(mutation_supporting_1) == 1 &
-                length(mutation_supporting_2) == 1) {
-              mut_position_1 <- min(
-                length(df_seq),
-                start(mutation_supporting_1) + pre_search_length_1)
-              mut_position_2 <- min(
-                length(df_seq),
-                end(mutation_supporting_2) - pre_search_length - alt_length + 1)
-              if (mut_position_1 == mut_position_2) {
-                mut_position <- mut_position_1
-              } else if (mut_position_1 < mut_position_2) {
-                if (mut_position_1 > (mut_position_2 - 5) &
-                    mut_position_1 < length(df_seq) &
-                    str_count(as.character(as.data.frame(
-                      mutation_supporting_1)[1]), "N") < 10 &
-                    str_count(as.character(as.data.frame(
-                      mutation_supporting_2)[1]), "N") < 10 &
-                    search_status_1 < 4 & search_status_2 < 4) {
-                  indel_flag <- 1
+              if (length(mutation_supporting_2) != 1) {
+                  for (Lax_1 in seq(5, 20, length = 3)) {
+                    for (Lax_2 in 4:5) {
+                      if (length(mutation_supporting_2) != 1) {
+                        search_status_2 <- search_status_2 + 1
+                        setting <- fun_setting(
+                          pre = pre_search_length_default + Lax_1 * laxness,
+                          post = post_search_length_default,
+                          neighbor_seq = neighbor_seq,
+                          neighbor_length = neighbor_length,
+                          alt_length = alt_length)
+                        pre_search_length <- setting[[1]]
+                        post_search_length <- setting[[2]]
+                        peri_seq_1 <- setting[[3]]
+                        peri_seq_2 <- setting[[4]]
+                        mutation_supporting_2 <- matchPattern(
+                          peri_seq_2,
+                          df_seq,
+                          max.mismatch = mut_near_2 + Lax_2 * laxness,
+                          min.mismatch = 0,
+                          with.indels = FALSE,
+                          fixed = FALSE)
+                      }
+                    }
+                  }
+                }
+              if (length(mutation_supporting_1) == 1 &
+                  length(mutation_supporting_2) == 1) {
+                mut_position_1 <- min(
+                  length(df_seq),
+                  start(mutation_supporting_1) + pre_search_length_1)
+                mut_position_2 <- min(
+                  length(df_seq),
+                  end(mutation_supporting_2) - pre_search_length - alt_length + 1)
+                if (mut_position_1 == mut_position_2) {
                   mut_position <- mut_position_1
-                  rep_status <- fun_repeat_check(
-                    df_seq[mut_position_1],
-                    df_seq[mut_position_1:(mut_position_1 + 1)],
-                    ref_seq,
-                    ref_width - 1,
-                    del = 1)
-                  pre_rep_status <- max(pre_rep_status, rep_status[[1]])
-                  post_rep_status <- max(post_rep_status, rep_status[[2]])
-                  pre_rep_short <- max(pre_rep_short, rep_status[[3]])
-                  post_rep_short <- max(post_rep_short, rep_status[[4]])
-                  homopolymer_status <- max(homopolymer_status, rep_status[[3]])
-                } else if (str_count(as.character(as.data.frame(
+                } else if (mut_position_1 < mut_position_2) {
+                  if (mut_position_1 > (mut_position_2 - 5) &
+                      mut_position_1 < length(df_seq) &
+                      str_count(as.character(as.data.frame(
+                        mutation_supporting_1)[1]), "N") < 10 &
+                      str_count(as.character(as.data.frame(
+                        mutation_supporting_2)[1]), "N") < 10 &
+                      search_status_1 < 4 & search_status_2 < 4) {
+                    indel_flag <- 1
+                    mut_position <- mut_position_1
+                    rep_status <- fun_repeat_check(
+                      df_seq[mut_position_1],
+                      df_seq[mut_position_1:(mut_position_1 + 1)],
+                      ref_seq,
+                      ref_width - 1,
+                      del = 1)
+                    pre_rep_status <- max(pre_rep_status, rep_status[[1]])
+                    post_rep_status <- max(post_rep_status, rep_status[[2]])
+                    pre_rep_short <- max(pre_rep_short, rep_status[[3]])
+                    post_rep_short <- max(post_rep_short, rep_status[[4]])
+                    homopolymer_status <- max(homopolymer_status, rep_status[[3]])
+                  } else if (str_count(as.character(as.data.frame(
+                               mutation_supporting_1)[1]), "N") < 10 &
+                             str_count(as.character(as.data.frame(
+                               mutation_supporting_1)[1]), "N") < 10){
+                    if (search_status_1 <= search_status_2) {
+                      if (mut_position_1 > 0) {
+                        mut_position <- mut_position_1
+                      } else if (mut_position_2 <= length(df_seq)) {
+                        mut_position <- mut_position_2
+                      }
+                    } else {
+                      if (mut_position_2 <= length(df_seq)) {
+                        mut_position <- mut_position_2
+                      } else if (mut_position_1 > 0) {
+                        mut_position <- mut_position_1
+                      }
+                    }
+                  } else if (str_count(as.character(as.data.frame(
+                    mutation_supporting_1)[1]), "N") < 10) {
+                    if (mut_position_1 > 0) {
+                      mut_position <- mut_position_1
+                    }
+                  } else if (str_count(as.character(as.data.frame(
+                    mutation_supporting_2)[1]), "N") < 10) {
+                    if (mut_position_2 <= length(df_seq)) {
+                      mut_position <- mut_position_2
+                    }
+                  }
+                } else if (mut_position_2 < mut_position_1 &
+                           mut_position_2 < length(df_seq) &
+                           mut_position_2 > (mut_position_1 - 5) &
+                           str_count(as.character(as.data.frame(
                              mutation_supporting_1)[1]), "N") < 10 &
                            str_count(as.character(as.data.frame(
-                             mutation_supporting_1)[1]), "N") < 10){
+                             mutation_supporting_2)[1]), "N") < 10 &
+                           search_status_1 < 4 & search_status_2 < 4) {
+                    indel_flag <- 1
+                    mut_position <- mut_position_2
+                    rep_status <- fun_repeat_check(
+                      df_seq[mut_position_2],
+                      df_seq[mut_position_2:(mut_position_2 + 1)],
+                      ref_seq,
+                      ref_width,
+                      del = 0)
+                    pre_rep_status <- max(pre_rep_status, rep_status[[1]])
+                    post_rep_status <- max(post_rep_status, rep_status[[2]])
+                    pre_rep_short <- max(pre_rep_short, rep_status[[3]])
+                    post_rep_short <- max(post_rep_short, rep_status[[4]])
+                    homopolymer_status <- max(homopolymer_status, rep_status[[3]])
+                } else if (str_count(as.character(as.data.frame(
+                  mutation_supporting_1)[1]), "N") < 10 &
+                  str_count(as.character(as.data.frame(
+                    mutation_supporting_1)[1]), "N") < 10){
                   if (search_status_1 <= search_status_2) {
                     if (mut_position_1 > 0) {
                       mut_position <- mut_position_1
@@ -633,72 +919,26 @@ fun_read_check <- function(df_mutation,
                     mut_position <- mut_position_2
                   }
                 }
-              } else if (mut_position_2 < mut_position_1 &
-                         mut_position_2 < length(df_seq) &
-                         mut_position_2 > (mut_position_1 - 5) &
-                         str_count(as.character(as.data.frame(
-                           mutation_supporting_1)[1]), "N") < 10 &
-                         str_count(as.character(as.data.frame(
-                           mutation_supporting_2)[1]), "N") < 10 &
-                         search_status_1 < 4 & search_status_2 < 4) {
-                  indel_flag <- 1
-                  mut_position <- mut_position_2
-                  rep_status <- fun_repeat_check(
-                    df_seq[mut_position_2],
-                    df_seq[mut_position_2:(mut_position_2 + 1)],
-                    ref_seq,
-                    ref_width,
-                    del = 0)
-                  pre_rep_status <- max(pre_rep_status, rep_status[[1]])
-                  post_rep_status <- max(post_rep_status, rep_status[[2]])
-                  pre_rep_short <- max(pre_rep_short, rep_status[[3]])
-                  post_rep_short <- max(post_rep_short, rep_status[[4]])
-                  homopolymer_status <- max(homopolymer_status, rep_status[[3]])
-              } else if (str_count(as.character(as.data.frame(
-                mutation_supporting_1)[1]), "N") < 10 &
-                str_count(as.character(as.data.frame(
-                  mutation_supporting_1)[1]), "N") < 10){
-                if (search_status_1 <= search_status_2) {
-                  if (mut_position_1 > 0) {
-                    mut_position <- mut_position_1
-                  } else if (mut_position_2 <= length(df_seq)) {
-                    mut_position <- mut_position_2
-                  }
-                } else {
-                  if (mut_position_2 <= length(df_seq)) {
-                    mut_position <- mut_position_2
-                  } else if (mut_position_1 > 0) {
-                    mut_position <- mut_position_1
-                  }
+              } else if (length(mutation_supporting_1) == 1) {
+                if (str_count(as.character(as.data.frame(
+                      mutation_supporting_1)[1]), "N") <= 10 &
+                    start(mutation_supporting_1) > 0) {
+                  mut_position <- min(
+                    length(df_seq),
+                    start(mutation_supporting_1) + pre_search_length_1)
                 }
-              } else if (str_count(as.character(as.data.frame(
-                mutation_supporting_1)[1]), "N") < 10) {
-                if (mut_position_1 > 0) {
-                  mut_position <- mut_position_1
-                }
-              } else if (str_count(as.character(as.data.frame(
-                mutation_supporting_2)[1]), "N") < 10) {
-                if (mut_position_2 <= length(df_seq)) {
-                  mut_position <- mut_position_2
+              } else if (length(mutation_supporting_2) == 1) {
+                if (str_count(as.character(as.data.frame(
+                      mutation_supporting_2)[1]), "N") <= 10 &
+                    end(mutation_supporting_2) <= length(df_seq)) {
+                  mut_position <- min(
+                    length(df_seq),
+                    end(mutation_supporting_2) -
+                      pre_search_length - alt_length + 1)
                 }
               }
-            } else if (length(mutation_supporting_1) == 1) {
-              if (str_count(as.character(as.data.frame(
-                    mutation_supporting_1)[1]), "N") <= 10 &
-                  start(mutation_supporting_1) > 0) {
-                mut_position <- min(
-                  length(df_seq),
-                  start(mutation_supporting_1) + pre_search_length_1)
-              }
-            } else if (length(mutation_supporting_2) == 1) {
-              if (str_count(as.character(as.data.frame(
-                    mutation_supporting_2)[1]), "N") <= 10 &
-                  end(mutation_supporting_2) <= length(df_seq)) {
-                mut_position <- min(
-                  length(df_seq),
-                  end(mutation_supporting_2) -
-                    pre_search_length - alt_length + 1)
-              }
+            } else {
+              mut_position = mut_position_cigar[[j]]
             }
             if (mut_position > 0 & mut_position <= length(df_seq)) {
               total_read <- total_read + 1

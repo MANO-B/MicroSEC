@@ -5,7 +5,9 @@
 # This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.
 # The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.
 # 
-# Four files are nessesary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.
+# Two files are necessary for the analysis: mutation information file, BAM file
+# An additional file is preferable: mutation supporting read ID information file.  
+# A sample information tsv file is mandatory if multiple samples are processed simultaneously.  
 #
 # File 1: mutation information file
 # This excel file should contain at least these contents:
@@ -26,10 +28,10 @@
 #
 # File 4: sample information tsv file  
 # Seven or eight columns are necessary.  
-# [sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]
+# [sample name] [mutation information excel file] [BAM file] [optional: read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]
 # PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
 #
-# Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
+# Reference genome: Human (hg3 or hg19) or Mouse (mm10)
 #
 # This pipeline contains 8 filtering processes.
 #
@@ -61,7 +63,7 @@
 # Example
 # Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/Sample_list_test.txt N
 # Rscript MicroSEC.R /mnt/HDD8TB/MicroSEC /mnt/HDD8TB/MicroSEC/source/TOP_MicroSEC_1_20/sample_info_test.tsv N
-# Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz /mnt/result/mutation/SAMPLE.gz /mnt/result/mutation/SAMPLE.gz /mnt/result/BAM/SAMPLE.bam /mnt/result/ID 150 	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38
+# Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz SAMPLE /mnt/result/mutation/SAMPLE.tsv.gz /mnt/result/BAM/SAMPLE.bam /mnt/result/ID 150 	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38
 #
 # If you want to know the progress visually, [progress bar Y/N] should be Y.
 #
@@ -72,62 +74,69 @@
 library(MicroSEC)
 
 # set arguments
-args = commandArgs(trailingOnly = T)
+args <- commandArgs(trailingOnly = T)
 
 if (args[3] == "N" | args[3] == "Y") {
-  wd = args[1]
-  sample_list = args[2]
-  progress_bar = args[3]
+  wd <- args[1]
+  sample_list <- args[2]
+  progress_bar <- args[3]
   
   setwd(wd)
   
   # load sample information tsv file
-  sample_info = read.csv(sample_list,
+  sample_info <- read.csv(sample_list,
                          header = FALSE,
                          stringsAsFactors = FALSE,
                          sep = "\t")
   
   # initialize
-  msec = NULL
-  homology_search = NULL
-  mut_depth = NULL
+  msec <- NULL
+  homology_search <- NULL
+  mut_depth <- NULL
   
   for (sample in seq_len(dim(sample_info)[1])) {
     sample_name = sample_info[sample, 1]
     mutation_file = sample_info[sample, 2]
     bam_file = sample_info[sample, 3]
-    read_list = sample_info[sample, 4]
-    read_length = as.integer(sample_info[sample, 5])
-    adapter_1 = sample_info[sample, 6]
-    if (sample_info[sample, 7] %in%
-        c("Human", "Mouse", "hg19", "hg38", "mm10")) {
-      adapter_2 = adapter_1
-      organism = sample_info[sample, 7]
-    } else{
-      adapter_2 = sample_info[sample, 7]
-      organism = sample_info[sample, 8]
+    if (is.character(sample_info[sample, 4]) == TRUE) {
+      list_exist <- TRUE
+      read_list <- sample_info[sample, 4]
+      read_length <- as.integer(sample_info[sample, 5])
+      adapter_1 <- sample_info[sample, 6]
+      if (sample_info[sample, 7] %in%
+          c("Human", "Mouse", "hg19", "hg38", "mm10")) {
+        adapter_2 <- adapter_1
+        organism <- sample_info[sample, 7]
+      } else{
+        adapter_2 <- sample_info[sample, 7]
+        organism <- sample_info[sample, 8]
+      }
+    } else {
+      list_exist <- FALSE
+      read_length <- as.integer(sample_info[sample, 4])
+      adapter_1 <- sample_info[sample, 5]
+      if (sample_info[sample, 6] %in%
+          c("Human", "Mouse", "hg19", "hg38", "mm10")) {
+        adapter_2 <- adapter_1
+        organism <- sample_info[sample, 6]
+      } else{
+        adapter_2 <- sample_info[sample, 6]
+        organism <- sample_info[sample, 7]
+      }
+    }
+    # load mutation information
+    fun_load_mutation(mutation_file, sample_name) # df_mutation
+    fun_load_bam(bam_file) # df_bam
+    if (list_exist) {
+      fun_load_id(read_list) # df_mut_call
     }
     
-    # load mutation information
-    df_mutation = fun_load_mutation(mutation_file, sample_name)
-    df_bam = fun_load_bam(bam_file)
-    df_mut_call = fun_load_id(read_list)
-    
     # load genomic sequence
-    ref_genome = fun_load_genome(organism)
-    chr_no = fun_load_chr_no(organism)
+    fun_load_genome(organism) # ref_genome
+    fun_load_chr_no(organism) # chr_no
     
     # analysis
-    result = fun_read_check(df_mutation = df_mutation,
-                            df_bam =  df_bam,
-                            df_mut_call = df_mut_call,
-                            ref_genome = ref_genome,
-                            sample_name = sample_name,
-                            read_length = read_length,
-                            adapter_1 = adapter_1,
-                            adapter_2 = adapter_2,
-                            short_homology_search_length = 4,
-                            progress_bar = progress_bar)
+    result = fun_read_check(short_homology_search_length = 4)
     msec = rbind(msec, result[[1]])
     homology_search = rbind(homology_search, result[[2]])
     mut_depth = rbind(mut_depth, result[[3]])
@@ -135,10 +144,7 @@ if (args[3] == "N" | args[3] == "Y") {
   # search homologous sequences
   msec = fun_homology(msec,
                       homology_search,
-                      min_homology_search = 40,
-                      ref_genome,
-                      chr_no,
-                      progress_bar = progress_bar)
+                      min_homology_search = 40)
   
   # statistical analysis
   msec = fun_summary(msec)
@@ -168,25 +174,16 @@ if (args[3] == "N" | args[3] == "Y") {
   progress_bar = "N"
   
   # load mutation information
-  df_mutation = fun_load_mutation_gz(mutation_file)
-  df_bam = fun_load_bam(bam_file)
-  df_mut_call = fun_load_id(read_list)
+  fun_load_mutation_gz(mutation_file) # df_mutation
+  fun_load_bam(bam_file) # df_bam
+  fun_load_id(read_list) # df_mut_call
   
   # load genomic sequence
-  ref_genome = fun_load_genome(organism)
-  chr_no = fun_load_chr_no(organism)
+  fun_load_genome(organism) # ref_genome
+  fun_load_chr_no(organism) # chr_no
   
   # analysis
-  result = fun_read_check(df_mutation = df_mutation,
-                          df_bam =  df_bam,
-                          df_mut_call = df_mut_call,
-                          ref_genome = ref_genome,
-                          sample_name = sample_name,
-                          read_length = read_length,
-                          adapter_1 = adapter_1,
-                          adapter_2 = adapter_2,
-                          short_homology_search_length = 4,
-                          progress_bar = progress_bar)
+  result = fun_read_check(short_homology_search_length = 4)
   msec = result[[1]]
   homology_search = result[[2]]
   mut_depth = result[[3]]
@@ -194,10 +191,7 @@ if (args[3] == "N" | args[3] == "Y") {
   # search homologous sequences
   msec = fun_homology(msec,
                       homology_search,
-                      min_homology_search = 40,
-                      ref_genome,
-                      chr_no,
-                      progress_bar = progress_bar)
+                      min_homology_search = 40)
   
   # statistical analysis
   msec = fun_summary(msec)
