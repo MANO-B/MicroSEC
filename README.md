@@ -3,6 +3,7 @@
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
 paraffin-embedded (FFPE) samples.  
+(Working on the new version running without mutation read ID list)
 This repository contains all the codes to regenerate results from our 
 paper:  
 "MicroSEC: Sequence error filtering pipeline for formalin-fixed and 
@@ -11,6 +12,8 @@ paraffin-embedded samples"
 ## Supplementary Code
 > M. Ikegami et al., "MicroSEC: Sequence error filtering pipeline for 
 formalin-fixed and paraffin-embedded samples", in preparation.
+DOI: 10.21203/rs.3.rs-153650/v1
+https://www.researchsquare.com/article/rs-153650/v1
 
 ## Contents
 
