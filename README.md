@@ -3,7 +3,6 @@
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
 paraffin-embedded (FFPE) samples.  
-(Working on the new version running without mutation read ID list)  
 This repository contains all the codes to regenerate results from our 
 paper:  
 "MicroSEC: Sequence error filtering pipeline for formalin-fixed and 
@@ -26,7 +25,8 @@ https://www.researchsquare.com/article/rs-153650/v1
 
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
-Four files are necessary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
+Two files are necessary for the analysis: mutation information file, BAM file  
+A mutation supporting read ID information file is desirable but not necessary.  
   
 ### File 1: mutation information file  
 This excel file should contain at least these contents:  
@@ -98,6 +98,8 @@ This pipeline contains 8 filtering processes.
 - Filter 7  : Indel mutations locating at a >=15 homopolymer.  
 - Filter 8  : >=10% low quality bases in the mutation supporting reads.  
 
+Filter 1, 2, 3, and 4 detect possible FFPE artifacts.  
+Filter 5, 6, 7, and 8 detect frequent errors caused by next generation sequencers.  
 Supporting lengths are adjusted considering small repeat sequences around the mutations.  
   
 Results are saved in a excel file.  
