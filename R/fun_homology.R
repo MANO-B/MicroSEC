@@ -86,7 +86,7 @@ fun_homology <- function(msec,
         target <- ref_genome[[seqnames(ref_genome)[[seqname]]]]
         distant_homology <- distant_homology + countPDict(search_seq_f, target)
         distant_homology <- distant_homology + countPDict(search_seq_r, target)
-        rm(ref_genome)
+        ref_genome <- NULL
         gc()
         gc()
         fun_load_genome(organism)
