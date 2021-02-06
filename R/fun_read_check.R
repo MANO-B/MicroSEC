@@ -35,7 +35,6 @@
 #' @importFrom Biostrings end
 #' @importFrom Biostrings nchar
 #' @importFrom BiocGenerics as.data.frame
-#' @importFrom GenomeInfoDb seqlevelsStyle
 #' @examples
 #' \donttest{
 #' fun_read_check(short_homology_search_length = 4)
@@ -86,7 +85,7 @@ fun_read_check <- function(short_homology_search_length) {
   if (!is.character(df_chr)) {
     df_chr <- as.character(df_chr)
   }
-  seqlevelsStyle(df_chr) <- "UCSC"
+  GenomeInfoDb::seqlevelsStyle(df_chr) <- "UCSC"
   
   if (length(df_mutation[, 1]) > 0) {
     # initialize

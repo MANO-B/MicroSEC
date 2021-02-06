@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2021-01-02" />
+<meta name="date" content="2021-02-07" />
 
 <title>MicroSEC: Sequence artifact filtering pipeline for FFPE samples</title>
 
@@ -30,45 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-});
-</script>
-<style type="text/css">
-a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
-a.anchor-section::before {content: '#';}
-.hasAnchor:hover a.anchor-section {visibility: visible;}
-</style>
-<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
-document.addEventListener('DOMContentLoaded', function() {
-  // Do nothing if AnchorJS is used
-  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
-    return;
-  }
-
-  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
-  // Do nothing if sections are already anchored
-  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
-    return null;
-  }
-
-  // Use section id when pandoc runs with --section-divs
-  const section_id = function(x) {
-    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
-            ? x.id : '');
-  };
-
-  // Add anchors
-  h.forEach(function(x) {
-    const id = x.id || section_id(x.parentElement);
-    if (id === '') {
-      return null;
-    }
-    let anchor = document.createElement('a');
-    anchor.href = '#' + id;
-    anchor.classList = ['anchor-section'];
-    x.classList.add('hasAnchor');
-    x.appendChild(anchor);
-  });
 });
 </script>
 
@@ -170,6 +131,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -367,7 +329,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">MicroSEC: Sequence artifact filtering pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2021-01-02</h4>
+<h4 class="date">2021-02-07</h4>
 
 
 
@@ -387,8 +349,8 @@ SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or no
 Neighborhood_sequence: [5’-20 bases] + [Alt sequence] + [3’-20 bases].<br />
 Transition: 1-snv mutation pattern with a 3’-base. C&gt;T_t represents CT to TT mutation. C&gt;T_g_FFPE represents the possible FFPE artifact.<br />
 Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.<br />
-Gene, HGVS.c, HGVS.p, Total_QV&gt;=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.</p>
-<p>File 2: BAM file</p>
+Gene, HGVS.c, HGVS.p, Total_QV&gt;=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.<br />
+If you do not know the Neighborhood_sequence, enter “-”. File 2: BAM file</p>
 <p>File 3: mutation supporting read ID information file<br />
 This file should contain at least these contents:</p>
 <p>Chr Pos Ref Alt<br />
@@ -397,7 +359,7 @@ chr1 2561609 T A</p>
 <p>_;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f .;A;N#</p>
 <p>File 4: sample information tsv file<br />
 Seven or eight columns are necessary.<br />
-[sample name] [mutation information excel file] [BAM file] [read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]<br />
+[sample name] [mutation information excel file] [BAM file] [optional: read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]<br />
 PC9 ./source/CCLE.xlsx ./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam ./source/PC9_Cell_line 127 AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38</p>
 <p>This pipeline contains 8 filtering processes.</p>
 <p>Filter 1 : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).<br />
@@ -421,7 +383,7 @@ The explatation of the results is written in detail in the second sheet of the e
 </div>
 <div id="setting" class="section level2">
 <h2>Setting</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>wd =<span class="st"> &quot;.&quot;</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>wd &lt;-<span class="st"> &quot;.&quot;</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">collapse =</span> <span class="ot">TRUE</span>,</span>
 <span id="cb4-3"><a href="#cb4-3"></a>                      <span class="dt">fig.width =</span> <span class="dv">12</span>,</span>
 <span id="cb4-4"><a href="#cb4-4"></a>                      <span class="dt">fig.height =</span> <span class="dv">8</span>,</span>
@@ -433,7 +395,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb4-10"><a href="#cb4-10"></a>        <span class="dt">show.error.messages =</span> <span class="ot">FALSE</span>,</span>
 <span id="cb4-11"><a href="#cb4-11"></a>        <span class="dt">warn =</span> <span class="dv">-1</span>)</span>
 <span id="cb4-12"><a href="#cb4-12"></a></span>
-<span id="cb4-13"><a href="#cb4-13"></a>progress_bar =<span class="st"> &quot;N&quot;</span></span></code></pre></div>
+<span id="cb4-13"><a href="#cb4-13"></a>progress_bar &lt;-<span class="st"> &quot;N&quot;</span></span></code></pre></div>
 </div>
 <div id="necessary-packages" class="section level2">
 <h2>Necessary packages</h2>
@@ -442,64 +404,244 @@ The explatation of the results is written in detail in the second sheet of the e
 <div id="analysis" class="section level2">
 <h2>Analysis</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># initialize</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>msec =<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a>homology_search =<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>mut_depth =<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co"># test data</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>sample_name =<span class="st"> &quot;H15-11943-1-T_TDv3&quot;</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a>read_length =<span class="st"> </span><span class="dv">151</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a>adapter_<span class="dv">1</span> =<span class="st"> &quot;AGATCGGAAGAGCACACGTCTGAACTCCAGTCA&quot;</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a>adapter_<span class="dv">2</span> =<span class="st"> &quot;AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT&quot;</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a>organism =<span class="st"> &quot;hg38&quot;</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="co"># load mutation information</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="kw">data</span>(exampleMutation)</span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="kw">data</span>(exampleBAM)</span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="kw">data</span>(exampleMutCall)</span>
-<span id="cb6-17"><a href="#cb6-17"></a></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co"># load genomic sequence</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a>ref_genome =<span class="st"> </span><span class="kw">fun_load_genome</span>(organism)</span>
-<span id="cb6-20"><a href="#cb6-20"></a>chr_no =<span class="st"> </span><span class="kw">fun_load_chr_no</span>(organism)</span>
-<span id="cb6-21"><a href="#cb6-21"></a></span>
-<span id="cb6-22"><a href="#cb6-22"></a><span class="co"># analysis</span></span>
-<span id="cb6-23"><a href="#cb6-23"></a>result =<span class="st"> </span><span class="kw">fun_read_check</span>(<span class="dt">df_mutation =</span> exampleMutation,</span>
-<span id="cb6-24"><a href="#cb6-24"></a>                        <span class="dt">df_bam =</span> exampleBAM,</span>
-<span id="cb6-25"><a href="#cb6-25"></a>                        <span class="dt">df_mut_call =</span> exampleMutCall,</span>
-<span id="cb6-26"><a href="#cb6-26"></a>                        <span class="dt">ref_genome =</span> ref_genome,</span>
-<span id="cb6-27"><a href="#cb6-27"></a>                        <span class="dt">sample_name =</span> sample_name,</span>
-<span id="cb6-28"><a href="#cb6-28"></a>                        <span class="dt">read_length =</span> read_length,</span>
-<span id="cb6-29"><a href="#cb6-29"></a>                        <span class="dt">adapter_1 =</span> adapter_<span class="dv">1</span>,</span>
-<span id="cb6-30"><a href="#cb6-30"></a>                        <span class="dt">adapter_2 =</span> adapter_<span class="dv">2</span>,</span>
-<span id="cb6-31"><a href="#cb6-31"></a>                        <span class="dt">short_homology_search_length =</span> <span class="dv">4</span>,</span>
-<span id="cb6-32"><a href="#cb6-32"></a>                        <span class="dt">progress_bar =</span> progress_bar)</span>
-<span id="cb6-33"><a href="#cb6-33"></a>msec =<span class="st"> </span><span class="kw">rbind</span>(msec, result[[<span class="dv">1</span>]])</span>
-<span id="cb6-34"><a href="#cb6-34"></a>homology_search =<span class="st"> </span><span class="kw">rbind</span>(homology_search, result[[<span class="dv">2</span>]])</span>
-<span id="cb6-35"><a href="#cb6-35"></a>mut_depth =<span class="st"> </span><span class="kw">rbind</span>(mut_depth, result[[<span class="dv">3</span>]])</span>
-<span id="cb6-36"><a href="#cb6-36"></a></span>
-<span id="cb6-37"><a href="#cb6-37"></a><span class="co"># search homologous sequences</span></span>
-<span id="cb6-38"><a href="#cb6-38"></a>msec =<span class="st"> </span><span class="kw">fun_homology</span>(msec,</span>
-<span id="cb6-39"><a href="#cb6-39"></a>                    homology_search,</span>
-<span id="cb6-40"><a href="#cb6-40"></a>                    <span class="dt">min_homology_search =</span> <span class="dv">40</span>,</span>
-<span id="cb6-41"><a href="#cb6-41"></a>                    ref_genome,</span>
-<span id="cb6-42"><a href="#cb6-42"></a>                    chr_no,</span>
-<span id="cb6-43"><a href="#cb6-43"></a>                    <span class="dt">progress_bar =</span> progress_bar)</span>
-<span id="cb6-44"><a href="#cb6-44"></a></span>
-<span id="cb6-45"><a href="#cb6-45"></a><span class="co"># statistical analysis</span></span>
-<span id="cb6-46"><a href="#cb6-46"></a>msec =<span class="st"> </span><span class="kw">fun_summary</span>(msec)</span>
-<span id="cb6-47"><a href="#cb6-47"></a>msec =<span class="st"> </span><span class="kw">fun_analysis</span>(msec,</span>
-<span id="cb6-48"><a href="#cb6-48"></a>                    mut_depth,</span>
-<span id="cb6-49"><a href="#cb6-49"></a>                    <span class="dt">short_homology_search_length =</span> <span class="dv">4</span>,</span>
-<span id="cb6-50"><a href="#cb6-50"></a>                    <span class="dt">min_homology_search =</span> <span class="dv">40</span>,</span>
-<span id="cb6-51"><a href="#cb6-51"></a>                    <span class="dt">threshold_p =</span> <span class="dv">10</span> <span class="op">^</span><span class="st"> </span>(<span class="op">-</span><span class="dv">6</span>),</span>
-<span id="cb6-52"><a href="#cb6-52"></a>                    <span class="dt">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
-<span id="cb6-53"><a href="#cb6-53"></a>                    <span class="dt">threshold_short_length =</span> <span class="fl">0.75</span>,</span>
-<span id="cb6-54"><a href="#cb6-54"></a>                    <span class="dt">threshold_distant_homology =</span> <span class="fl">0.15</span>,</span>
-<span id="cb6-55"><a href="#cb6-55"></a>                    <span class="dt">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
-<span id="cb6-56"><a href="#cb6-56"></a>                    <span class="dt">homopolymer_length =</span> <span class="dv">15</span>)</span>
-<span id="cb6-57"><a href="#cb6-57"></a></span>
-<span id="cb6-58"><a href="#cb6-58"></a><span class="co"># save the results in the working/output directory.</span></span>
-<span id="cb6-59"><a href="#cb6-59"></a><span class="co"># fun_save(msec, sample_name, wd)</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2"></a>msec &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>homology_search &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>mut_depth &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>list_exist &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co"># test data</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>sample_name &lt;-<span class="st"> &quot;H15-11943-1-T_TDv3&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>read_length &lt;-<span class="st"> </span><span class="dv">151</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>adapter_<span class="dv">1</span> &lt;-<span class="st"> &quot;AGATCGGAAGAGCACACGTCTGAACTCCAGTCA&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>adapter_<span class="dv">2</span> &lt;-<span class="st"> &quot;AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>organism &lt;-<span class="st"> &quot;hg38&quot;</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co"># load mutation information</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="kw">data</span>(exampleMutation)</span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="kw">data</span>(exampleBAM)</span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="kw">data</span>(exampleMutCall)</span>
+<span id="cb6-18"><a href="#cb6-18"></a></span>
+<span id="cb6-19"><a href="#cb6-19"></a>df_mutation &lt;-<span class="st"> </span>exampleMutation</span>
+<span id="cb6-20"><a href="#cb6-20"></a>df_bam &lt;-<span class="st"> </span>exampleBAM</span>
+<span id="cb6-21"><a href="#cb6-21"></a>df_mut_call &lt;-<span class="st"> </span>exampleMutCall</span>
+<span id="cb6-22"><a href="#cb6-22"></a></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co"># load genomic sequence</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="kw">fun_load_genome</span>(organism)</span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="kw">fun_load_chr_no</span>(organism)</span>
+<span id="cb6-26"><a href="#cb6-26"></a></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="co"># analysis</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a>result &lt;-<span class="st"> </span><span class="kw">fun_read_check</span>(<span class="dt">short_homology_search_length =</span> <span class="dv">4</span>)</span>
+<span id="cb6-29"><a href="#cb6-29"></a>msec &lt;-<span class="st"> </span><span class="kw">rbind</span>(msec, result[[<span class="dv">1</span>]])</span>
+<span id="cb6-30"><a href="#cb6-30"></a>homology_search &lt;-<span class="st"> </span><span class="kw">rbind</span>(homology_search, result[[<span class="dv">2</span>]])</span>
+<span id="cb6-31"><a href="#cb6-31"></a>mut_depth &lt;-<span class="st"> </span><span class="kw">rbind</span>(mut_depth, result[[<span class="dv">3</span>]])</span>
+<span id="cb6-32"><a href="#cb6-32"></a></span>
+<span id="cb6-33"><a href="#cb6-33"></a><span class="co"># search homologous sequences</span></span>
+<span id="cb6-34"><a href="#cb6-34"></a>msec &lt;-<span class="st"> </span><span class="kw">fun_homology</span>(msec,</span>
+<span id="cb6-35"><a href="#cb6-35"></a>                    homology_search,</span>
+<span id="cb6-36"><a href="#cb6-36"></a>                    <span class="dt">min_homology_search =</span> <span class="dv">40</span>)</span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt; </span></span>
+<span id="cb6-38"><a href="#cb6-38"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-39"><a href="#cb6-39"></a><span class="st">  </span><span class="er">|</span><span class="st">                    </span><span class="er">|</span><span class="st">   </span><span class="dv">0</span>%</span>
+<span id="cb6-40"><a href="#cb6-40"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-41"><a href="#cb6-41"></a><span class="st">  </span><span class="er">|=</span><span class="st">                   </span><span class="er">|</span><span class="st">   </span><span class="dv">4</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-42"><a href="#cb6-42"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-43"><a href="#cb6-43"></a><span class="st">  </span><span class="er">|==</span><span class="st">                  </span><span class="er">|</span><span class="st">   </span><span class="dv">8</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">2</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-44"><a href="#cb6-44"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-45"><a href="#cb6-45"></a><span class="st">  </span><span class="er">|==</span><span class="st">                  </span><span class="er">|</span><span class="st">  </span><span class="dv">12</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">3</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-46"><a href="#cb6-46"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-47"><a href="#cb6-47"></a><span class="st">  </span><span class="er">|===</span><span class="st">                 </span><span class="er">|</span><span class="st">  </span><span class="dv">17</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">4</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-48"><a href="#cb6-48"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-49"><a href="#cb6-49"></a><span class="st">  </span><span class="er">|====</span><span class="st">                </span><span class="er">|</span><span class="st">  </span><span class="dv">21</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">5</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-50"><a href="#cb6-50"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-51"><a href="#cb6-51"></a><span class="st">  </span><span class="er">|=====</span><span class="st">               </span><span class="er">|</span><span class="st">  </span><span class="dv">25</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">6</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-52"><a href="#cb6-52"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-53"><a href="#cb6-53"></a><span class="st">  </span><span class="er">|======</span><span class="st">              </span><span class="er">|</span><span class="st">  </span><span class="dv">29</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">7</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-54"><a href="#cb6-54"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-55"><a href="#cb6-55"></a><span class="st">  </span><span class="er">|=======</span><span class="st">             </span><span class="er">|</span><span class="st">  </span><span class="dv">33</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">8</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-56"><a href="#cb6-56"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-57"><a href="#cb6-57"></a><span class="st">  </span><span class="er">|========</span><span class="st">            </span><span class="er">|</span><span class="st">  </span><span class="dv">38</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">9</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-58"><a href="#cb6-58"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-59"><a href="#cb6-59"></a><span class="st">  </span><span class="er">|========</span><span class="st">            </span><span class="er">|</span><span class="st">  </span><span class="dv">42</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">10</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-60"><a href="#cb6-60"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-61"><a href="#cb6-61"></a><span class="st">  </span><span class="er">|=========</span><span class="st">           </span><span class="er">|</span><span class="st">  </span><span class="dv">46</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">11</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-62"><a href="#cb6-62"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-63"><a href="#cb6-63"></a><span class="st">  </span><span class="er">|==========</span><span class="st">          </span><span class="er">|</span><span class="st">  </span><span class="dv">50</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">12</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-64"><a href="#cb6-64"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-65"><a href="#cb6-65"></a><span class="st">  </span><span class="er">|===========</span><span class="st">         </span><span class="er">|</span><span class="st">  </span><span class="dv">54</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">13</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-66"><a href="#cb6-66"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-67"><a href="#cb6-67"></a><span class="st">  </span><span class="er">|============</span><span class="st">        </span><span class="er">|</span><span class="st">  </span><span class="dv">58</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">14</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-68"><a href="#cb6-68"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-69"><a href="#cb6-69"></a><span class="st">  </span><span class="er">|============</span><span class="st">        </span><span class="er">|</span><span class="st">  </span><span class="dv">62</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">15</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-70"><a href="#cb6-70"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-71"><a href="#cb6-71"></a><span class="st">  </span><span class="er">|=============</span><span class="st">       </span><span class="er">|</span><span class="st">  </span><span class="dv">67</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">16</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-72"><a href="#cb6-72"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-73"><a href="#cb6-73"></a><span class="st">  </span><span class="er">|==============</span><span class="st">      </span><span class="er">|</span><span class="st">  </span><span class="dv">71</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">17</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-74"><a href="#cb6-74"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-75"><a href="#cb6-75"></a><span class="st">  </span><span class="er">|===============</span><span class="st">     </span><span class="er">|</span><span class="st">  </span><span class="dv">75</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">18</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-76"><a href="#cb6-76"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-77"><a href="#cb6-77"></a><span class="st">  </span><span class="er">|================</span><span class="st">    </span><span class="er">|</span><span class="st">  </span><span class="dv">79</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">19</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-78"><a href="#cb6-78"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-79"><a href="#cb6-79"></a><span class="st">  </span><span class="er">|=================</span><span class="st">   </span><span class="er">|</span><span class="st">  </span><span class="dv">83</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">20</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-80"><a href="#cb6-80"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-81"><a href="#cb6-81"></a><span class="st">  </span><span class="er">|==================</span><span class="st">  </span><span class="er">|</span><span class="st">  </span><span class="dv">88</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">21</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-82"><a href="#cb6-82"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-83"><a href="#cb6-83"></a><span class="st">  </span><span class="er">|==================</span><span class="st">  </span><span class="er">|</span><span class="st">  </span><span class="dv">92</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">22</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-84"><a href="#cb6-84"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-85"><a href="#cb6-85"></a><span class="st">  </span><span class="er">|===================</span><span class="st"> </span><span class="er">|</span><span class="st">  </span><span class="dv">96</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">23</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-86"><a href="#cb6-86"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-87"><a href="#cb6-87"></a><span class="st">  </span><span class="er">|====================|</span><span class="st"> </span><span class="dv">100</span>% Chromosome screening<span class="op">:</span><span class="st"> </span><span class="dv">24</span> <span class="op">/</span><span class="st"> </span><span class="dv">24</span>   </span>
+<span id="cb6-88"><a href="#cb6-88"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-89"><a href="#cb6-89"></a><span class="st">  </span><span class="er">|</span><span class="st">                    </span><span class="er">|</span><span class="st">   </span><span class="dv">0</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-90"><a href="#cb6-90"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-91"><a href="#cb6-91"></a><span class="st">  </span><span class="er">|</span><span class="st">                    </span><span class="er">|</span><span class="st">   </span><span class="dv">1</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">4</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-92"><a href="#cb6-92"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-93"><a href="#cb6-93"></a><span class="st">  </span><span class="er">|</span><span class="st">                    </span><span class="er">|</span><span class="st">   </span><span class="dv">2</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">7</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-94"><a href="#cb6-94"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-95"><a href="#cb6-95"></a><span class="st">  </span><span class="er">|=</span><span class="st">                   </span><span class="er">|</span><span class="st">   </span><span class="dv">3</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">10</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-96"><a href="#cb6-96"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-97"><a href="#cb6-97"></a><span class="st">  </span><span class="er">|=</span><span class="st">                   </span><span class="er">|</span><span class="st">   </span><span class="dv">4</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">13</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-98"><a href="#cb6-98"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-99"><a href="#cb6-99"></a><span class="st">  </span><span class="er">|=</span><span class="st">                   </span><span class="er">|</span><span class="st">   </span><span class="dv">5</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">16</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-100"><a href="#cb6-100"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-101"><a href="#cb6-101"></a><span class="st">  </span><span class="er">|=</span><span class="st">                   </span><span class="er">|</span><span class="st">   </span><span class="dv">6</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">19</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">22</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-102"><a href="#cb6-102"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-103"><a href="#cb6-103"></a><span class="st">  </span><span class="er">|=</span><span class="st">                   </span><span class="er">|</span><span class="st">   </span><span class="dv">7</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">25</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-104"><a href="#cb6-104"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-105"><a href="#cb6-105"></a><span class="st">  </span><span class="er">|==</span><span class="st">                  </span><span class="er">|</span><span class="st">   </span><span class="dv">8</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">28</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-106"><a href="#cb6-106"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-107"><a href="#cb6-107"></a><span class="st">  </span><span class="er">|==</span><span class="st">                  </span><span class="er">|</span><span class="st">   </span><span class="dv">9</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">31</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-108"><a href="#cb6-108"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-109"><a href="#cb6-109"></a><span class="st">  </span><span class="er">|==</span><span class="st">                  </span><span class="er">|</span><span class="st">  </span><span class="dv">10</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">34</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-110"><a href="#cb6-110"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-111"><a href="#cb6-111"></a><span class="st">  </span><span class="er">|==</span><span class="st">                  </span><span class="er">|</span><span class="st">  </span><span class="dv">11</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">37</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-112"><a href="#cb6-112"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-113"><a href="#cb6-113"></a><span class="st">  </span><span class="er">|==</span><span class="st">                  </span><span class="er">|</span><span class="st">  </span><span class="dv">12</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">40</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-114"><a href="#cb6-114"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-115"><a href="#cb6-115"></a><span class="st">  </span><span class="er">|===</span><span class="st">                 </span><span class="er">|</span><span class="st">  </span><span class="dv">13</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">43</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">46</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-116"><a href="#cb6-116"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-117"><a href="#cb6-117"></a><span class="st">  </span><span class="er">|===</span><span class="st">                 </span><span class="er">|</span><span class="st">  </span><span class="dv">14</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">49</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-118"><a href="#cb6-118"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-119"><a href="#cb6-119"></a><span class="st">  </span><span class="er">|===</span><span class="st">                 </span><span class="er">|</span><span class="st">  </span><span class="dv">15</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">52</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-120"><a href="#cb6-120"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-121"><a href="#cb6-121"></a><span class="st">  </span><span class="er">|===</span><span class="st">                 </span><span class="er">|</span><span class="st">  </span><span class="dv">16</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">55</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-122"><a href="#cb6-122"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-123"><a href="#cb6-123"></a><span class="st">  </span><span class="er">|===</span><span class="st">                 </span><span class="er">|</span><span class="st">  </span><span class="dv">17</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">58</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-124"><a href="#cb6-124"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-125"><a href="#cb6-125"></a><span class="st">  </span><span class="er">|====</span><span class="st">                </span><span class="er">|</span><span class="st">  </span><span class="dv">18</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">61</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-126"><a href="#cb6-126"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-127"><a href="#cb6-127"></a><span class="st">  </span><span class="er">|====</span><span class="st">                </span><span class="er">|</span><span class="st">  </span><span class="dv">19</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">64</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-128"><a href="#cb6-128"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-129"><a href="#cb6-129"></a><span class="st">  </span><span class="er">|====</span><span class="st">                </span><span class="er">|</span><span class="st">  </span><span class="dv">20</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">67</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">70</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-130"><a href="#cb6-130"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-131"><a href="#cb6-131"></a><span class="st">  </span><span class="er">|====</span><span class="st">                </span><span class="er">|</span><span class="st">  </span><span class="dv">21</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">73</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-132"><a href="#cb6-132"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-133"><a href="#cb6-133"></a><span class="st">  </span><span class="er">|====</span><span class="st">                </span><span class="er">|</span><span class="st">  </span><span class="dv">22</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">76</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-134"><a href="#cb6-134"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-135"><a href="#cb6-135"></a><span class="st">  </span><span class="er">|=====</span><span class="st">               </span><span class="er">|</span><span class="st">  </span><span class="dv">23</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">79</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-136"><a href="#cb6-136"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-137"><a href="#cb6-137"></a><span class="st">  </span><span class="er">|=====</span><span class="st">               </span><span class="er">|</span><span class="st">  </span><span class="dv">24</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">82</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-138"><a href="#cb6-138"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-139"><a href="#cb6-139"></a><span class="st">  </span><span class="er">|=====</span><span class="st">               </span><span class="er">|</span><span class="st">  </span><span class="dv">25</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">85</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-140"><a href="#cb6-140"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-141"><a href="#cb6-141"></a><span class="st">  </span><span class="er">|=====</span><span class="st">               </span><span class="er">|</span><span class="st">  </span><span class="dv">26</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">88</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-142"><a href="#cb6-142"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-143"><a href="#cb6-143"></a><span class="st">  </span><span class="er">|=====</span><span class="st">               </span><span class="er">|</span><span class="st">  </span><span class="dv">27</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">91</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">94</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-144"><a href="#cb6-144"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-145"><a href="#cb6-145"></a><span class="st">  </span><span class="er">|======</span><span class="st">              </span><span class="er">|</span><span class="st">  </span><span class="dv">28</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">97</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-146"><a href="#cb6-146"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-147"><a href="#cb6-147"></a><span class="st">  </span><span class="er">|======</span><span class="st">              </span><span class="er">|</span><span class="st">  </span><span class="dv">29</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">100</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-148"><a href="#cb6-148"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-149"><a href="#cb6-149"></a><span class="st">  </span><span class="er">|======</span><span class="st">              </span><span class="er">|</span><span class="st">  </span><span class="dv">30</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">103</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-150"><a href="#cb6-150"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-151"><a href="#cb6-151"></a><span class="st">  </span><span class="er">|======</span><span class="st">              </span><span class="er">|</span><span class="st">  </span><span class="dv">31</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">106</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-152"><a href="#cb6-152"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-153"><a href="#cb6-153"></a><span class="st">  </span><span class="er">|======</span><span class="st">              </span><span class="er">|</span><span class="st">  </span><span class="dv">32</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">109</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-154"><a href="#cb6-154"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-155"><a href="#cb6-155"></a><span class="st">  </span><span class="er">|=======</span><span class="st">             </span><span class="er">|</span><span class="st">  </span><span class="dv">33</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">112</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-156"><a href="#cb6-156"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-157"><a href="#cb6-157"></a><span class="st">  </span><span class="er">|=======</span><span class="st">             </span><span class="er">|</span><span class="st">  </span><span class="dv">34</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">115</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-158"><a href="#cb6-158"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-159"><a href="#cb6-159"></a><span class="st">  </span><span class="er">|=======</span><span class="st">             </span><span class="er">|</span><span class="st">  </span><span class="dv">35</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">118</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">121</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-160"><a href="#cb6-160"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-161"><a href="#cb6-161"></a><span class="st">  </span><span class="er">|=======</span><span class="st">             </span><span class="er">|</span><span class="st">  </span><span class="dv">36</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">124</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-162"><a href="#cb6-162"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-163"><a href="#cb6-163"></a><span class="st">  </span><span class="er">|=======</span><span class="st">             </span><span class="er">|</span><span class="st">  </span><span class="dv">37</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">127</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-164"><a href="#cb6-164"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-165"><a href="#cb6-165"></a><span class="st">  </span><span class="er">|========</span><span class="st">            </span><span class="er">|</span><span class="st">  </span><span class="dv">38</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">130</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-166"><a href="#cb6-166"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-167"><a href="#cb6-167"></a><span class="st">  </span><span class="er">|========</span><span class="st">            </span><span class="er">|</span><span class="st">  </span><span class="dv">39</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">133</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-168"><a href="#cb6-168"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-169"><a href="#cb6-169"></a><span class="st">  </span><span class="er">|========</span><span class="st">            </span><span class="er">|</span><span class="st">  </span><span class="dv">40</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">136</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-170"><a href="#cb6-170"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-171"><a href="#cb6-171"></a><span class="st">  </span><span class="er">|========</span><span class="st">            </span><span class="er">|</span><span class="st">  </span><span class="dv">41</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">139</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-172"><a href="#cb6-172"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-173"><a href="#cb6-173"></a><span class="st">  </span><span class="er">|========</span><span class="st">            </span><span class="er">|</span><span class="st">  </span><span class="dv">42</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">142</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">145</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-174"><a href="#cb6-174"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-175"><a href="#cb6-175"></a><span class="st">  </span><span class="er">|=========</span><span class="st">           </span><span class="er">|</span><span class="st">  </span><span class="dv">43</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">148</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-176"><a href="#cb6-176"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-177"><a href="#cb6-177"></a><span class="st">  </span><span class="er">|=========</span><span class="st">           </span><span class="er">|</span><span class="st">  </span><span class="dv">44</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">151</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-178"><a href="#cb6-178"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-179"><a href="#cb6-179"></a><span class="st">  </span><span class="er">|=========</span><span class="st">           </span><span class="er">|</span><span class="st">  </span><span class="dv">45</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">154</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-180"><a href="#cb6-180"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-181"><a href="#cb6-181"></a><span class="st">  </span><span class="er">|=========</span><span class="st">           </span><span class="er">|</span><span class="st">  </span><span class="dv">46</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">157</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-182"><a href="#cb6-182"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-183"><a href="#cb6-183"></a><span class="st">  </span><span class="er">|=========</span><span class="st">           </span><span class="er">|</span><span class="st">  </span><span class="dv">47</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">160</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-184"><a href="#cb6-184"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-185"><a href="#cb6-185"></a><span class="st">  </span><span class="er">|==========</span><span class="st">          </span><span class="er">|</span><span class="st">  </span><span class="dv">48</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">163</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-186"><a href="#cb6-186"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-187"><a href="#cb6-187"></a><span class="st">  </span><span class="er">|==========</span><span class="st">          </span><span class="er">|</span><span class="st">  </span><span class="dv">49</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">166</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">169</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-188"><a href="#cb6-188"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-189"><a href="#cb6-189"></a><span class="st">  </span><span class="er">|==========</span><span class="st">          </span><span class="er">|</span><span class="st">  </span><span class="dv">50</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">172</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-190"><a href="#cb6-190"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-191"><a href="#cb6-191"></a><span class="st">  </span><span class="er">|==========</span><span class="st">          </span><span class="er">|</span><span class="st">  </span><span class="dv">51</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">175</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-192"><a href="#cb6-192"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-193"><a href="#cb6-193"></a><span class="st">  </span><span class="er">|==========</span><span class="st">          </span><span class="er">|</span><span class="st">  </span><span class="dv">52</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">178</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-194"><a href="#cb6-194"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-195"><a href="#cb6-195"></a><span class="st">  </span><span class="er">|===========</span><span class="st">         </span><span class="er">|</span><span class="st">  </span><span class="dv">53</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">181</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-196"><a href="#cb6-196"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-197"><a href="#cb6-197"></a><span class="st">  </span><span class="er">|===========</span><span class="st">         </span><span class="er">|</span><span class="st">  </span><span class="dv">54</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">184</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-198"><a href="#cb6-198"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-199"><a href="#cb6-199"></a><span class="st">  </span><span class="er">|===========</span><span class="st">         </span><span class="er">|</span><span class="st">  </span><span class="dv">55</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">187</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-200"><a href="#cb6-200"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-201"><a href="#cb6-201"></a><span class="st">  </span><span class="er">|===========</span><span class="st">         </span><span class="er">|</span><span class="st">  </span><span class="dv">56</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">190</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">193</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-202"><a href="#cb6-202"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-203"><a href="#cb6-203"></a><span class="st">  </span><span class="er">|===========</span><span class="st">         </span><span class="er">|</span><span class="st">  </span><span class="dv">57</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">196</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-204"><a href="#cb6-204"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-205"><a href="#cb6-205"></a><span class="st">  </span><span class="er">|============</span><span class="st">        </span><span class="er">|</span><span class="st">  </span><span class="dv">58</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">199</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-206"><a href="#cb6-206"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-207"><a href="#cb6-207"></a><span class="st">  </span><span class="er">|============</span><span class="st">        </span><span class="er">|</span><span class="st">  </span><span class="dv">59</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">202</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-208"><a href="#cb6-208"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-209"><a href="#cb6-209"></a><span class="st">  </span><span class="er">|============</span><span class="st">        </span><span class="er">|</span><span class="st">  </span><span class="dv">60</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">205</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-210"><a href="#cb6-210"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-211"><a href="#cb6-211"></a><span class="st">  </span><span class="er">|============</span><span class="st">        </span><span class="er">|</span><span class="st">  </span><span class="dv">61</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">208</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-212"><a href="#cb6-212"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-213"><a href="#cb6-213"></a><span class="st">  </span><span class="er">|============</span><span class="st">        </span><span class="er">|</span><span class="st">  </span><span class="dv">62</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">211</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-214"><a href="#cb6-214"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-215"><a href="#cb6-215"></a><span class="st">  </span><span class="er">|=============</span><span class="st">       </span><span class="er">|</span><span class="st">  </span><span class="dv">63</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">214</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>        Homology count<span class="op">:</span><span class="st"> </span><span class="dv">217</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-216"><a href="#cb6-216"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-217"><a href="#cb6-217"></a><span class="st">  </span><span class="er">|=============</span><span class="st">       </span><span class="er">|</span><span class="st">  </span><span class="dv">64</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">220</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-218"><a href="#cb6-218"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-219"><a href="#cb6-219"></a><span class="st">  </span><span class="er">|=============</span><span class="st">       </span><span class="er">|</span><span class="st">  </span><span class="dv">65</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">223</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-220"><a href="#cb6-220"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-221"><a href="#cb6-221"></a><span class="st">  </span><span class="er">|=============</span><span class="st">       </span><span class="er">|</span><span class="st">  </span><span class="dv">66</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">226</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span>       </span>
+<span id="cb6-222"><a href="#cb6-222"></a>  <span class="op">|</span><span class="st">                          </span></span>
+<span id="cb6-223"><a href="#cb6-223"></a><span class="st">  </span><span class="er">|=============</span><span class="st">       </span><span class="er">|</span><span class="st">  </span><span class="dv">67</span>% Homology count<span class="op">:</span><span class="st"> </span><span class="dv">229</span> <span class="op">/</span><span class="st"> </span><span class="dv">230</span></span>
+<span id="cb6-224"><a href="#cb6-224"></a></span>
+<span id="cb6-225"><a href="#cb6-225"></a><span class="co"># statistical analysis</span></span>
+<span id="cb6-226"><a href="#cb6-226"></a>msec &lt;-<span class="st"> </span><span class="kw">fun_summary</span>(msec)</span>
+<span id="cb6-227"><a href="#cb6-227"></a>msec &lt;-<span class="st"> </span><span class="kw">fun_analysis</span>(msec,</span>
+<span id="cb6-228"><a href="#cb6-228"></a>                    mut_depth,</span>
+<span id="cb6-229"><a href="#cb6-229"></a>                    <span class="dt">short_homology_search_length =</span> <span class="dv">4</span>,</span>
+<span id="cb6-230"><a href="#cb6-230"></a>                    <span class="dt">min_homology_search =</span> <span class="dv">40</span>,</span>
+<span id="cb6-231"><a href="#cb6-231"></a>                    <span class="dt">threshold_p =</span> <span class="dv">10</span> <span class="op">^</span><span class="st"> </span>(<span class="op">-</span><span class="dv">6</span>),</span>
+<span id="cb6-232"><a href="#cb6-232"></a>                    <span class="dt">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
+<span id="cb6-233"><a href="#cb6-233"></a>                    <span class="dt">threshold_short_length =</span> <span class="fl">0.75</span>,</span>
+<span id="cb6-234"><a href="#cb6-234"></a>                    <span class="dt">threshold_distant_homology =</span> <span class="fl">0.15</span>,</span>
+<span id="cb6-235"><a href="#cb6-235"></a>                    <span class="dt">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-236"><a href="#cb6-236"></a>                    <span class="dt">homopolymer_length =</span> <span class="dv">15</span>)</span>
+<span id="cb6-237"><a href="#cb6-237"></a></span>
+<span id="cb6-238"><a href="#cb6-238"></a><span class="co"># save the results in the working/output directory.</span></span>
+<span id="cb6-239"><a href="#cb6-239"></a><span class="co"># fun_save(msec, sample_name, wd)</span></span></code></pre></div>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
@@ -636,7 +778,7 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; </span></span>
 <span id="cb8-21"><a href="#cb8-21"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.1.17</span></span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt; [1] MicroSEC_1.1.18</span></span>
 <span id="cb8-23"><a href="#cb8-23"></a><span class="co">#&gt; </span></span>
 <span id="cb8-24"><a href="#cb8-24"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span id="cb8-25"><a href="#cb8-25"></a><span class="co">#&gt;  [1] Biobase_2.46.0                    pkgload_1.1.0                    </span></span>
@@ -645,43 +787,43 @@ The explatation of the results is written in detail in the second sheet of the e
 <span id="cb8-28"><a href="#cb8-28"></a><span class="co">#&gt;  [7] stats4_3.6.3                      BSgenome_1.54.0                  </span></span>
 <span id="cb8-29"><a href="#cb8-29"></a><span class="co">#&gt;  [9] GenomeInfoDbData_1.2.2            Rsamtools_2.2.3                  </span></span>
 <span id="cb8-30"><a href="#cb8-30"></a><span class="co">#&gt; [11] yaml_2.2.1                        remotes_2.2.0                    </span></span>
-<span id="cb8-31"><a href="#cb8-31"></a><span class="co">#&gt; [13] sessioninfo_1.1.1                 pillar_1.4.6                     </span></span>
-<span id="cb8-32"><a href="#cb8-32"></a><span class="co">#&gt; [15] backports_1.1.10                  lattice_0.20-41                  </span></span>
-<span id="cb8-33"><a href="#cb8-33"></a><span class="co">#&gt; [17] glue_1.4.2                        digest_0.6.27                    </span></span>
-<span id="cb8-34"><a href="#cb8-34"></a><span class="co">#&gt; [19] GenomicRanges_1.38.0              XVector_0.26.0                   </span></span>
-<span id="cb8-35"><a href="#cb8-35"></a><span class="co">#&gt; [21] htmltools_0.5.0                   Matrix_1.2-18                    </span></span>
-<span id="cb8-36"><a href="#cb8-36"></a><span class="co">#&gt; [23] R.oo_1.24.0                       XML_4.0-0                        </span></span>
-<span id="cb8-37"><a href="#cb8-37"></a><span class="co">#&gt; [25] pkgconfig_2.0.3                   devtools_2.3.2                   </span></span>
-<span id="cb8-38"><a href="#cb8-38"></a><span class="co">#&gt; [27] zlibbioc_1.32.0                   purrr_0.3.4                      </span></span>
-<span id="cb8-39"><a href="#cb8-39"></a><span class="co">#&gt; [29] processx_3.4.4                    openxlsx_4.2.3                   </span></span>
-<span id="cb8-40"><a href="#cb8-40"></a><span class="co">#&gt; [31] BiocParallel_1.20.1               tibble_3.0.4                     </span></span>
-<span id="cb8-41"><a href="#cb8-41"></a><span class="co">#&gt; [33] generics_0.0.2                    IRanges_2.20.2                   </span></span>
-<span id="cb8-42"><a href="#cb8-42"></a><span class="co">#&gt; [35] usethis_1.6.3                     ellipsis_0.3.1                   </span></span>
-<span id="cb8-43"><a href="#cb8-43"></a><span class="co">#&gt; [37] withr_2.3.0                       SummarizedExperiment_1.16.1      </span></span>
-<span id="cb8-44"><a href="#cb8-44"></a><span class="co">#&gt; [39] BiocGenerics_0.32.0               cli_2.1.0                        </span></span>
-<span id="cb8-45"><a href="#cb8-45"></a><span class="co">#&gt; [41] magrittr_1.5                      crayon_1.3.4                     </span></span>
-<span id="cb8-46"><a href="#cb8-46"></a><span class="co">#&gt; [43] memoise_1.1.0                     evaluate_0.14                    </span></span>
-<span id="cb8-47"><a href="#cb8-47"></a><span class="co">#&gt; [45] ps_1.4.0                          R.methodsS3_1.8.1                </span></span>
-<span id="cb8-48"><a href="#cb8-48"></a><span class="co">#&gt; [47] fs_1.5.0                          fansi_0.4.1                      </span></span>
-<span id="cb8-49"><a href="#cb8-49"></a><span class="co">#&gt; [49] xml2_1.3.2                        pkgbuild_1.1.0                   </span></span>
-<span id="cb8-50"><a href="#cb8-50"></a><span class="co">#&gt; [51] tools_3.6.3                       data.table_1.13.2                </span></span>
-<span id="cb8-51"><a href="#cb8-51"></a><span class="co">#&gt; [53] prettyunits_1.1.1                 lifecycle_0.2.0                  </span></span>
-<span id="cb8-52"><a href="#cb8-52"></a><span class="co">#&gt; [55] matrixStats_0.57.0                stringr_1.4.0                    </span></span>
-<span id="cb8-53"><a href="#cb8-53"></a><span class="co">#&gt; [57] S4Vectors_0.24.4                  zip_2.1.1                        </span></span>
-<span id="cb8-54"><a href="#cb8-54"></a><span class="co">#&gt; [59] DelayedArray_0.12.3               callr_3.5.1                      </span></span>
-<span id="cb8-55"><a href="#cb8-55"></a><span class="co">#&gt; [61] Biostrings_2.54.0                 compiler_3.6.3                   </span></span>
-<span id="cb8-56"><a href="#cb8-56"></a><span class="co">#&gt; [63] GenomeInfoDb_1.22.1               rlang_0.4.8                      </span></span>
-<span id="cb8-57"><a href="#cb8-57"></a><span class="co">#&gt; [65] grid_3.6.3                        RCurl_1.98-1.2                   </span></span>
-<span id="cb8-58"><a href="#cb8-58"></a><span class="co">#&gt; [67] rstudioapi_0.11                   bitops_1.0-6                     </span></span>
-<span id="cb8-59"><a href="#cb8-59"></a><span class="co">#&gt; [69] rmarkdown_2.5                     testthat_2.3.2                   </span></span>
-<span id="cb8-60"><a href="#cb8-60"></a><span class="co">#&gt; [71] roxygen2_7.1.1                    R6_2.4.1                         </span></span>
-<span id="cb8-61"><a href="#cb8-61"></a><span class="co">#&gt; [73] GenomicAlignments_1.22.1          rtracklayer_1.46.0               </span></span>
-<span id="cb8-62"><a href="#cb8-62"></a><span class="co">#&gt; [75] knitr_1.30                        dplyr_1.0.2                      </span></span>
-<span id="cb8-63"><a href="#cb8-63"></a><span class="co">#&gt; [77] commonmark_1.7                    rprojroot_1.3-2                  </span></span>
-<span id="cb8-64"><a href="#cb8-64"></a><span class="co">#&gt; [79] desc_1.2.0                        stringi_1.5.3                    </span></span>
-<span id="cb8-65"><a href="#cb8-65"></a><span class="co">#&gt; [81] parallel_3.6.3                    Rcpp_1.0.5                       </span></span>
-<span id="cb8-66"><a href="#cb8-66"></a><span class="co">#&gt; [83] vctrs_0.3.4                       BSgenome.Hsapiens.UCSC.hg38_1.4.1</span></span>
-<span id="cb8-67"><a href="#cb8-67"></a><span class="co">#&gt; [85] tidyselect_1.1.0                  xfun_0.18</span></span></code></pre></div>
+<span id="cb8-31"><a href="#cb8-31"></a><span class="co">#&gt; [13] sessioninfo_1.1.1                 pillar_1.4.7                     </span></span>
+<span id="cb8-32"><a href="#cb8-32"></a><span class="co">#&gt; [15] lattice_0.20-41                   glue_1.4.2                       </span></span>
+<span id="cb8-33"><a href="#cb8-33"></a><span class="co">#&gt; [17] digest_0.6.27                     GenomicRanges_1.38.0             </span></span>
+<span id="cb8-34"><a href="#cb8-34"></a><span class="co">#&gt; [19] XVector_0.26.0                    htmltools_0.5.0                  </span></span>
+<span id="cb8-35"><a href="#cb8-35"></a><span class="co">#&gt; [21] Matrix_1.3-2                      R.oo_1.24.0                      </span></span>
+<span id="cb8-36"><a href="#cb8-36"></a><span class="co">#&gt; [23] XML_4.0-0                         pkgconfig_2.0.3                  </span></span>
+<span id="cb8-37"><a href="#cb8-37"></a><span class="co">#&gt; [25] devtools_2.3.2                    zlibbioc_1.32.0                  </span></span>
+<span id="cb8-38"><a href="#cb8-38"></a><span class="co">#&gt; [27] purrr_0.3.4                       processx_3.4.5                   </span></span>
+<span id="cb8-39"><a href="#cb8-39"></a><span class="co">#&gt; [29] openxlsx_4.2.3                    BiocParallel_1.20.1              </span></span>
+<span id="cb8-40"><a href="#cb8-40"></a><span class="co">#&gt; [31] tibble_3.0.4                      generics_0.1.0                   </span></span>
+<span id="cb8-41"><a href="#cb8-41"></a><span class="co">#&gt; [33] IRanges_2.20.2                    usethis_2.0.0                    </span></span>
+<span id="cb8-42"><a href="#cb8-42"></a><span class="co">#&gt; [35] ellipsis_0.3.1                    withr_2.3.0                      </span></span>
+<span id="cb8-43"><a href="#cb8-43"></a><span class="co">#&gt; [37] SummarizedExperiment_1.16.1       BiocGenerics_0.32.0              </span></span>
+<span id="cb8-44"><a href="#cb8-44"></a><span class="co">#&gt; [39] cli_2.2.0                         magrittr_2.0.1                   </span></span>
+<span id="cb8-45"><a href="#cb8-45"></a><span class="co">#&gt; [41] crayon_1.3.4                      memoise_1.1.0                    </span></span>
+<span id="cb8-46"><a href="#cb8-46"></a><span class="co">#&gt; [43] evaluate_0.14                     ps_1.5.0                         </span></span>
+<span id="cb8-47"><a href="#cb8-47"></a><span class="co">#&gt; [45] R.methodsS3_1.8.1                 fs_1.5.0                         </span></span>
+<span id="cb8-48"><a href="#cb8-48"></a><span class="co">#&gt; [47] fansi_0.4.1                       xml2_1.3.2                       </span></span>
+<span id="cb8-49"><a href="#cb8-49"></a><span class="co">#&gt; [49] pkgbuild_1.2.0                    tools_3.6.3                      </span></span>
+<span id="cb8-50"><a href="#cb8-50"></a><span class="co">#&gt; [51] data.table_1.13.6                 prettyunits_1.1.1                </span></span>
+<span id="cb8-51"><a href="#cb8-51"></a><span class="co">#&gt; [53] lifecycle_0.2.0                   matrixStats_0.57.0               </span></span>
+<span id="cb8-52"><a href="#cb8-52"></a><span class="co">#&gt; [55] stringr_1.4.0                     S4Vectors_0.24.4                 </span></span>
+<span id="cb8-53"><a href="#cb8-53"></a><span class="co">#&gt; [57] zip_2.1.1                         DelayedArray_0.12.3              </span></span>
+<span id="cb8-54"><a href="#cb8-54"></a><span class="co">#&gt; [59] callr_3.5.1                       Biostrings_2.54.0                </span></span>
+<span id="cb8-55"><a href="#cb8-55"></a><span class="co">#&gt; [61] compiler_3.6.3                    GenomeInfoDb_1.22.1              </span></span>
+<span id="cb8-56"><a href="#cb8-56"></a><span class="co">#&gt; [63] rlang_0.4.10                      grid_3.6.3                       </span></span>
+<span id="cb8-57"><a href="#cb8-57"></a><span class="co">#&gt; [65] RCurl_1.98-1.2                    rstudioapi_0.13                  </span></span>
+<span id="cb8-58"><a href="#cb8-58"></a><span class="co">#&gt; [67] bitops_1.0-6                      rmarkdown_2.6                    </span></span>
+<span id="cb8-59"><a href="#cb8-59"></a><span class="co">#&gt; [69] testthat_3.0.1                    roxygen2_7.1.1                   </span></span>
+<span id="cb8-60"><a href="#cb8-60"></a><span class="co">#&gt; [71] R6_2.5.0                          GenomicAlignments_1.22.1         </span></span>
+<span id="cb8-61"><a href="#cb8-61"></a><span class="co">#&gt; [73] rtracklayer_1.46.0                knitr_1.30                       </span></span>
+<span id="cb8-62"><a href="#cb8-62"></a><span class="co">#&gt; [75] dplyr_1.0.2                       commonmark_1.7                   </span></span>
+<span id="cb8-63"><a href="#cb8-63"></a><span class="co">#&gt; [77] rprojroot_2.0.2                   desc_1.2.0                       </span></span>
+<span id="cb8-64"><a href="#cb8-64"></a><span class="co">#&gt; [79] stringi_1.5.3                     parallel_3.6.3                   </span></span>
+<span id="cb8-65"><a href="#cb8-65"></a><span class="co">#&gt; [81] Rcpp_1.0.5                        vctrs_0.3.6                      </span></span>
+<span id="cb8-66"><a href="#cb8-66"></a><span class="co">#&gt; [83] tidyselect_1.1.0                  xfun_0.20                        </span></span>
+<span id="cb8-67"><a href="#cb8-67"></a><span class="co">#&gt; [85] BSgenome.Hsapiens.UCSC.hg38_1.4.1</span></span></code></pre></div>
 </div>
 
 
