@@ -39,7 +39,7 @@ mutation. C>T_g_FFPE represents the possible FFPE artifact.
 Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
 Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can 
 be set to any values.  
-  
+If you do not know the Neighborhood_sequence, enter "-".
 File 2: BAM file  
   
 File 3: mutation supporting read ID information file  
@@ -54,8 +54,9 @@ _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f  .;A;N#
 File 4: sample information tsv file  
 Seven or eight columns are necessary.  
 [sample name] [mutation information excel file] [BAM file] 
-[read ID information directory] [read length] [adapter sequence read 1] 
-[optional: adapter sequence read 2] [sample type: Human or Mouse]  
+[optional: read ID information directory] [read length] 
+[adapter sequence read 1] [optional: adapter sequence read 2] 
+[sample type: Human or Mouse]  
 PC9	./source/CCLE.xlsx ./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam 
 ./source/PC9_Cell_line 127 
 AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38  
@@ -77,14 +78,13 @@ Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).
 Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% 
 of the read length.  
 Filter 3-3: <10% of bases are low quality (Quality score <18).  
-Filter 4  : >=90% mutation-supporting reads are soft-clipped (after cutting 
-adapter sequence).  
-Filter 5  : >=20% mutations were called by chimeric reads comprising two 
+Filter 4  : >=15% mutations were called by chimeric reads comprising two 
 distant regions.  
-Filter 6  : Mutations locating at simple repeat sequences.  
-Filter 7  : C>T_g positive artifacts in FFPE samples.  
-Filter 8  : Indel mutations locating at a >=15 homopolymer.  
-  
+Filter 5  : Mutations locating at simple repeat sequences.  
+Filter 6  : C>T_g positive artifacts in FFPE samples.  
+Filter 7  : Indel mutations locating at a >=15 homopolymer.  
+Filter 8  : >=10% low quality bases in the mutation supporting reads.  
+
 Supporting lengths are adjusted considering small repeat sequences around the 
 mutations.  
   
@@ -96,7 +96,7 @@ github url: https://github.com/MANO-B/MicroSEC
   
 ## Setting
 ```{r}
-wd = "."
+wd <- "."
 knitr::opts_chunk$set(collapse = TRUE,
                       fig.width = 12,
                       fig.height = 8,
@@ -104,9 +104,11 @@ knitr::opts_chunk$set(collapse = TRUE,
                       warning = FALSE,
                       message = TRUE,
                       comment = "#>")
-options(rmarkdown.html_vignette.check_title = FALSE, show.error.messages = FALSE, warn = -1)
+options(rmarkdown.html_vignette.check_title = FALSE,
+        show.error.messages = FALSE,
+        warn = -1)
 
-progress_bar = "N"
+progress_bar <- "N"
 ```
 
 ## Necessary packages
@@ -117,60 +119,52 @@ library(MicroSEC)
 ## Analysis
 ```{r}
 # initialize
-msec = NULL
-homology_search = NULL
-mut_depth = NULL
+msec <- NULL
+homology_search <- NULL
+mut_depth <- NULL
+list_exist <- TRUE
 
 # test data
-sample_name = "H15-11943-1-T_TDv3"
-read_length = 151
-adapter_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
-adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
-organism = "hg38"
+sample_name <- "H15-11943-1-T_TDv3"
+read_length <- 151
+adapter_1 <- "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+adapter_2 <- "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
+organism <- "hg38"
 
 # load mutation information
 data(exampleMutation)
 data(exampleBAM)
 data(exampleMutCall)
 
+df_mutation <- exampleMutation
+df_bam <- exampleBAM
+df_mut_call <- exampleMutCall
+
 # load genomic sequence
-ref_genome = fun_load_genome(organism)
-chr_no = fun_load_chr_no(organism)
+fun_load_genome(organism)
+fun_load_chr_no(organism)
 
 # analysis
-result = fun_read_check(df_mutation = exampleMutation,
-                        df_bam = exampleBAM,
-                        df_mut_call = exampleMutCall,
-                        ref_genome = ref_genome,
-                        sample_name = sample_name,
-                        read_length = read_length,
-                        adapter_1 = adapter_1,
-                        adapter_2 = adapter_2,
-                        short_homology_search_length = 4,
-                        progress_bar = progress_bar)
-msec = rbind(msec, result[[1]])
-homology_search = rbind(homology_search, result[[2]])
-mut_depth = rbind(mut_depth, result[[3]])
+result <- fun_read_check(short_homology_search_length = 4)
+msec <- rbind(msec, result[[1]])
+homology_search <- rbind(homology_search, result[[2]])
+mut_depth <- rbind(mut_depth, result[[3]])
 
 # search homologous sequences
-msec = fun_homology(msec,
+msec <- fun_homology(msec,
                     homology_search,
-                    min_homology_search = 40,
-                    ref_genome,
-                    chr_no,
-                    progress_bar = progress_bar)
+                    min_homology_search = 40)
 
 # statistical analysis
-msec = fun_summary(msec)
-msec = fun_analysis(msec,
+msec <- fun_summary(msec)
+msec <- fun_analysis(msec,
                     mut_depth,
                     short_homology_search_length = 4,
                     min_homology_search = 40,
                     threshold_p = 10 ^ (-6),
                     threshold_hairpin_ratio = 0.50,
-                    threshold_soft_clip_ratio = 0.90,
-                    threshold_short_length = 0.8,
-                    threshold_distant_homology = 0.2,
+                    threshold_short_length = 0.75,
+                    threshold_distant_homology = 0.15,
                     threshold_low_quality_rate = 0.1,
                     homopolymer_length = 15)
 

@@ -61,7 +61,7 @@ fun_convert <- function(mutation_file,
   # load somatic mutation list
   df_mutation <- read.xlsx(mutation_file, sheet = 1)
   # load genomic sequence
-  ref_genome <- fun_load_genome(organism)
+  fun_load_genome(organism)
   # genome sequence extraction functions
   fun_genome <- function(x, y) {
     r <- NULL
@@ -81,22 +81,28 @@ fun_convert <- function(mutation_file,
   df_mutation <- df_mutation %>% mutate(
     Gene = Hugo_Symbol,
     HGVS.p = Protein_Change,
-    Pos = Start_Position,
-    Start = Start_Position,
-    End = End_Position,
+    Pos = Start_position,
+    Start = Start_position,
+    End = End_position,
     Mut_type = Variant_Type,
     Ref = Reference,
     Alt = Tumor_Seq)
   df_mutation <- df_mutation %>% dplyr::mutate(
     Mut_type = tolower(Mut_type))
+  df_mutation$Chr <- as.character(df_mutation$Chr)
+  df_mutation$Pos <- as.integer(df_mutation$Pos)
+  df_mutation$Start <- as.integer(df_mutation$Start)
+  df_mutation$End <- as.integer(df_mutation$End)
   df_mutation <- df_mutation %>% dplyr::mutate(
-    PRE_del = fun_genome(Chr, as.integer(Start) - 1),
-    PRE_ins = fun_genome(Chr, as.integer(Start)),
-    POST_ins = fun_genome(Chr, as.integer(End)),
+    PRE_del = fun_genome(Chr, Start - 1),
+    PRE_ins = fun_genome(Chr, Start),
+    POST_ins = fun_genome(Chr, End),
     Alt_length_1 = nchar(Ref),
     Alt_length_2 = nchar(Alt))
   df_mutation <- df_mutation %>% dplyr::mutate(
     Mut_type = ifelse(Mut_type == "snp", "snv", Mut_type))
+  df_mutation <- df_mutation %>% dplyr::mutate(
+    Mut_type = ifelse(Mut_type == "dnp", "snv", Mut_type))
   df_mutation <- df_mutation %>% dplyr::mutate(
     Alt_length = (((Alt_length_1 - Alt_length_2) +
                    abs(Alt_length_1 - Alt_length_2)) / 2) +
@@ -111,10 +117,10 @@ fun_convert <- function(mutation_file,
     Alt_indel = paste(Alt_ins, Alt_del, Alt_snv, sep = ""),
     Ref_indel = paste(Ref_ins, Ref_del, Ref_snv, sep = ""))
   df_mutation <- df_mutation %>% dplyr::mutate(
-    Neighbor_start_1 = as.integer(Start) - 20,
-    Neighbor_end_1 = as.integer(Start) - 1,
-    Neighbor_start_2 = as.integer(End) + 1,
-    Neighbor_end_2 = as.integer(End) + 20)
+    Neighbor_start_1 = Start - 20,
+    Neighbor_end_1 = Start - 1,
+    Neighbor_start_2 = End + 1,
+    Neighbor_end_2 = End + 20)
   df_mutation <- df_mutation %>% dplyr::mutate(
     Pre_Neighbor = fun_genome_2(Chr, Neighbor_start_1, Neighbor_end_1),
     Post_Neighbor = fun_genome_2(Chr, Neighbor_start_2, Neighbor_end_2))

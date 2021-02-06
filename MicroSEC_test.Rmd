@@ -76,6 +76,10 @@ for (sample in 1:dim(sample_info)[1]) {
       organism <- sample_info[sample, 7]
     }
   }
+  # load genomic sequence
+  fun_load_genome(organism) # ref_genome
+  fun_load_chr_no(organism) # chr_no
+  
   # load mutation information
   fun_load_mutation(mutation_file, sample_name) # df_mutation
   fun_load_bam(bam_file) # df_bam
@@ -83,23 +87,19 @@ for (sample in 1:dim(sample_info)[1]) {
     fun_load_id(read_list) # df_mut_call
   }
 
-  # load genomic sequence
-  fun_load_genome(organism) # ref_genome
-  fun_load_chr_no(organism) # chr_no
-  
   # analysis
-  result = fun_read_check(short_homology_search_length = 4)
-  msec = rbind(msec, result[[1]])
-  homology_search = rbind(homology_search, result[[2]])
-  mut_depth = rbind(mut_depth, result[[3]])
+  result <- fun_read_check(short_homology_search_length = 4)
+  msec <- rbind(msec, result[[1]])
+  homology_search <- rbind(homology_search, result[[2]])
+  mut_depth <- rbind(mut_depth, result[[3]])
 }
 # search homologous sequences
-msec = fun_homology(msec,
+msec <- fun_homology(msec,
                     homology_search,
                     min_homology_search = 40)
 # statistical analysis
-msec = fun_summary(msec)
-msec_ = fun_analysis(msec,
+msec <- fun_summary(msec)
+msec_ <- fun_analysis(msec,
                     mut_depth,
                     short_homology_search_length = 4,
                     min_homology_search = 40,

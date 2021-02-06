@@ -18,6 +18,7 @@
 # Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases]
 # Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
 # Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
+# If you do not know the Neighborhood_sequence, enter "-".
 #
 # File 2: BAM file
 #
@@ -124,16 +125,16 @@ if (args[3] == "N" | args[3] == "Y") {
         organism <- sample_info[sample, 7]
       }
     }
+    # load genomic sequence
+    fun_load_genome(organism) # ref_genome
+    fun_load_chr_no(organism) # chr_no
+    
     # load mutation information
     fun_load_mutation(mutation_file, sample_name) # df_mutation
     fun_load_bam(bam_file) # df_bam
     if (list_exist) {
       fun_load_id(read_list) # df_mut_call
     }
-    
-    # load genomic sequence
-    fun_load_genome(organism) # ref_genome
-    fun_load_chr_no(organism) # chr_no
     
     # analysis
     result = fun_read_check(short_homology_search_length = 4)
@@ -172,16 +173,17 @@ if (args[3] == "N" | args[3] == "Y") {
   adapter_2 = args[8]
   organism = args[9]
   progress_bar = "N"
-  
-  # load mutation information
-  fun_load_mutation_gz(mutation_file) # df_mutation
-  fun_load_bam(bam_file) # df_bam
-  fun_load_id(read_list) # df_mut_call
+  list_exist <- TRUE
   
   # load genomic sequence
   fun_load_genome(organism) # ref_genome
   fun_load_chr_no(organism) # chr_no
-  
+
+  # load mutation information
+  fun_load_mutation_gz(mutation_file) # df_mutation
+  fun_load_bam(bam_file) # df_bam
+  fun_load_id(read_list) # df_mut_call
+
   # analysis
   result = fun_read_check(short_homology_search_length = 4)
   msec = result[[1]]

@@ -3,7 +3,7 @@
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
 paraffin-embedded (FFPE) samples.  
-(Working on the new version running without mutation read ID list)
+(Working on the new version running without mutation read ID list)  
 This repository contains all the codes to regenerate results from our 
 paper:  
 "MicroSEC: Sequence error filtering pipeline for formalin-fixed and 
@@ -47,7 +47,7 @@ SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 10813
     - Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
     - Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
     - Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
-  
+    - If you do not know the Neighborhood_sequence, enter "-".
 ### File 2: BAM file  
 This file should contain at least these contents:  
 - QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, and QUAL  
@@ -218,72 +218,75 @@ Rscript MicroSEC.R /mnt/result/post_filter/SAMPLE.gz SAMPLE_NAME /mnt/result/mut
 library(MicroSEC)
 
 options(show.error.messages = FALSE, warn = -1)
-wd = "/mnt/HDD8TB/MicroSEC" # set your working/output directory
-sample_list = "/mnt/HDD8TB/MicroSEC/source/Sample_list.txt"
-progress_bar = "Y"
+wd <- "mnt/HDD8TB/MicroSEC" # set your working/output directory
+sample_list <- "mnt/HDD8TB/MicroSEC/source/Sample_list.txt"
+progress_bar <- "Y"
   
 # load sample information tsv file
-sample_info = read.csv(sample_list,
+sample_info <- read.csv(sample_list,
                        header = FALSE,
                        stringsAsFactors = FALSE,
                        sep = "\t")
 
 # initialize
-msec = NULL
-homology_search = NULL
-mut_depth = NULL
+msec <- NULL
+homology_search <- NULL
+mut_depth <- NULL
 
 for (sample in seq_len(dim(sample_info)[1])) {
   sample_name = sample_info[sample, 1]
   mutation_file = sample_info[sample, 2]
   bam_file = sample_info[sample, 3]
-  read_list = sample_info[sample, 4]
-  read_length = as.integer(sample_info[sample, 5])
-  adapter_1 = sample_info[sample, 6]
-  if (sample_info[sample, 7] %in%
-      c("Human", "Mouse", "hg19", "hg38", "mm10")) {
-    adapter_2 = adapter_1
-    organism = sample_info[sample, 7]
-  } else{
-    adapter_2 = sample_info[sample, 7]
-    organism = sample_info[sample, 8]
+  if (is.character(sample_info[sample, 4]) == TRUE) {
+    list_exist <- TRUE
+    read_list <- sample_info[sample, 4]
+    read_length <- as.integer(sample_info[sample, 5])
+    adapter_1 <- sample_info[sample, 6]
+    if (sample_info[sample, 7] %in%
+        c("Human", "Mouse", "hg19", "hg38", "mm10")) {
+      adapter_2 <- adapter_1
+      organism <- sample_info[sample, 7]
+    } else{
+      adapter_2 <- sample_info[sample, 7]
+      organism <- sample_info[sample, 8]
+    }
+  } else {
+    list_exist <- FALSE
+    read_length <- as.integer(sample_info[sample, 4])
+    adapter_1 <- sample_info[sample, 5]
+    if (sample_info[sample, 6] %in%
+        c("Human", "Mouse", "hg19", "hg38", "mm10")) {
+      adapter_2 <- adapter_1
+      organism <- sample_info[sample, 6]
+    } else{
+      adapter_2 <- sample_info[sample, 6]
+      organism <- sample_info[sample, 7]
+    }
   }
 
-  # load mutation information
-  df_mutation = fun_load_mutation(mutation_file, sample_name)
-  df_bam = fun_load_bam(bam_file)
-  df_mut_call = fun_load_id(read_list)
-
   # load genomic sequence
-  ref_genome = fun_load_genome(organism)
-  chr_no = fun_load_chr_no(organism)
+  fun_load_genome(organism)
+  fun_load_chr_no(organism)
+
+  # load mutation information
+  fun_load_mutation(mutation_file, sample_name)
+  fun_load_bam(bam_file)
+  fun_load_id(read_list)
 
   # analysis
-  result = fun_read_check(df_mutation = df_mutation,
-                          df_bam =  df_bam,
-                          df_mut_call = df_mut_call,
-                          ref_genome = ref_genome,
-                          sample_name = sample_name,
-                          read_length = read_length,
-                          adapter_1 = adapter_1,
-                          adapter_2 = adapter_2,
-                          short_homology_search_length = 4,
-                          progress_bar = progress_bar)
-  msec = rbind(msec, result[[1]])
-  homology_search = rbind(homology_search, result[[2]])
-  mut_depth = rbind(mut_depth, result[[3]])
+  result <- fun_read_check(short_homology_search_length = 4)
+  msec <- rbind(msec, result[[1]])
+  homology_search <- rbind(homology_search, result[[2]])
+  mut_depth <- rbind(mut_depth, result[[3]])
 }
 # search homologous sequences
-msec = fun_homology(msec,
+msec <- fun_homology(msec,
                     homology_search,
-                    min_homology_search = 40,
-                    ref_genome,
-                    chr_no,
-                    progress_bar = progress_bar)
+                    min_homology_search = 40)
 
 # statistical analysis
-msec = fun_summary(msec)
-msec = fun_analysis(msec,
+msec <- fun_summary(msec)
+msec <- fun_analysis(msec,
                     mut_depth,
                     short_homology_search_length = 4,
                     min_homology_search = 40,
@@ -325,16 +328,16 @@ A conversion function is prepared.
 # Set column names correctly.
 #
 # Before (hg19)
-# Sample Hugo_Symbol    Chr   Start_Position   End_Position Variant_Type Reference Tumor_Seq Protein_Change
-# LS411N BRAF           7     140453136        140453136    SNP          A         T         p.V600E
-# LS411N CELSR1         22    46931227         46931227     DEL          C         -         p.G615fs
-# LS411N APC            5     112175951        112175952    INS          -         A         p.E1554fs
+# Sample Hugo_Symbol    Chr   Start_position   End_position Variant_Type Reference Tumor_Seq Protein_Change
+# LS411N BRAF           chr7     140453136        140453136    SNP          A         T         p.V600E
+# LS411N CELSR1         chr22    46931227         46931227     DEL          C         -         p.G615fs
+# LS411N APC            chr5     112175951        112175952    INS          -         A         p.E1554fs
 #
 # After
 # Sample Gene     Chr   Pos          Mut_type  Ref   Alt HGVS.p       Neighborhood_sequence
-# LS411N BRAF     7     140453136    1-snv     A     T   p.V600E      ACCCACTCCATCGAGATTTCTCTGTAGCTAGACCAAAATCA
-# LS411N CELSR1   22    46931226     1-del     GC    G   p.G615fs     TCTTAGGCCCAGCGCTGCCGCCCCCAGAAAGGTGGAGGCC
-# LS411N APC      5     112175951    1-ins     G     GA  p.E1554fs    AAAACCAAGAGAAAGAGGCAGAAAAAAACTATTGATTCTGAA    
+# LS411N BRAF     chr7     140453136    1-snv     A     T   p.V600E      ACCCACTCCATCGAGATTTCTCTGTAGCTAGACCAAAATCA
+# LS411N CELSR1   chr22    46931226     1-del     GC    G   p.G615fs     TCTTAGGCCCAGCGCTGCCGCCCCCAGAAAGGTGGAGGCC
+# LS411N APC      chr5     112175951    1-ins     G     GA  p.E1554fs    AAAACCAAGAGAAAGAGGCAGAAAAAAACTATTGATTCTGAA    
 
 library(openxlsx)
 library(MicroSEC)
@@ -345,6 +348,101 @@ df_mutation = fun_convert(
 )
 
 write.xlsx(df_mutation, "/mnt/HDD8TB/MicroSEC/mutation_modified.xlsx")
+```
+
+### Try to apply MicroSEC to CCLE WES data
+CCLE (Cancer Cell Line Encyclopedia) supplies whole exome sequencing 
+data and somatic mutation call lists of lots of cell lines.  
+This is an open source dataset.  
+Although these data are obtained from not FFPE samples but fresh samples, 
+some possible MICR-originating sequence artifacts are detected.
+
+- Download 24 BAM file from the NCBI SRA website.
+  Choose "Output this run in BAM format to File".  
+  The files will be downloaded as SRR8618961_1.bam - SRR8618961_Y.bam.  
+  https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR8618961  
+- Merge all BAM files with samtools
+```
+a="SRR8618961"
+samtools merge -@ 4 ${a}_all.bam ${a}_1.bam ${a}_2.bam ${a}_3.bam ${a}_4.bam ${a}_5.bam ${a}_6.bam ${a}_7.bam ${a}_8.bam ${a}_9.bam ${a}_10.bam ${a}_11.bam ${a}_12.bam ${a}_13.bam ${a}_14.bam ${a}_15.bam ${a}_16.bam ${a}_17.bam ${a}_18.bam ${a}_19.bam ${a}_20.bam ${a}_21.bam ${a}_22.bam ${a}_X.bam ${a}_Y.bam
+samtools sort -@ 4 ${a}_all.bam > ${a}_sort.bam
+samtools rmdup ${a}_sort.bam ${a}.bam 
+samtools index -@ 4 ${a}.bam
+```
+
+- Download a mutation call list from CCLE website.
+  "CCLE_DepMap_18q3_maf_20180718.txt"  
+  https://portals.broadinstitute.org/ccle  
+- Convert the mutation list with fun_convert function.
+```
+library(openxlsx)
+library(MicroSEC)
+
+df_CCLE <- utils::read.csv("CCLE_DepMap_18q3_maf_20180718.txt",
+                          header = TRUE,
+                          stringsAsFactors = FALSE,
+                          sep = "\t")
+df_CCLE <- df_CCLE %>% dplyr::filter(Tumor_Sample_Barcode == "NCIH2286_LUNG")
+df_CCLE$Sample <- df_CCLE$Tumor_Sample_Barcode
+df_CCLE$Chr <- df_CCLE$Chromosome
+df_CCLE$Reference <- df_CCLE$Reference_Allele
+df_CCLE$Tumor_Seq <- df_CCLE$Tumor_Seq_Allele1
+seqlevelsStyle(df_CCLE$Chr) <- "UCSC"
+df_CCLE <- df_CCLE %>% dplyr::filter(Chr != "M")
+write.xlsx(df_CCLE, "/mnt/HDD8TB/MicroSEC/source/NCIH2286_LUNG_Mutations.xlsx")
+
+df_mutation <- fun_convert(
+  "NCIH2286_LUNG_Mutations.xlsx",
+  "hg19"
+)
+
+write.xlsx(df_mutation, "/mnt/HDD8TB/MicroSEC/source/NCIH2286_LUNG_modified.xlsx")
+```
+- Perform MicroSEC filtering
+```
+msec <- NULL
+homology_search <- NULL
+mut_depth <- NULL
+
+sample_name <- "NCIH2286_LUNG"
+mutation_file <- "/mnt/HDD8TB/MicroSEC/source/NCIH2286_LUNG_modified.xlsx"
+bam_file <- "SRR8618961.bam"
+list_exist <- FALSE
+read_length <- 76
+adapter_1 <- "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+adapter_2 <- "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
+organism <- "hg19"
+
+# load genomic sequence
+fun_load_genome(organism) # ref_genome
+fun_load_chr_no(organism) # chr_no
+
+fun_load_mutation(mutation_file, sample_name) # df_mutation
+fun_load_bam(bam_file) # df_bam
+
+result <- fun_read_check(short_homology_search_length = 4)
+msec <- rbind(msec, result[[1]])
+homology_search <- rbind(homology_search, result[[2]])
+mut_depth <- rbind(mut_depth, result[[3]])
+msec <- fun_homology(msec,
+                    homology_search,
+                    min_homology_search = 40)
+
+# statistical analysis
+msec <- fun_summary(msec)
+msec <- fun_analysis(msec,
+                    mut_depth,
+                    short_homology_search_length = 4,
+                    min_homology_search = 40,
+                    threshold_p = 10 ^ (-6),
+                    threshold_hairpin_ratio = 0.50,
+                    threshold_short_length = 0.75,
+                    threshold_distant_homology = 0.15,
+                    threshold_low_quality_rate = 0.1,
+                    homopolymer_length = 15)
+# save the results
+fun_save(msec, "NCIH2286_LUNG", ".")
+
 ```
 
 ### Reproducibility

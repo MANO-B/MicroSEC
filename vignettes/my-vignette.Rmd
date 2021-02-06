@@ -39,7 +39,7 @@ mutation. C>T_g_FFPE represents the possible FFPE artifact.
 Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
 Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can 
 be set to any values.  
-  
+If you do not know the Neighborhood_sequence, enter "-".
 File 2: BAM file  
   
 File 3: mutation supporting read ID information file  
@@ -54,8 +54,9 @@ _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f  .;A;N#
 File 4: sample information tsv file  
 Seven or eight columns are necessary.  
 [sample name] [mutation information excel file] [BAM file] 
-[read ID information directory] [read length] [adapter sequence read 1] 
-[optional: adapter sequence read 2] [sample type: Human or Mouse]  
+[optional: read ID information directory] [read length] 
+[adapter sequence read 1] [optional: adapter sequence read 2] 
+[sample type: Human or Mouse]  
 PC9	./source/CCLE.xlsx ./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam 
 ./source/PC9_Cell_line 127 
 AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38  
@@ -144,19 +145,19 @@ fun_load_genome(organism)
 fun_load_chr_no(organism)
 
 # analysis
-result = fun_read_check(short_homology_search_length = 4)
-msec = rbind(msec, result[[1]])
-homology_search = rbind(homology_search, result[[2]])
-mut_depth = rbind(mut_depth, result[[3]])
+result <- fun_read_check(short_homology_search_length = 4)
+msec <- rbind(msec, result[[1]])
+homology_search <- rbind(homology_search, result[[2]])
+mut_depth <- rbind(mut_depth, result[[3]])
 
 # search homologous sequences
-msec = fun_homology(msec,
+msec <- fun_homology(msec,
                     homology_search,
                     min_homology_search = 40)
 
 # statistical analysis
-msec = fun_summary(msec)
-msec = fun_analysis(msec,
+msec <- fun_summary(msec)
+msec <- fun_analysis(msec,
                     mut_depth,
                     short_homology_search_length = 4,
                     min_homology_search = 40,
