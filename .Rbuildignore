@@ -16,3 +16,8 @@
 ^LICENCE$
 ^MicroSEC.*\.xlsx$
 ^MicroSEC.*\.tsv$
+^MicroSEC_data_format\.Rmd$
+^MicroSEC_figure\.Rmd$
+^MicroSEC_summarize\.Rmd$
+^MicroSEC_target\.Rmd$
+^MicroSEC_test\.Rmd$

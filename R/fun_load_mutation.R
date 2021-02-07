@@ -36,7 +36,15 @@ fun_load_mutation <- function(mutation_file,
   SimpleRepeat_TRF <- NULL
   Neighborhood_sequence <- NULL
   Transition <- NULL
-  
+  Neighbor_start_1 <- NULL
+  Neighbor_start_2 <- NULL
+  eighbor_end_1 <- NULL
+  eighbor_end_2 <- NULL
+  Pre_Neighbor <- NULL
+  Post_Neighbor <- NULL
+  Mut_len <- NULL
+
+
   # load somatic mutation list
   df_mutation <<- read.xlsx(mutation_file, sheet = 1)
   # data formatting

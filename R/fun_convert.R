@@ -25,8 +25,8 @@ fun_convert <- function(mutation_file,
                         organism) {
   Hugo_Symbol <- NULL
   Protein_Change <- NULL
-  Start_Position <- NULL
-  End_Position <- NULL
+  Start_position <- NULL
+  End_position <- NULL
   Variant_Type <- NULL
   Reference <- NULL
   Tumor_Seq <- NULL
@@ -64,6 +64,7 @@ fun_convert <- function(mutation_file,
   fun_load_genome(organism)
   # genome sequence extraction functions
   fun_genome <- function(x, y) {
+    ref_genome <- NULL
     r <- NULL
     for (i in seq_len(length(x))) {
       r <- c(r, as.character(ref_genome[[x[i]]][y[i]]))
@@ -71,6 +72,7 @@ fun_convert <- function(mutation_file,
     return(r)
   }
   fun_genome_2 <- function(x, y, z) {
+    ref_genome <- NULL
     r <- NULL
     for (i in seq_len(length(x))) {
       r <- c(r, as.character(ref_genome[[x[i]]][y[i]:z[i]]))
@@ -146,7 +148,7 @@ fun_convert <- function(mutation_file,
     -Alt_indel, -Ref_indel, -Neighbor_start_1, -Neighbor_start_2,
     -Neighbor_end_1, -Neighbor_end_2,
     -Pre_Neighbor, -Post_Neighbor,
-    -Hugo_Symbol, -Start_Position, -End_Position, -Variant_Type,
+    -Hugo_Symbol, -Start_position, -End_position, -Variant_Type,
     -Reference, -Tumor_Seq, -Protein_Change, -Start, -End)
   return(df_mutation)
 }

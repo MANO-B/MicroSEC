@@ -83,6 +83,7 @@ fun_analysis <- function(msec,
     filter_5_simple_repeat <- NULL
     filter_6_c_to_t_artifact <- NULL
     filter_7_mutation_at_homopolymer <- NULL
+    filter_8_low_quality <- NULL
     mut_type <- NULL
     hairpin_length <- NULL
     pre_minimum_length <- NULL
@@ -103,6 +104,8 @@ fun_analysis <- function(msec,
     short_support_length_adj <- NULL
     altered_length <- NULL
     distant_homology <- NULL
+    low_quality_pre <- NULL
+    low_quality_post <- NULL
     
     mut_depth_pre <- mut_depth[[1]]
     mut_depth_post <- mut_depth[[2]]

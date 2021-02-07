@@ -5,9 +5,6 @@
 #' @param msec Mutation filtering information.
 #' @param df_distant Sequences to be checked.
 #' @param min_homology_search Minimum length to define "homologous".
-#' @param ref_genome Reference genome.
-#' @param chr_no Chromosome number.
-#' @param progress_bar "Y": You can see the progress visually.
 #' @return msec
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
@@ -32,13 +29,16 @@ fun_homology <- function(msec,
                          df_distant,
                          min_homology_search) {
   # initialize
-  if (exists("ref_genome")) {
+  if (!exists("ref_genome")) {
     ref_genome <<- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
   }
-  if (exists("chr_no")) {
+  if (!exists("organism")) {
+    organism <<- "hg38"
+  }
+  if (!exists("chr_no")) {
     chr_no <<- 24
   }
-  if (exists("progress_bar")) {
+  if (!exists("progress_bar")) {
     progress_bar <<- "Y"
   }
 
@@ -46,7 +46,6 @@ fun_homology <- function(msec,
   Direction <- NULL
   fixed_seq_pre <- NULL
   fixed_seq_post <- NULL
-
   if (!is.null(df_distant)) {
     msec$distant_homology <- 0
     df_distant <- df_distant %>% dplyr::mutate(
