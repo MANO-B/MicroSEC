@@ -3,7 +3,6 @@
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
 paraffin-embedded (FFPE) samples.  
-(Working on the new version running without mutation read ID list)  
 This repository contains all the codes to regenerate results from our 
 paper:  
 "MicroSEC: Sequence error filtering pipeline for formalin-fixed and 
@@ -26,8 +25,9 @@ https://www.researchsquare.com/article/rs-153650/v1
 
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
-Four files are necessary for the analysis: mutation information file, BAM file, and mutation supporting read ID information file.  
-  
+Two files are necessary for the analysis: mutation information file, BAM file  
+A mutation supporting read ID information file is desirable but not necessary.  
+Prepare a sample information tsv file.   
 ### File 1: mutation information file  
 This excel file should contain at least these contents:  
 ```
@@ -73,7 +73,7 @@ chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212
 Seven or eight columns are necessary.  
 The file contains no header.
 ```
-[sample name] [mutation information excel file] [BAM file]          [read ID information directory] [read length] [adapter sequence read 1]         [optional: adapter sequence read 2] [reference genome]  
+[sample name] [mutation information excel file] [BAM file]          [optional: read ID information directory] [read length] [adapter sequence read 1]         [optional: adapter sequence read 2] [reference genome]  
 PC9           /mnt/source/CCLE.xlsx             /mnt/source/PC9.bam /mnt/source/PC9_Cell_line       127           AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT   hg38  
 ```
   
@@ -98,6 +98,8 @@ This pipeline contains 8 filtering processes.
 - Filter 7  : Indel mutations locating at a >=15 homopolymer.  
 - Filter 8  : >=10% low quality bases in the mutation supporting reads.  
 
+Filter 1, 2, 3, and 4 detect possible FFPE artifacts.  
+Filter 5, 6, 7, and 8 detect frequent errors caused by next generation sequencers.  
 Supporting lengths are adjusted considering small repeat sequences around the mutations.  
   
 Results are saved in a excel file.  
