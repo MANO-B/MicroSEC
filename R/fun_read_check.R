@@ -172,7 +172,8 @@ fun_read_check <- function(short_homology_search_length) {
               pos_err <- tmp
               if (dim(mut_read)[[1]] > 0) {
                 mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-                mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+                mut_read_id_list <- str_split(
+                                      mut_read$Mut_ID, pattern = ";")[[1]]
                 mut_call <- which(mut_detail ==
                                     str_replace(df_mutation[i, "Alt"],
                                                 pattern = df_mutation[i, "Ref"],
@@ -191,7 +192,8 @@ fun_read_check <- function(short_homology_search_length) {
               pos_err <- tmp
               if (dim(mut_read)[[1]] > 0) {
                 mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-                mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
+                mut_read_id_list <- str_split(
+                                      mut_read$Mut_ID, pattern = ";")[[1]]
                 mut_call <- which(mut_detail ==
                                   str_replace(df_mutation[i, "Ref"],
                                               pattern = df_mutation[i, "Alt"],
@@ -317,7 +319,8 @@ fun_read_check <- function(short_homology_search_length) {
                   cigar_type <- str_split(df_bam_cigar[depth],
                                           "[:digit:]+")[[1]][-1]
                   cigar_pos <- df_bam_pos[depth]
-                  cigar_qual <- as.vector(asc(as.character(df_bam_qual[[depth]])))
+                  cigar_qual <- as.vector(
+                                  asc(as.character(df_bam_qual[[depth]])))
                   read_pos <- 1
                   cigar_qual <- as.vector(
                     asc(as.character(df_bam_qual[[depth]])))
@@ -330,10 +333,12 @@ fun_read_check <- function(short_homology_search_length) {
                         cigar_seq <- df_bam_seq[depth][[1]]
                         cigar_qname <- df_bam_qname[depth]
                         cigar_strand <- gsub("\\-", "r",
-                                             gsub("\\+", "f", df_bam_strand[depth]))
+                                             gsub("\\+", "f",
+                                                  df_bam_strand[depth]))
                         if (as.character(
                             cigar_seq[read_pos:(read_pos + alt - 1)]) ==
-                            str_sub(df_mutation[i, "Alt"], start = 2, end = -1)) {
+                            str_sub(df_mutation[i, "Alt"],
+                                    start = 2, end = -1)) {
                           if (check_first) {
                             mut_read_id_list <- paste(cigar_qname,
                                                       cigar_strand, sep = "")
@@ -351,7 +356,6 @@ fun_read_check <- function(short_homology_search_length) {
                       }
                       if (cigar_type[k] == "D") {
                         cigar_pos <- cigar_pos + cigar_num[k]
-                        read_pos <- read_pos - cigar_num[k]
                       } else if (cigar_type[k] == "M") {
                         cigar_pos <- cigar_pos + cigar_num[k]
                       }
@@ -415,7 +419,8 @@ fun_read_check <- function(short_homology_search_length) {
                         cigar_seq <- df_bam_seq[depth][[1]]
                         cigar_qname <- df_bam_qname[depth]
                         cigar_strand <- gsub("\\-", "r",
-                                          gsub("\\+", "f", df_bam_strand[depth]))
+                                          gsub("\\+", "f",
+                                               df_bam_strand[depth]))
                         if (check_first) {
                           mut_read_id_list <- paste(cigar_qname,
                                                 cigar_strand, sep = "")
@@ -428,12 +433,11 @@ fun_read_check <- function(short_homology_search_length) {
                         }
                         mut_call <- 1
                         mut_position_cigar <- c(mut_position_cigar,
-                                      read_pos + df_mutation[i, "Pos"] - mut_pos) 
+                                   read_pos + df_mutation[i, "Pos"] - mut_pos) 
                       }
                     }
                     if (cigar_type[k] == "D") {
                       cigar_pos <- cigar_pos + cigar_num[k]
-                      read_pos <- read_pos - cigar_num[k]
                     } else if (cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
                     }
