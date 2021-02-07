@@ -403,6 +403,7 @@ write.xlsx(df_mutation, "/mnt/HDD8TB/MicroSEC/source/NCIH2286_LUNG_modified.xlsx
 msec <- NULL
 homology_search <- NULL
 mut_depth <- NULL
+progress_bar <- "Y"
 
 sample_name <- "NCIH2286_LUNG"
 mutation_file <- "/mnt/HDD8TB/MicroSEC/source/NCIH2286_LUNG_modified.xlsx"
