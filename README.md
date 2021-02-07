@@ -379,6 +379,7 @@ samtools index -@ 4 ${a}.bam
 ```
 library(openxlsx)
 library(MicroSEC)
+library(GenomeInfoDb)
 
 df_CCLE <- utils::read.csv("CCLE_DepMap_18q3_maf_20180718.txt",
                           header = TRUE,
