@@ -27,7 +27,7 @@ This pipeline is designed for filtering mutations found in formalin-fixed and pa
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
 Two files are necessary for the analysis: mutation information file, BAM file  
 A mutation supporting read ID information file is desirable but not necessary.  
-Prepare a sample information tsv file.   
+Prepare a sample information tsv file.  
 ### File 1: mutation information file  
 This excel file should contain at least these contents:  
 ```
@@ -70,11 +70,11 @@ chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212
     ".;.+ACACACAC;.-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
   
 ### File 4: sample information tsv file  
-Seven or eight columns are necessary.  
+From six to eight columns are necessary. Two optional columns can be omitted.  
 The file contains no header.
 ```
 [sample name] [mutation information excel file] [BAM file]          [optional: read ID information directory] [read length] [adapter sequence read 1]         [optional: adapter sequence read 2] [reference genome]  
-PC9           /mnt/source/CCLE.xlsx             /mnt/source/PC9.bam /mnt/source/PC9_Cell_line       127           AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT   hg38  
+PC9           /mnt/source/CCLE.xlsx             /mnt/source/PC9.bam /mnt/source/PC9_Cell_line                 127           AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT   hg38  
 ```
   
 - Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
