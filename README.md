@@ -448,6 +448,21 @@ msec <- fun_analysis(msec,
 fun_save(msec, "NCIH2286_LUNG", ".")
 
 ```
+- Nine possible artifacts are detected by MicroSEC filter-4.  
+  These mutations are not called in RNA-seq data.  
+  Six mutations are soft-clipped.
+
+| Tumor_Sample_Barcode | Chr   | Gene    | HGVS.p  | Pos       | Mut_type | Ref | Alt | total_read | soft_clipped_read | filter_1_mutation_intra_hairpin_loop | filter_2_hairpin_structure | filter_3_microhomology_induced_mutation | filter_4_highly_homologous_region | WES_AC  | RNAseq_AC | WGS_AC | 
+| -------------------- | ----- | ------- | ------- | --------- | -------- | --- | --- | ---------- | ----------------- | ------------------------------------ | -------------------------- | --------------------------------------- | --------------------------------- | ------- | --------- | ------ | 
+| NCIH2286_LUNG        | chr16 | NPIPB5  | p.T452I | 22545659  | 1-snv    | C   | T   | 1          | 0                 | FALSE                                | FALSE                      | FALSE                                   | TRUE                              |         |           | 5:27   | 
+| NCIH2286_LUNG        | chr19 | PSG4    | p.P43T  | 43708341  | 1-snv    | G   | T   | 178        | 6                 | FALSE                                | FALSE                      | FALSE                                   | TRUE                              | 155:314 | 11:1      | 24:54  | 
+| NCIH2286_LUNG        | chrX  | ABCD1   | p.A626T | 153008685 | 1-snv    | G   | A   | 22         | 0                 | FALSE                                | FALSE                      | FALSE                                   | TRUE                              | 19:0    | 77:0      | 29:0   | 
+| NCIH2286_LUNG        | chrX  | MAGEA2B | p.M247T | 151886335 | 1-snv    | T   | C   | 103        | 15                | FALSE                                | FALSE                      | FALSE                                   | TRUE                              |         | 60:2      |        | 
+| NCIH2286_LUNG        | chrX  | MAGEA2B | p.M247I | 151886336 | 1-snv    | G   | C   | 101        | 15                | FALSE                                | FALSE                      | FALSE                                   | TRUE                              |         | 62:1      |        | 
+| NCIH2286_LUNG        | chrX  | MAGEA2B | p.L250L | 151886343 | 1-snv    | C   | T   | 105        | 29                | FALSE                                | FALSE                      | FALSE                                   | TRUE                              |         | 75:2      |        | 
+| NCIH2286_LUNG        | chrX  | MAGEA2  | p.L250L | 151919140 | 1-snv    | G   | A   | 132        | 32                | FALSE                                | FALSE                      | FALSE                                   | TRUE                              |         | 108:0     |        | 
+| NCIH2286_LUNG        | chrX  | MAGEA2  | p.M247I | 151919147 | 1-snv    | C   | G   | 141        | 28                | FALSE                                | FALSE                      | FALSE                                   | TRUE                              |         | 84:0      |        | 
+| NCIH2286_LUNG        | chrX  | MAGEA2  | p.M247T | 151919148 | 1-snv    | A   | G   | 137        | 24                | FALSE                                | FALSE                      | FALSE                                   | TRUE                              |         | 81:0      |        | 
 
 ### Reproducibility
 
