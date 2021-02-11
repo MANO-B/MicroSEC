@@ -450,7 +450,7 @@ fun_save(msec, "NCIH2286_LUNG", ".")
 ```
 - Nine possible artifacts are detected by MicroSEC filter-4.  
   These mutations are not called in RNA-seq data.  
-  Six mutations are soft-clipped.
+  Six mutations are supported by not a small number of soft-clipped reads.
 
 | Tumor_Sample_Barcode | Chr   | Gene    | HGVS.p  | Pos       | Mut_type | Ref | Alt | total_read | soft_clipped_read | filter_1_mutation_intra_hairpin_loop | filter_2_hairpin_structure | filter_3_microhomology_induced_mutation | filter_4_highly_homologous_region | WES_AC  | RNAseq_AC | WGS_AC | 
 | -------------------- | ----- | ------- | ------- | --------- | -------- | --- | --- | ---------- | ----------------- | ------------------------------------ | -------------------------- | --------------------------------------- | --------------------------------- | ------- | --------- | ------ | 
