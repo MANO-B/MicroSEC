@@ -32,13 +32,13 @@ fun_homology <- function(msec,
                          df_distant,
                          min_homology_search) {
   # initialize
-  if (exists("ref_genome")) {
+  if (!exists("ref_genome")) {
     ref_genome <<- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
   }
-  if (exists("chr_no")) {
+  if (!exists("chr_no")) {
     chr_no <<- 24
   }
-  if (exists("progress_bar")) {
+  if (!exists("progress_bar")) {
     progress_bar <<- "Y"
   }
 
