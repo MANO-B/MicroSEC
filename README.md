@@ -187,7 +187,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
-# Stable version from CRAN
+# Stable version from CRAN (old version (v1.1.3), not recommended)
 install.packages("MicroSEC")
 
 # Developmental stable version from github (recommended)
