@@ -105,7 +105,7 @@ fun_load_mutation <- function(mutation_file,
             Mut_type == "del", Pos + Mut_len + 20, Pos + Mut_len + 19)))
       df_mutation <<- df_mutation %>% dplyr::mutate(
       Pre_Neighbor = fun_genome(Chr, Neighbor_start_1, Neighbor_end_1),
-      Post_Neighbor = fun_genome_2(Chr, Neighbor_start_2, Neighbor_end_2))
+      Post_Neighbor = fun_genome(Chr, Neighbor_start_2, Neighbor_end_2))
     df_mutation <<- df_mutation %>% dplyr::mutate(
       Neighborhood_sequence =
         paste(Pre_Neighbor, Alt, Post_Neighbor, sep = ""))
