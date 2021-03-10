@@ -32,9 +32,12 @@ fun_homology <- function(msec,
   if (!exists("ref_genome")) {
     ref_genome <<- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
   }
+<<<<<<< HEAD
   if (!exists("organism")) {
     organism <<- "hg38"
   }
+=======
+>>>>>>> 73599e3e1f58758fa6184f30d86957de03ad2c27
   if (!exists("chr_no")) {
     chr_no <<- 24
   }
