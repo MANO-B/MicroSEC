@@ -69,6 +69,12 @@ fun_load_mutation <- function(mutation_file,
   if (!"Transition" %in% colnames(df_mutation)) {
     df_mutation$Transition <<- "NA"
   }
+  if (df_mutation$SimpleRepeat_TRF[[1]] == "-") {
+    df_mutation$SimpleRepeat_TRF <<- "NA"
+  }
+  if (df_mutation$Transition[[1]] == "-") {
+    df_mutation$Transition <<- "NA"
+  }
   if (df_mutation$Neighborhood_sequence[[1]] == "-") {
     fun_genome <- function(x, y, z) {
       r <- NULL
