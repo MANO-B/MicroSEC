@@ -25,7 +25,7 @@ https://www.researchsquare.com/article/rs-153650/v1
 
 This pipeline is designed for filtering mutations found in formalin-fixed and paraffin-embedded (FFPE) samples.  
 The MicroSEC filter utilizes a statistical analysis, and the results for mutations with less than 10 supporting reads are not reliable.  
-Two files are necessary for the analysis: mutation information file, BAM file  
+Two files are necessary for the analysis: mutation information file, BAM file.  
 A mutation supporting read ID information file is desirable but not necessary.  
 Prepare a sample information tsv file.  
 ### File 1: mutation information file  
@@ -37,11 +37,13 @@ SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 10813
 - Notation:  
     - Mut_type: [altered bases]-[mutation type (snv, ins, or del)]. 1-snv, 3-snv, 3-del, 1-ins, etc.  
     - Total_QV>=20: The read number with total Q-value >=20.  
-    - Chr: chr1-22, chrX, and chrY for hg38. 1-22, X, and Y for hg19.  
+    - Chr: chr1-22, chrX, and chrY for hg19 and hg38. 1-20, X, and Y for mm10.  
+           Depending on the version of the package, "chr" may or may not be necessary.  
     - Pos/Ref/Alt: There are some difference from HGVS nomenclature as follows:  
           - 131C>T -> Pos/Ref/Alt 131/C/T.  
           - 514_515insC and 514A -> Pos/Ref/Alt 514/A/AC  
           - 244delC and 243A -> Pos/Ref/Alt 243/AC/A  
+            Conversion program is ready; see below.  
     - SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not.  
     - Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
     - Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT mutation. C>T_g_FFPE represents the possible FFPE artifact.  
@@ -49,10 +51,11 @@ SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 10813
     - Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
     - If you do not know the Neighborhood_sequence, enter "-".
 ### File 2: BAM file  
-This file should contain at least these contents:  
-- QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, and QUAL  
+This file should contain at least these contents (always included in standard BAM files):  
+- QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, and QUAL.  
   
 ### File 3: mutation supporting read ID information tsv file  
+The program will run without this file, but it is preferable to have it.  
 This file should contain at least these contents:  
 ```
 Chr  Pos       Ref Alt        Mut_ID                                                                                                Mut
@@ -77,7 +80,8 @@ The file contains no header.
 PC9           /mnt/source/CCLE.xlsx             /mnt/source/PC9.bam /mnt/source/PC9_Cell_line                 127           AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT   hg38  
 ```
   
-- Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10
+- Reference genome: Human (hg38), Mouse (mm10), hg19, hg38, or mm10.
+  Support for other organisms is easy, and will be done as needed upon request.  
   
 ## Filtering detail
 This pipeline contains 8 filtering processes.  
@@ -99,7 +103,7 @@ This pipeline contains 8 filtering processes.
 - Filter 8  : >=10% low quality bases in the mutation supporting reads.  
 
 Filter 1, 2, 3, and 4 detect possible FFPE artifacts.  
-Filter 5, 6, 7, and 8 detect frequent errors caused by next generation sequencers.  
+Filter 5, 6, 7, and 8 detect frequent errors caused by the next generation sequencing platform.  
 Supporting lengths are adjusted considering small repeat sequences around the mutations.  
   
 Results are saved in a excel file.  
@@ -123,7 +127,7 @@ The runtimes below are generated using a computer with the recommended specs (12
 ### R language
 
 This script files runs on `R` for Windows, Mac, or Linux, which requires the R version 3.4.0 or later.
-
+If you use version 3.5 or lower of R, you will have some difficulty installing the packages, but it is not impossible.  
 
 ### Package dependencies
 
@@ -182,6 +186,7 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 > packageVersion("GenomeInfoDb")
 [1] '1.22.1'
 ```
+The program does not use any of the functions specific to the above version packages, so there is no problem if you use the latest version of the package.  
 
 ## Instructions for Use
 See also https://rdrr.io/cran/MicroSEC/
@@ -359,7 +364,7 @@ This is an open source dataset.
 Although these data are obtained from not FFPE samples but fresh samples, 
 some possible MICR-originating sequence artifacts are detected.
 
-- Download 24 BAM file from the NCBI SRA website.
+- Download 24 BAM files from the NCBI SRA website.
   Choose "Output this run in BAM format to File".  
   The files will be downloaded as SRR8618961_1.bam - SRR8618961_Y.bam.  
   https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR8618961  
