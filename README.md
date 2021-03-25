@@ -53,6 +53,18 @@ SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 10813
 ### File 2: BAM file  
 This file should contain at least these contents (always included in standard BAM files):  
 - QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, and QUAL.  
+
+I only have experience processing BAM files of up to 20 gigabytes.  
+It is recommended that huge BAM files be split up for processing.  
+  
+For example,  
+```
+samtools view -b sort.bam chr1:100-1000 > output_chr1.bam
+```
+
+It is better to split the file by chromosome.  
+If the file size is still too large, split it further at a distance from the mutation.  
+Deleting regions where there are no mutations will lighten the process.  
   
 ### File 3: mutation supporting read ID information tsv file  
 The program will run without this file, but it is preferable to have it.  
