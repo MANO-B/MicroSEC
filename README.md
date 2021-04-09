@@ -1,5 +1,14 @@
 ![MicroSEC logo](MicroSEC_logo.png)
 
+# NEW
+MicroSEC.R has been improved to dramatically reduce memory usage.  
+The speed of analysis is also improved by deleting parts of the BAM file that are not relevant to the mutation prior to analysis by MicroSEC.  
+You will get the following warning, but it is based on an improper description of @RG in the BAM file, and the program is running well.  
+Please download and use the new version of MicroSEC.R.  
+```
+[W::finish_rg_pg] Tag PG:bwa-mem not found in @PG records. 
+```
+
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
 paraffin-embedded (FFPE) samples.  
@@ -127,9 +136,9 @@ github url: https://github.com/MANO-B/MicroSEC
 
 ### Hardware Requirements
 
-The scripts requires only a standard computer with enough RAM to support the operations defined by a user. For minimal performance, this will be a computer with about 32 GB of RAM. For optimal performance, we recommend a computer with the following specs:
+The scripts requires only a standard computer with enough RAM to support the operations defined by a user. For minimal performance, this will be a computer with about 16 GB of RAM. For optimal performance, we recommend a computer with the following specs:
 
-RAM: 128+ GB  
+RAM: 16+ GB  
 CPU: 4+ cores, 4.2+ GHz/core
 
 The runtimes below are generated using a computer with the recommended specs (128 GB RAM, 4 cores@4.2 GHz) and internet of speed 100 Mbps.
