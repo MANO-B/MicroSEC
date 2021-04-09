@@ -140,14 +140,18 @@ github url: https://github.com/MANO-B/MicroSEC
 
 ### Hardware Requirements
 
-The scripts requires only a standard computer with enough RAM to support the operations defined by a user. For minimal performance, this will be a computer with about 16 GB of RAM. For optimal performance, we recommend a computer with the following specs:
+The scripts requires only a standard computer with enough RAM to support the operations defined by a user. For minimal performance, this will be a computer with about 16 GB of RAM (depending on the size of BAM file and the number of mutations). For optimal performance, we recommend a computer with the following specs:
 
 RAM: 16+ GB  
 CPU: 4+ cores, 4.2+ GHz/core
 
-The runtimes below are generated using a computer with the recommended specs (128 GB RAM, 4 cores@4.2 GHz) and internet of speed 100 Mbps.
+The runtimes below are generated using a computer with the recommended specs (16 GB RAM, M1 Macbook air) and internet of speed 40 Mbps.
 
 ### Software Requirements
+
+### Samtools
+
+Samtools is used for pre-processing to remove reads that are not related to mutations. Version 1.12 is what I am using, but I think older versions will work if they support multi-core processing.  
 
 ### R language
 
