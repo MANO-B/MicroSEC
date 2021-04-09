@@ -37,7 +37,7 @@ The MicroSEC filter utilizes a statistical analysis, and the results for mutatio
 Two files are necessary for the analysis: mutation information file, BAM file.  
 A mutation supporting read ID information file is desirable but not necessary.  
 Prepare a sample information tsv file.  
-### File 1: mutation information file  
+### File 1: mutation information file (required)  
 This excel file should contain at least these contents:  
 ```
 Sample       Gene       HGVS.c  HGVS.p Mut_type Total_QV>=20   %Alt   Chr  Pos         Ref Alt SimpleRepeat_TRF Neighborhood_sequence                      Transition  
@@ -59,7 +59,7 @@ SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 10813
     - Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
     - Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
     - If you do not know the Neighborhood_sequence, enter "-".
-### File 2: BAM file  
+### File 2: BAM file (required)  
 This file should contain at least these contents (always included in standard BAM files):  
 - QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, and QUAL.  
 
@@ -75,7 +75,7 @@ It is better to split the file by chromosome.
 If the file size is still too large, split it further at a distance from the mutation.  
 Deleting regions where there are no mutations will lighten the process.  
   
-### File 3: mutation supporting read ID information tsv file  
+### File 3: mutation supporting read ID information tsv file (optional)  
 The program will run without this file, but it is preferable to have it.  
 This file should contain at least these contents:  
 ```
@@ -93,7 +93,7 @@ chr6 346429    G   GACACACAC  _;ID005-2:545593f,ID006-1:1132212f,ID006-1:1132212
     ".;A;N" represents the mutation pattern: "reference base";"altered to A";"other alterations"  
     ".;.+ACACACAC;.-ACAC;N" reapresents the mutation pattern: "reference base";"insertion ACACACAC";"deletion ACAC";"other alterations"  
   
-### File 4: sample information tsv file  
+### File 4: sample information tsv file (required)  
 From six to eight columns are necessary. Two optional columns can be omitted.  
 The file contains no header.
 ```
@@ -292,12 +292,255 @@ for (sample in seq_len(dim(sample_info)[1])) {
     }
   }
 
+  bam_file_bai = paste(bam_file, ".bai", sep="")
+  if (!file.exists(bam_file_bai)) {
+    print("sorting BAM file")
+    bam_file_sort = paste(bam_file, "_sort.bam", sep="")
+    syscom = paste("samtools sort -@ 4 -o ",
+                   bam_file_sort,
+                   " ",
+                   bam_file,
+                   sep="")
+    system(syscom)
+    syscom = paste("samtools index ",
+                   bam_file_sort,
+                   sep="")
+    system(syscom)
+    bam_file = bam_file_sort
+  }
+
   # load genomic sequence
   fun_load_genome(organism)
   fun_load_chr_no(organism)
 
   # load mutation information
   fun_load_mutation(mutation_file, sample_name)
+  df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+  sep_new = TRUE
+  continuous = FALSE
+  chr_last = ""
+  pos_last = 0
+  bam_file_tmp1 = paste(bam_file, ".tmp1", sep="")
+  bam_file_tmp2 = paste(bam_file, ".tmp2", sep="")
+  bam_file_slim = paste(bam_file, ".SLIM", sep="")
+  for (mut_no in seq_len(dim(df_mutation)[1])) {
+    print(paste(mut_no, "/", dim(df_mutation)[1]))
+    if (mut_no == 1 & mut_no != dim(df_mutation)[1]) {
+      if (df_mutation$Chr[mut_no + 1] != df_mutation$Chr[mut_no] |
+          df_mutation$Pos[mut_no + 1] > df_mutation$Pos[mut_no] + 400) {
+        syscom = paste("samtools view -h ",
+                       bam_file,
+                       " ",
+                       df_mutation$Chr[mut_no],
+                       ":",
+                       max(1, df_mutation$Pos[mut_no] - 200),
+                       "-",
+                       df_mutation$Pos[mut_no] + 200,
+                       " > ",
+                       bam_file_slim,
+                       sep="")
+        system(syscom)
+        continuous = FALSE
+        sep_new = FALSE
+      } else {
+        continuous = TRUE
+        pos_last = max(1, df_mutation$Pos[mut_no] - 200)
+      }
+    } else if (mut_no == 1 & mut_no == dim(df_mutation)[1]) {
+      syscom = paste("samtools view -h ",
+                     bam_file,
+                     " ",
+                     df_mutation$Chr[mut_no],
+                     ":",
+                     max(1, df_mutation$Pos[mut_no] - 200),
+                     "-",
+                     df_mutation$Pos[mut_no] + 200,
+                     " > ",
+                     bam_file_slim,
+                     sep="")
+      system(syscom)
+    } else if (mut_no == dim(df_mutation)[1]) {
+      if (sep_new) {
+        syscom = paste("samtools view -h ",
+                       bam_file,
+                       " ",
+                       df_mutation$Chr[mut_no],
+                       ":",
+                       pos_last,
+                       "-",
+                       df_mutation$Pos[mut_no] + 200,
+                       " > ",
+                       bam_file_slim,
+                       sep="")
+        system(syscom)
+      } else if (continuous) {
+        syscom = paste("samtools view -h ",
+                       bam_file,
+                       " ",
+                       df_mutation$Chr[mut_no],
+                       ":",
+                       pos_last,
+                       "-",
+                       df_mutation$Pos[mut_no] + 200,
+                       " > ",
+                       bam_file_tmp1,
+                       sep="")
+        system(syscom)
+        syscom = paste("samtools merge -fucp ",
+                       bam_file_tmp2,
+                       " ",
+                       bam_file_slim,
+                       " ",
+                       bam_file_tmp1,
+                       sep="")
+        system(syscom)
+        syscom = paste("mv ",
+                       bam_file_tmp2,
+                       " ",
+                       bam_file_slim,
+                       sep="")
+        system(syscom)
+      } else {
+        syscom = paste("samtools view -h ",
+                       bam_file,
+                       " ",
+                       df_mutation$Chr[mut_no],
+                       ":",
+                       max(1, df_mutation$Pos[mut_no] - 200),
+                       "-",
+                       df_mutation$Pos[mut_no] + 200,
+                       " > ",
+                       bam_file_tmp1,
+                       sep="")
+        system(syscom)
+        syscom = paste("samtools merge -fucp ",
+                       bam_file_tmp2,
+                       " ",
+                       bam_file_slim,
+                       " ",
+                       bam_file_tmp1,
+                       sep="")
+        system(syscom)
+        syscom = paste("mv ",
+                       bam_file_tmp2,
+                       " ",
+                       bam_file_slim,
+                       sep="")
+        system(syscom)
+      }
+    } else {
+      if (sep_new) {
+        if (df_mutation$Chr[mut_no + 1] != df_mutation$Chr[mut_no] |
+            df_mutation$Pos[mut_no + 1] > df_mutation$Pos[mut_no] + 400) {
+          syscom = paste("samtools view -h ",
+                         bam_file,
+                         " ",
+                         df_mutation$Chr[mut_no],
+                         ":",
+                         pos_last,
+                         "-",
+                         df_mutation$Pos[mut_no] + 200,
+                         " > ",
+                         bam_file_slim,
+                         sep="")
+          system(syscom)
+          continuous = FALSE
+          sep_new = FALSE
+        }
+      } else if (continuous) {
+        if (df_mutation$Chr[mut_no + 1] != df_mutation$Chr[mut_no] |
+            df_mutation$Pos[mut_no + 1] > df_mutation$Pos[mut_no] + 400) {
+          syscom = paste("samtools view -h ",
+                         bam_file,
+                         " ",
+                         df_mutation$Chr[mut_no],
+                         ":",
+                         pos_last,
+                         "-",
+                         df_mutation$Pos[mut_no] + 200,
+                         " > ",
+                         bam_file_tmp1,
+                         sep="")
+          system(syscom)
+          syscom = paste("samtools merge -fucp ",
+                         bam_file_tmp2,
+                         " ",
+                         bam_file_slim,
+                         " ",
+                         bam_file_tmp1,
+                         sep="")
+          system(syscom)
+          syscom = paste("mv ",
+                         bam_file_tmp2,
+                         " ",
+                         bam_file_slim,
+                         sep="")
+          system(syscom)
+          continuous = FALSE
+        }
+      } else {
+        if (df_mutation$Chr[mut_no + 1] != df_mutation$Chr[mut_no] |
+            df_mutation$Pos[mut_no + 1] > df_mutation$Pos[mut_no] + 400) {
+          syscom = paste("samtools view -h ",
+                         bam_file,
+                         " ",
+                         df_mutation$Chr[mut_no],
+                         ":",
+                         max(1, df_mutation$Pos[mut_no] - 200),
+                         "-",
+                         df_mutation$Pos[mut_no] + 200,
+                         " > ",
+                         bam_file_tmp1,
+                         sep="")
+          system(syscom)
+          syscom = paste("samtools merge -fucp ",
+                         bam_file_tmp2,
+                         " ",
+                         bam_file_slim,
+                         " ",
+                         bam_file_tmp1,
+                         sep="")
+          system(syscom)
+          syscom = paste("mv ",
+                         bam_file_tmp2,
+                         " ",
+                         bam_file_slim,
+                         sep="")
+          system(syscom)
+        } else {
+          continuous = TRUE
+          pos_last = max(1, df_mutation$Pos[mut_no] - 200)
+        }
+      }
+    }
+  }
+  syscom = paste("samtools sort -@ 4 -o ",
+                 bam_file_tmp2,
+                 " ",
+                 bam_file_slim,
+                 sep="")
+  system(syscom)
+  syscom = paste("samtools view -bS ",
+                 bam_file_tmp2,
+                 " > ",
+                 bam_file_slim,
+                 sep="")
+  system(syscom)
+  syscom = paste("rm ",
+                 bam_file_tmp1,
+                 sep="")
+  system(syscom)
+  syscom = paste("rm ",
+                 bam_file_tmp2,
+                 sep="")
+  system(syscom)
+  syscom = paste("samtools index ",
+                 bam_file_slim,
+                 sep="")
+  system(syscom)
+  print(paste("Slimmed BAM files were saved as ", bam_file_slim, sep=""))
+  
+  bam_file = bam_file_slim
   fun_load_bam(bam_file)
   fun_load_id(read_list)
 
