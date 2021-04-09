@@ -6,6 +6,10 @@ The speed of analysis is also improved by deleting parts of the BAM file that ar
 You will get the following warning, but it is based on an improper description of @RG in the BAM file, and the program is running well.  
 Please download and use the new version of MicroSEC.R.  
 ```
+wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.R
+```
+An example of warnings;  
+```
 [W::finish_rg_pg] Tag PG:bwa-mem not found in @PG records. 
 ```
 
