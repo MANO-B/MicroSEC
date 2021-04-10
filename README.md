@@ -2,7 +2,7 @@
 
 # NEW
 MicroSEC.R has been improved to dramatically reduce memory usage.  
-The speed of analysis is also improved by deleting parts of the BAM file that are not relevant to the mutation prior to analysis by MicroSEC.  
+The speed of analysis is also improved by deleting parts of the BAM file that are not relevant to the mutations prior to analysis by MicroSEC.  
 You will get the following warning, but it is based on an improper description of @RG in the BAM file, and the program is running well.  
 Samtools is now mandatory.  
 Please download and use the new version of MicroSEC.R.  
