@@ -149,7 +149,7 @@ if (args[3] == "N" | args[3] == "Y") {
     
     # load mutation information
     fun_load_mutation(mutation_file, sample_name) # df_mutation
-    df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+    df_mutation = df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
     sep_new = TRUE
     continuous = FALSE
     chr_last = ""
@@ -427,7 +427,7 @@ if (args[3] == "N" | args[3] == "Y") {
 
   # load mutation information
   fun_load_mutation_gz(mutation_file) # df_mutation
-  df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+  df_mutation = df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
   sep_new = TRUE
   continuous = FALSE
   chr_last = ""
