@@ -40,7 +40,7 @@ for (sample in seq_len(dim(sample_info)[1])) {
   
   # load mutation information
   fun_load_mutation(mutation_file, sample_name) # df_mutation
-  df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+  df_mutation = df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
   sep_new = TRUE
   continuous = FALSE
   chr_last = ""
