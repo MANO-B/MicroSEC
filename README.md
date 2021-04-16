@@ -114,19 +114,18 @@ This pipeline contains 8 filtering processes.
 
 - Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
         - Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).  
-        - Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.  
-- Filter 2  : Hairpin-structure induced error detection (2-1 or 2-2).  
+        - Filter 1-2: The shorter-supporting lengths distributed over less than 75% of the read length.  
+- Filter 2  : Hairpin-structure induced error detection (2-1 and 2-2).  
         - Filter 2-1: Palindromic sequences exist within 150 bases.  
         - Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
-- Filter 3  : 3'-/5'-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
+- Filter 3  : 3'-/5'-supporting lengths are too densely distributed to occur (3-1 and 3-2).  
         - Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
-        - Filter 3-2: The distributions of 3'-/5'-supporting lengths are shorter than 80% of the read length.  
-        - Filter 3-3: <10% of bases are low quality (Quality score <18).  
+        - Filter 3-2: The distributions of 3'-/5'-supporting lengths are within 75% of the read length.  
 - Filter 4  : >=15% mutations were called by chimeric reads comprising two distant regions.  
 - Filter 5  : Mutations locating at simple repeat sequences.  
 - Filter 6  : C>T_g false positive calls in FFPE samples.  
 - Filter 7  : Indel mutations locating at a >=15 homopolymer.  
-- Filter 8  : >=10% low quality bases in the mutation supporting reads.  
+- Filter 8  : >=10% of bases are low quality (Quality score <18) in the mutation supporting reads.  
 
 Filter 1, 2, 3, and 4 detect possible FFPE artifacts.  
 Filter 5, 6, 7, and 8 detect frequent errors caused by the next generation sequencing platform.  
@@ -324,7 +323,7 @@ for (sample in seq_len(dim(sample_info)[1])) {
 
   # load mutation information
   fun_load_mutation(mutation_file, sample_name)
-  df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+  df_mutation = df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
   sep_new = TRUE
   continuous = FALSE
   chr_last = ""
