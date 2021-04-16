@@ -9,8 +9,8 @@
 # An additional file is preferable: mutation supporting read ID information file.  
 # A sample information tsv file is mandatory if multiple samples are processed simultaneously.  
 #
-# File 1: mutation information file
-# This excel file should contain at least these contents:
+# File 1: mutation information file (mandatory)
+# This excel file should contain at least these columns:
 #       Sample     Gene HGVS.c HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition
 # SL_1010-N6-B SLC25A24   _  _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t
 # Total_QV>=20: The read number with total Q-value >=20. 
@@ -20,37 +20,38 @@
 # Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
 # If you do not know the Neighborhood_sequence, enter "-".
 #
-# File 2: BAM file
+# File 2: BAM file (mandatory)
 #
-# File 3: mutation supporting read ID information file
+# File 3: mutation supporting read ID information file (optional)
 # This file should contain at least these contents:
 #  Chr     Pos Ref Alt                                                                                                Mut_ID     Mut
 # chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#
 #
-# File 4: sample information tsv file  
-# Seven or eight columns are necessary.  
+# File 4: sample information tsv file  (mandatory, if multiple samples are processed in a batch)
+# Six to eight columns are necessary (without column names).
+# Optional columns can be deleted if they are not applicable.
 # [sample name] [mutation information excel file] [BAM file] [optional: read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]
 # PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
-#
-# Reference genome: Human (hg3 or hg19) or Mouse (mm10)
+# A375	./source/CCLE.xlsx	./source/Cell_line/A375_Cell_line_Ag_TDv4.realigned.bam	127	 AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
+
+# Reference genome: Human (hg38 or hg19) or Mouse (mm10)
 #
 # This pipeline contains 8 filtering processes.
 #
-# Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
+# Filter 1  : Shorter-supporting lengths distribute too unevenly to occur (1-1 and 1-2).  
 # Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).  
-# Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.  
-# Filter 2  : Hairpin-structure induced error detection (2-1 or 2-2).  
+# Filter 1-2: The shorter-supporting lengths distributed over less than 75% of the read length.  
+# Filter 2  : Hairpin-structure induced error detection (2-1 and 2-2).  
 # Filter 2-1: Palindromic sequences exist within 150 bases. 
 # Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
-# Filter 3  : 3’-/5’-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
+# Filter 3  : 3’-/5’-supporting lengths are too unevenly distributed to occur (3-1 and 3-3).  
 # Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
-# Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
-# Filter 3-3: <10% of bases are low quality (Quality score <18).
+# Filter 3-2: The distributions of 3’-/5’-supporting lengths are within 75% of the read length.  
 # Filter 4  : >=15% mutations were called by chimeric reads comprising two distant regions.
 # Filter 5  : Mutations locating at simple repeat sequences.
 # Filter 6  : C>T_g false positive calls in FFPE samples.
 # Filter 7  : Mutations locating at a >=15 homopolymer.
-# Filter 8  : >=10% low quality bases in the mutation supporting reads.
+# Filter 8  : >=10% low quality bases (Quality score <18) in the mutation supporting reads.
 #
 # Supporting lengths are adjusted considering small repeat sequences around the mutations.
 #
@@ -128,7 +129,7 @@ if (args[3] == "N" | args[3] == "Y") {
 
     bam_file_bai = paste(bam_file, ".bai", sep="")
     if (!file.exists(bam_file_bai)) {
-      print("sorting BAM file")
+      print("Sorting a BAM file...")
       bam_file_sort = paste(bam_file, "_sort.bam", sep="")
       syscom = paste("samtools sort -@ 4 -o ",
                      bam_file_sort,
