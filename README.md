@@ -43,7 +43,7 @@ Two files are necessary for the analysis: mutation information file, BAM file.
 A mutation supporting read ID information file is desirable but not necessary.  
 Prepare a sample information tsv file.  
 ### File 1: mutation information file (required)  
-This excel file should contain at least these contents:  
+This excel file should contain at least these contents (any number of other columns are allowed):  
 ```
 Sample       Gene       HGVS.c  HGVS.p Mut_type Total_QV>=20   %Alt   Chr  Pos         Ref Alt SimpleRepeat_TRF Neighborhood_sequence                      Transition  
 SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 108130741   C   T   N                CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t
