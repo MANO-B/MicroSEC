@@ -350,16 +350,16 @@ if (args[3] == "N" | args[3] == "Y") {
           }
         }
       }
-      syscom = paste("samtools sort -@ 4 -o ",
-                     bam_file_tmp2,
-                     " ",
+      syscom = paste("samtools view -bS ",
                      bam_file_slim,
+                     " > ",
+                     bam_file_tmp2,
                      sep="")
       system(syscom)
-      syscom = paste("samtools view -bS ",
-                     bam_file_tmp2,
-                     " > ",
+      syscom = paste("samtools sort -@ 4 -o ",
                      bam_file_slim,
+                     " ",
+                     bam_file_tmp2,
                      sep="")
       system(syscom)
       syscom = paste("rm ",
@@ -628,16 +628,16 @@ if (args[3] == "N" | args[3] == "Y") {
         }
       }
     }
-    syscom = paste("samtools sort -@ 4 -o ",
-                   bam_file_tmp2,
-                   " ",
+    syscom = paste("samtools view -bS ",
                    bam_file_slim,
+                   " > ",
+                   bam_file_tmp2,
                    sep="")
     system(syscom)
-    syscom = paste("samtools view -bS ",
-                   bam_file_tmp2,
-                   " > ",
+    syscom = paste("samtools sort -@ 4 -o ",
                    bam_file_slim,
+                   " ",
+                   bam_file_tmp2,
                    sep="")
     system(syscom)
     syscom = paste("rm ",
