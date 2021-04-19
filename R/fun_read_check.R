@@ -232,8 +232,8 @@ fun_read_check <- function(short_homology_search_length) {
                 if (mean(cigar_qual) >= 53) {
                   read_pos <- 1
                   for (k in seq_len(length(cigar_type))) {
-                    if ((cigar_pos_tmp <= df_mutation[i, "Pos"]) &
-                        ((cigar_pos_tmp + cigar_num[k]) >=
+                    if ((cigar_pos <= df_mutation[i, "Pos"]) &
+                        ((cigar_pos + cigar_num[k]) >=
                           df_mutation[i, "Pos"]) &
                           cigar_type[k] == "M") {
                       snv_pos <- read_pos + df_mutation[i, "Pos"] - cigar_pos
