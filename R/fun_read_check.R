@@ -324,7 +324,6 @@ fun_read_check <- function(short_homology_search_length) {
                     asc(as.character(df_bam_qual[[depth]])))
                   if (mean(cigar_qual) >= 53) {
                     for (k in seq_len(length(cigar_type))) {
-                      duplication <- 0
                       if ((cigar_pos == mut_pos) &
                           (cigar_num[k] == alt) &
                           cigar_type[k] == "I") {
@@ -365,6 +364,8 @@ fun_read_check <- function(short_homology_search_length) {
               mut_read_id_list = list(mut_read_id_list)
             }
           } else if (mut_type == "del") {
+            indel_length <- nchar(df_mutation[i, "Ref"]) - 1
+            indel_status <- 1
             alt <- nchar(df_mutation[i, "Ref"]) - 1
             mut_pos <- NULL
             for (depth in seq_len(length(df_bam_pos))) {
@@ -382,6 +383,7 @@ fun_read_check <- function(short_homology_search_length) {
                     if ((cigar_num[k] == alt) &
                         cigar_type[k] == "D") {
                       mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
+                      print(cigar_pos)
                     }
                     if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
@@ -410,7 +412,6 @@ fun_read_check <- function(short_homology_search_length) {
                     asc(as.character(df_bam_qual[[depth]])))
                   if (mean(cigar_qual) >= 53) {
                     for (k in seq_len(length(cigar_type))) {
-                      duplication <- 0
                       if ((cigar_pos == mut_pos) &
                           (cigar_num[k] == alt) &
                           cigar_type[k] == "D") {
@@ -430,7 +431,7 @@ fun_read_check <- function(short_homology_search_length) {
                         }
                         mut_call <- 1
                         mut_position_cigar <- c(mut_position_cigar,
-                                                read_pos + df_mutation[i, "Pos"] - mut_pos) 
+                                    read_pos + df_mutation[i, "Pos"] - mut_pos) 
                       }
                     }
                     if (cigar_type[k] == "D" | cigar_type[k] == "M") {
