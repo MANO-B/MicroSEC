@@ -397,7 +397,7 @@ fun_read_check <- function(short_homology_search_length) {
                 }
               }
             }
-            print("mutation", mut_pos)
+            print(paste("mutation", mut_pos))
             if (!is.null(mut_pos)){
               mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
               for (depth in seq_len(length(df_bam_pos))) {
