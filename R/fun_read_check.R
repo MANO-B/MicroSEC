@@ -397,7 +397,6 @@ fun_read_check <- function(short_homology_search_length) {
                 }
               }
             }
-            print(paste("mutation", mut_pos))
             if (!is.null(mut_pos)){
               mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
               for (depth in seq_len(length(df_bam_pos))) {
@@ -434,12 +433,12 @@ fun_read_check <- function(short_homology_search_length) {
                         mut_position_cigar <- c(mut_position_cigar,
                                     read_pos + df_mutation[i, "Pos"] - mut_pos) 
                       }
-                    }
-                    if (cigar_type[k] == "D" | cigar_type[k] == "M") {
-                      cigar_pos <- cigar_pos + cigar_num[k]
-                    }
-                    if (cigar_type[k] != "D" & cigar_type[k] != "H") {
-                      read_pos <- read_pos + cigar_num[k]
+                      if (cigar_type[k] == "D" | cigar_type[k] == "M") {
+                        cigar_pos <- cigar_pos + cigar_num[k]
+                      }
+                      if (cigar_type[k] != "D" & cigar_type[k] != "H") {
+                        read_pos <- read_pos + cigar_num[k]
+                      }
                     }
                   }
                 }
