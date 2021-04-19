@@ -383,7 +383,6 @@ fun_read_check <- function(short_homology_search_length) {
                     if ((cigar_num[k] == alt) &
                         cigar_type[k] == "D") {
                       mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
-                      print(cigar_pos)
                     }
                     if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
