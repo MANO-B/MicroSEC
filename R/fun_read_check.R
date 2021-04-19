@@ -101,7 +101,7 @@ fun_read_check <- function(short_homology_search_length) {
     post_search_length_default <- 20
     post_search_length <- 20
     minimum_hairpin_length <- 15
-    # ref_width <- 150
+    ref_width <- 150
     hairpin_search_length_1 <- 5
     hairpin_search_length_2 <- 10
     max_mutation_search <- 50
