@@ -380,7 +380,7 @@ fun_read_check <- function(short_homology_search_length) {
                 if (mean(cigar_qual) >= 53) {
                   read_pos <- 1
                   for (k in seq_len(length(cigar_type))) {
-                    if ((cigar_num[k] == alt) &
+                    if (cigar_num[k] == alt &
                         cigar_type[k] == "D") {
                       mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
                     }
@@ -397,6 +397,7 @@ fun_read_check <- function(short_homology_search_length) {
                 }
               }
             }
+            print("mutation", mut_pos)
             if (!is.null(mut_pos)){
               mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
               for (depth in seq_len(length(df_bam_pos))) {
@@ -411,10 +412,10 @@ fun_read_check <- function(short_homology_search_length) {
                     asc(as.character(df_bam_qual[[depth]])))
                   if (mean(cigar_qual) >= 53) {
                     for (k in seq_len(length(cigar_type))) {
-                      if ((cigar_pos == mut_pos) &
-                          (cigar_num[k] == alt) &
+                      print(cigar_pos)
+                      if (cigar_pos == mut_pos &
+                          cigar_num[k] == alt &
                           cigar_type[k] == "D") {
-                        print(cigar_pos)
                         cigar_qname <- df_bam_qname[depth]
                         cigar_strand <- gsub("\\-", "r",
                                              gsub("\\+", "f",
