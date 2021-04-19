@@ -415,6 +415,7 @@ fun_read_check <- function(short_homology_search_length) {
                       if ((cigar_pos == mut_pos) &
                           (cigar_num[k] == alt) &
                           cigar_type[k] == "D") {
+                        print(cigar_pos)
                         cigar_qname <- df_bam_qname[depth]
                         cigar_strand <- gsub("\\-", "r",
                                              gsub("\\+", "f",
