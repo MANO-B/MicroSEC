@@ -40,8 +40,7 @@
 #' fun_read_check(short_homology_search_length = 4)
 #' }
 #' @export
-fun_read_check <- function(short_homology_search_length,
-                           ref_width) {
+fun_read_check <- function(short_homology_search_length) {
   if (!exists("df_mutation")) {
     df_mutation <<- exampleMutation
   }
@@ -155,12 +154,12 @@ fun_read_check <- function(short_homology_search_length,
       if (list_exist) {
         if (mut_type == "snv") {
           mut_read <- df_mut_call %>%
-          filter(Chr == df_mutation[i, "Chr"] & Pos == df_mutation[i, "Pos"])
+            filter(Chr == df_mutation[i, "Chr"] & Pos == df_mutation[i, "Pos"])
           if (dim(mut_read)[1] > 0) {
             mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
             mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
             mut_call <- which(mut_detail == str_sub(df_mutation[i, "Alt"],
-                                                      start = 1, end = 1))
+                                                    start = 1, end = 1))
           }
         } else if (mut_type == "ins") {
           indel_length <- nchar(df_mutation[i, "Alt"]) - 1
@@ -174,7 +173,7 @@ fun_read_check <- function(short_homology_search_length,
               if (dim(mut_read)[[1]] > 0) {
                 mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
                 mut_read_id_list <- str_split(
-                                      mut_read$Mut_ID, pattern = ";")[[1]]
+                  mut_read$Mut_ID, pattern = ";")[[1]]
                 mut_call <- which(mut_detail ==
                                     str_replace(df_mutation[i, "Alt"],
                                                 pattern = df_mutation[i, "Ref"],
@@ -194,11 +193,11 @@ fun_read_check <- function(short_homology_search_length,
               if (dim(mut_read)[[1]] > 0) {
                 mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
                 mut_read_id_list <- str_split(
-                                      mut_read$Mut_ID, pattern = ";")[[1]]
+                  mut_read$Mut_ID, pattern = ";")[[1]]
                 mut_call <- which(mut_detail ==
-                                  str_replace(df_mutation[i, "Ref"],
-                                              pattern = df_mutation[i, "Alt"],
-                                              replacement = ".-"))
+                                    str_replace(df_mutation[i, "Ref"],
+                                                pattern = df_mutation[i, "Alt"],
+                                                replacement = ".-"))
               }
             }
           }
@@ -233,34 +232,32 @@ fun_read_check <- function(short_homology_search_length,
                 if (mean(cigar_qual) >= 53) {
                   read_pos <- 1
                   for (k in seq_len(length(cigar_type))) {
-                    if ((cigar_pos <= df_mutation[i, "Pos"]) &
-                        ((cigar_pos + cigar_num[k]) >= df_mutation[i, "Pos"]) &
-                        cigar_type[k] == "M") {
+                    if ((cigar_pos_tmp <= df_mutation[i, "Pos"]) &
+                        ((cigar_pos_tmp + cigar_num[k]) >=
+                          df_mutation[i, "Pos"]) &
+                          cigar_type[k] == "M") {
                       snv_pos <- read_pos + df_mutation[i, "Pos"] - cigar_pos
                       if (snv_pos > 0 &
                           (snv_pos + alt - 1) <= length(cigar_seq)) {
                         if (as.character(
-                             cigar_seq[snv_pos:(snv_pos + alt - 1)]) ==
-                            df_mutation[i, "Alt"]) {
+                          cigar_seq[snv_pos:(snv_pos + alt - 1)]) ==
+                          df_mutation[i, "Alt"]) {
                           if (check_first) {
                             mut_read_id_list <- paste(cigar_qname,
                                                       cigar_strand, sep = "")
                             check_first <- FALSE
                           } else {
                             mut_read_id_list <- paste(mut_read_id_list,
-                                                          ",",
-                                                          cigar_qname,
-                                                          cigar_strand, sep ="")
+                                                      ",",
+                                                      cigar_qname,
+                                                      cigar_strand, sep ="")
                           }
                           mut_position_cigar <- c(mut_position_cigar, snv_pos) 
                           mut_call <- 1
                         }
                       }
                     }
-                    if (cigar_type[k] == "D") {
-                      cigar_pos <- cigar_pos + cigar_num[k]
-                    }
-                    if (cigar_type[k] == "M") {
+                    if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
                     }
                     if (cigar_type[k] != "D" & cigar_type[k] != "H") {
@@ -272,6 +269,8 @@ fun_read_check <- function(short_homology_search_length,
             }
             mut_read_id_list = list(mut_read_id_list)
           } else if (mut_type == "ins") {
+            indel_length <- nchar(df_mutation[i, "Alt"]) - 1
+            indel_status <- 1
             alt <- nchar(df_mutation[i, "Alt"]) - 1
             mut_pos <- NULL
             for (depth in seq_len(length(df_bam_pos))) {
@@ -291,14 +290,12 @@ fun_read_check <- function(short_homology_search_length,
                         cigar_type[k] == "I") {
                       cigar_seq <- df_bam_seq[depth][[1]]
                       if (as.character(
-                           cigar_seq[read_pos:(read_pos + alt - 1)]) ==
-                          str_sub(df_mutation[i, "Alt"], start = 2, end = -1)) {
+                        cigar_seq[read_pos:(read_pos + alt - 1)]) ==
+                        str_sub(df_mutation[i, "Alt"], start = 2, end = -1)) {
                         mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
                       }
                     }
-                    if (cigar_type[k] == "D") {
-                      cigar_pos <- cigar_pos + cigar_num[k]
-                    } else if (cigar_type[k] == "M") {
+                    if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
                     }
                     if (cigar_type[k] != "D" & cigar_type[k] != "H") {
@@ -321,7 +318,7 @@ fun_read_check <- function(short_homology_search_length,
                                           "[:digit:]+")[[1]][-1]
                   cigar_pos <- df_bam_pos[depth]
                   cigar_qual <- as.vector(
-                                  asc(as.character(df_bam_qual[[depth]])))
+                    asc(as.character(df_bam_qual[[depth]])))
                   read_pos <- 1
                   cigar_qual <- as.vector(
                     asc(as.character(df_bam_qual[[depth]])))
@@ -337,27 +334,25 @@ fun_read_check <- function(short_homology_search_length,
                                              gsub("\\+", "f",
                                                   df_bam_strand[depth]))
                         if (as.character(
-                            cigar_seq[read_pos:(read_pos + alt - 1)]) ==
-                            str_sub(df_mutation[i, "Alt"],
-                                    start = 2, end = -1)) {
+                          cigar_seq[read_pos:(read_pos + alt - 1)]) ==
+                          str_sub(df_mutation[i, "Alt"],
+                                  start = 2, end = -1)) {
                           if (check_first) {
                             mut_read_id_list <- paste(cigar_qname,
                                                       cigar_strand, sep = "")
                             check_first <- FALSE
                           } else {
                             mut_read_id_list <- paste(mut_read_id_list,
-                                                          ",",
-                                                          cigar_qname,
-                                                          cigar_strand, sep ="")
+                                                      ",",
+                                                      cigar_qname,
+                                                      cigar_strand, sep ="")
                           }
                           mut_call <- 1
                           mut_position_cigar <- c(mut_position_cigar,
-                                read_pos + df_mutation[i, "Pos"] - mut_pos) 
+                                                  read_pos + df_mutation[i, "Pos"] - mut_pos) 
                         }
                       }
-                      if (cigar_type[k] == "D") {
-                        cigar_pos <- cigar_pos + cigar_num[k]
-                      } else if (cigar_type[k] == "M") {
+                      if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                         cigar_pos <- cigar_pos + cigar_num[k]
                       }
                       if (cigar_type[k] != "D" & cigar_type[k] != "H") {
@@ -387,10 +382,11 @@ fun_read_check <- function(short_homology_search_length,
                         cigar_type[k] == "D") {
                       mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
                     }
-                    if (cigar_type[k] == "D") {
+                    if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
-                    } else if (cigar_type[k] == "M") {
-                      cigar_pos <- cigar_pos + cigar_num[k]
+                    }
+                    if (cigar_type[k] != "D" & cigar_type[k] != "H") {
+                      read_pos <- read_pos + cigar_num[k]
                     }
                   }
                   if (cigar_pos >= (df_mutation[i, "Pos"] + alt + 1)) {
@@ -417,14 +413,13 @@ fun_read_check <- function(short_homology_search_length,
                       if ((cigar_pos == mut_pos) &
                           (cigar_num[k] == alt) &
                           cigar_type[k] == "D") {
-                        cigar_seq <- df_bam_seq[depth][[1]]
                         cigar_qname <- df_bam_qname[depth]
                         cigar_strand <- gsub("\\-", "r",
-                                          gsub("\\+", "f",
-                                               df_bam_strand[depth]))
+                                             gsub("\\+", "f",
+                                                  df_bam_strand[depth]))
                         if (check_first) {
                           mut_read_id_list <- paste(cigar_qname,
-                                                cigar_strand, sep = "")
+                                                    cigar_strand, sep = "")
                           check_first <- FALSE
                         } else {
                           mut_read_id_list <- paste(mut_read_id_list,
@@ -434,12 +429,10 @@ fun_read_check <- function(short_homology_search_length,
                         }
                         mut_call <- 1
                         mut_position_cigar <- c(mut_position_cigar,
-                                   read_pos + df_mutation[i, "Pos"] - mut_pos) 
+                                                read_pos + df_mutation[i, "Pos"] - mut_pos) 
                       }
                     }
-                    if (cigar_type[k] == "D") {
-                      cigar_pos <- cigar_pos + cigar_num[k]
-                    } else if (cigar_type[k] == "M") {
+                    if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
                     }
                     if (cigar_type[k] != "D" & cigar_type[k] != "H") {
@@ -479,8 +472,8 @@ fun_read_check <- function(short_homology_search_length,
                                start = 1,
                                end = -2)
         mut_read_strand <- str_sub(str_split(mutated_id, ",")[[1]],
-                                  start = -1,
-                                  end = -1)
+                                   start = -1,
+                                   end = -1)
         mut_read_strand <- gsub("r", "-", gsub("f", "+", mut_read_strand))
         id_no <- (df_bam_pos_chr > (df_mutation[i, "Pos"] - 200) &
                     df_bam_pos_chr < (df_mutation[i, "Pos"] + 1))
@@ -494,30 +487,30 @@ fun_read_check <- function(short_homology_search_length,
         alt_length <- nchar(df_mutation[i, "Alt"])
         ref_seq <- ref_genome[[df_mutation[i, "Chr"]]][
           (df_mutation[i, "Pos"] - ref_width):
-          (df_mutation[i, "Pos"] + ref_width)]
+            (df_mutation[i, "Pos"] + ref_width)]
         ref_indel <- c(ref_seq[1:ref_width], DNAString(df_mutation[i, "Alt"]),
-                      ref_seq[(ref_width + nchar(df_mutation[i, "Ref"]) + 1):
-                                (2 * ref_width + 1)])
+                       ref_seq[(ref_width + nchar(df_mutation[i, "Ref"]) + 1):
+                                 (2 * ref_width + 1)])
         # sequence information around the mutation position
         setting <- fun_setting(pre = pre_search_length_default,
-                              post = post_search_length_default,
-                              neighbor_seq = neighbor_seq,
-                              neighbor_length = neighbor_length,
-                              alt_length = alt_length)
+                               post = post_search_length_default,
+                               neighbor_seq = neighbor_seq,
+                               neighbor_length = neighbor_length,
+                               alt_length = alt_length)
         pre_search_length <- setting[[1]]
         post_search_length <- setting[[2]]
         peri_seq_1 <- setting[[3]]
         peri_seq_2 <- setting[[4]]
         near_list_1 <- df_mut_call %>%
           filter(Chr == df_mutation[i, "Chr"] &
-                 Pos >= (df_mutation[i, "Pos"] - pos_err - pre_search_length) &
-                 Pos <= (df_mutation[i, "Pos"] + post_search_length) &
-                 Pos != (df_mutation[i, "Pos"] - pos_err))
+                   Pos >= (df_mutation[i, "Pos"] - pos_err - pre_search_length) &
+                   Pos <= (df_mutation[i, "Pos"] + post_search_length) &
+                   Pos != (df_mutation[i, "Pos"] - pos_err))
         near_list_2 <- df_mut_call %>%
           filter(Chr == df_mutation[i, "Chr"] &
-                 Pos >= (df_mutation[i, "Pos"] - pos_err - post_search_length) &
-                 Pos <= (df_mutation[i, "Pos"] + pre_search_length) &
-                 Pos != (df_mutation[i, "Pos"] - pos_err))
+                   Pos >= (df_mutation[i, "Pos"] - pos_err - post_search_length) &
+                   Pos <= (df_mutation[i, "Pos"] + pre_search_length) &
+                   Pos != (df_mutation[i, "Pos"] - pos_err))
         mut_near_1 <- dim(near_list_1)[1]
         mut_near_2 <- dim(near_list_2)[1]
         # short repeat around indel mutations
@@ -554,19 +547,19 @@ fun_read_check <- function(short_homology_search_length,
         }
         if (progress_bar == "Y") {
           pb <- utils::txtProgressBar(min = 0,
-                              max = max(1, length(mut_read_id)),
-                              width = 20,
-                              style = 3)
+                                      max = max(1, length(mut_read_id)),
+                                      width = 20,
+                                      style = 3)
           pb_t <- ceiling(length(mut_read_id) / 100)
         }
         # analyze each mutation supporting read
         for (j in seq_len(length(mut_read_id))) {
           if (length_flag == 1) {
             setting <- fun_setting(pre = pre_search_length_default,
-                                  post = post_search_length_default,
-                                  neighbor_seq = neighbor_seq,
-                                  neighbor_length = neighbor_length,
-                                  alt_length = alt_length)
+                                   post = post_search_length_default,
+                                   neighbor_seq = neighbor_seq,
+                                   neighbor_length = neighbor_length,
+                                   alt_length = alt_length)
             pre_search_length <- setting[[1]]
             post_search_length <- setting[[2]]
             peri_seq_1 <- setting[[3]]
@@ -781,31 +774,31 @@ fun_read_check <- function(short_homology_search_length,
                 }
               }
               if (length(mutation_supporting_2) != 1) {
-                  for (Lax_1 in seq(5, 15, length = 3)) {
-                    for (Lax_2 in 0:3) {
-                      if (length(mutation_supporting_2) != 1) {
-                        search_status_2 <- search_status_2 + 1
-                        setting <- fun_setting(
-                          pre = pre_search_length_default + Lax_1 * laxness,
-                          post = post_search_length_default,
-                          neighbor_seq = neighbor_seq,
-                          neighbor_length = neighbor_length,
-                          alt_length = alt_length)
-                        pre_search_length <- setting[[1]]
-                        post_search_length <- setting[[2]]
-                        peri_seq_1 <- setting[[3]]
-                        peri_seq_2 <- setting[[4]]
-                        mutation_supporting_2 <- matchPattern(
-                          peri_seq_2,
-                          df_seq,
-                          max.mismatch = mut_near_2 + Lax_2 * laxness,
-                          min.mismatch = 0,
-                          with.indels = FALSE,
-                          fixed = FALSE)
-                      }
+                for (Lax_1 in seq(5, 15, length = 3)) {
+                  for (Lax_2 in 0:3) {
+                    if (length(mutation_supporting_2) != 1) {
+                      search_status_2 <- search_status_2 + 1
+                      setting <- fun_setting(
+                        pre = pre_search_length_default + Lax_1 * laxness,
+                        post = post_search_length_default,
+                        neighbor_seq = neighbor_seq,
+                        neighbor_length = neighbor_length,
+                        alt_length = alt_length)
+                      pre_search_length <- setting[[1]]
+                      post_search_length <- setting[[2]]
+                      peri_seq_1 <- setting[[3]]
+                      peri_seq_2 <- setting[[4]]
+                      mutation_supporting_2 <- matchPattern(
+                        peri_seq_2,
+                        df_seq,
+                        max.mismatch = mut_near_2 + Lax_2 * laxness,
+                        min.mismatch = 0,
+                        with.indels = FALSE,
+                        fixed = FALSE)
                     }
                   }
                 }
+              }
               if (length(mutation_supporting_2) != 1) {
                 for (Lax_1 in seq(0, 9, length = 4)) {
                   for (Lax_2 in 4:5) {
@@ -833,31 +826,31 @@ fun_read_check <- function(short_homology_search_length,
                 }
               }
               if (length(mutation_supporting_2) != 1) {
-                  for (Lax_1 in seq(5, 20, length = 3)) {
-                    for (Lax_2 in 4:5) {
-                      if (length(mutation_supporting_2) != 1) {
-                        search_status_2 <- search_status_2 + 1
-                        setting <- fun_setting(
-                          pre = pre_search_length_default + Lax_1 * laxness,
-                          post = post_search_length_default,
-                          neighbor_seq = neighbor_seq,
-                          neighbor_length = neighbor_length,
-                          alt_length = alt_length)
-                        pre_search_length <- setting[[1]]
-                        post_search_length <- setting[[2]]
-                        peri_seq_1 <- setting[[3]]
-                        peri_seq_2 <- setting[[4]]
-                        mutation_supporting_2 <- matchPattern(
-                          peri_seq_2,
-                          df_seq,
-                          max.mismatch = mut_near_2 + Lax_2 * laxness,
-                          min.mismatch = 0,
-                          with.indels = FALSE,
-                          fixed = FALSE)
-                      }
+                for (Lax_1 in seq(5, 20, length = 3)) {
+                  for (Lax_2 in 4:5) {
+                    if (length(mutation_supporting_2) != 1) {
+                      search_status_2 <- search_status_2 + 1
+                      setting <- fun_setting(
+                        pre = pre_search_length_default + Lax_1 * laxness,
+                        post = post_search_length_default,
+                        neighbor_seq = neighbor_seq,
+                        neighbor_length = neighbor_length,
+                        alt_length = alt_length)
+                      pre_search_length <- setting[[1]]
+                      post_search_length <- setting[[2]]
+                      peri_seq_1 <- setting[[3]]
+                      peri_seq_2 <- setting[[4]]
+                      mutation_supporting_2 <- matchPattern(
+                        peri_seq_2,
+                        df_seq,
+                        max.mismatch = mut_near_2 + Lax_2 * laxness,
+                        min.mismatch = 0,
+                        with.indels = FALSE,
+                        fixed = FALSE)
                     }
                   }
                 }
+              }
               if (length(mutation_supporting_1) == 1 &
                   length(mutation_supporting_2) == 1) {
                 mut_position_1 <- min(
@@ -890,9 +883,9 @@ fun_read_check <- function(short_homology_search_length,
                     post_rep_short <- max(post_rep_short, rep_status[[4]])
                     homopolymer_status <- max(homopolymer_status, rep_status[[3]])
                   } else if (str_count(as.character(as.data.frame(
-                               mutation_supporting_1)[1]), "N") < 10 &
-                             str_count(as.character(as.data.frame(
-                               mutation_supporting_1)[1]), "N") < 10){
+                    mutation_supporting_1)[1]), "N") < 10 &
+                    str_count(as.character(as.data.frame(
+                      mutation_supporting_1)[1]), "N") < 10){
                     if (search_status_1 <= search_status_2) {
                       if (mut_position_1 > 0) {
                         mut_position <- mut_position_1
@@ -925,19 +918,19 @@ fun_read_check <- function(short_homology_search_length,
                            str_count(as.character(as.data.frame(
                              mutation_supporting_2)[1]), "N") < 10 &
                            search_status_1 < 4 & search_status_2 < 4) {
-                    indel_flag <- 1
-                    mut_position <- mut_position_2
-                    rep_status <- fun_repeat_check(
-                      df_seq[mut_position_2],
-                      df_seq[mut_position_2:(mut_position_2 + 1)],
-                      ref_seq,
-                      ref_width,
-                      del = 0)
-                    pre_rep_status <- max(pre_rep_status, rep_status[[1]])
-                    post_rep_status <- max(post_rep_status, rep_status[[2]])
-                    pre_rep_short <- max(pre_rep_short, rep_status[[3]])
-                    post_rep_short <- max(post_rep_short, rep_status[[4]])
-                    homopolymer_status <- max(homopolymer_status, rep_status[[3]])
+                  indel_flag <- 1
+                  mut_position <- mut_position_2
+                  rep_status <- fun_repeat_check(
+                    df_seq[mut_position_2],
+                    df_seq[mut_position_2:(mut_position_2 + 1)],
+                    ref_seq,
+                    ref_width,
+                    del = 0)
+                  pre_rep_status <- max(pre_rep_status, rep_status[[1]])
+                  post_rep_status <- max(post_rep_status, rep_status[[2]])
+                  pre_rep_short <- max(pre_rep_short, rep_status[[3]])
+                  post_rep_short <- max(post_rep_short, rep_status[[4]])
+                  homopolymer_status <- max(homopolymer_status, rep_status[[3]])
                 } else if (str_count(as.character(as.data.frame(
                   mutation_supporting_1)[1]), "N") < 10 &
                   str_count(as.character(as.data.frame(
@@ -968,16 +961,16 @@ fun_read_check <- function(short_homology_search_length,
                 }
               } else if (length(mutation_supporting_1) == 1) {
                 if (str_count(as.character(as.data.frame(
-                      mutation_supporting_1)[1]), "N") <= 10 &
-                    start(mutation_supporting_1) > 0) {
+                  mutation_supporting_1)[1]), "N") <= 10 &
+                  start(mutation_supporting_1) > 0) {
                   mut_position <- min(
                     length(df_seq),
                     start(mutation_supporting_1) + pre_search_length_1)
                 }
               } else if (length(mutation_supporting_2) == 1) {
                 if (str_count(as.character(as.data.frame(
-                      mutation_supporting_2)[1]), "N") <= 10 &
-                    end(mutation_supporting_2) <= length(df_seq)) {
+                  mutation_supporting_2)[1]), "N") <= 10 &
+                  end(mutation_supporting_2) <= length(df_seq)) {
                   mut_position <- min(
                     length(df_seq),
                     end(mutation_supporting_2) -
@@ -990,7 +983,7 @@ fun_read_check <- function(short_homology_search_length,
             if (mut_position > 0 & mut_position <= length(df_seq)) {
               total_read <- total_read + 1
               flag_hairpin_tmp <- 0
-
+              
               # search co-mutations on neighbor
               if (mut_position > 10) {
                 near_indel_pre_candidate <- near_indel_pre_candidate + 1
@@ -1020,7 +1013,7 @@ fun_read_check <- function(short_homology_search_length,
                   near_indel_post <- near_indel_post + 1
                 }
               }
-
+              
               if (indel_status == 1) {
                 comut_flag <- TRUE
                 for (comut in 0:3) {
@@ -1028,14 +1021,14 @@ fun_read_check <- function(short_homology_search_length,
                     co_mut_pre_tmp <- length(
                       matchPattern(df_seq[
                         max(1, (mut_position - indel_length - 1)):
-                        min((mut_position + nchar(df_mutation[i, "Alt"]) + 4),
+                          min((mut_position + nchar(df_mutation[i, "Alt"]) + 4),
                               length(df_seq))],
                         ref_indel[(ref_width - indel_length):
-                                (ref_width + nchar(df_mutation[i, "Alt"]) + 5)],
-                         max.mismatch = comut,
-                         min.mismatch = comut,
-                         with.indels = FALSE,
-                         fixed = TRUE))
+                                    (ref_width + nchar(df_mutation[i, "Alt"]) + 5)],
+                        max.mismatch = comut,
+                        min.mismatch = comut,
+                        with.indels = FALSE,
+                        fixed = TRUE))
                   }
                   if (co_mut_pre_tmp > 0) {
                     co_mut_pre <- min(co_mut_pre, comut)
@@ -1048,12 +1041,12 @@ fun_read_check <- function(short_homology_search_length,
                     co_mut_post_tmp <- length(
                       matchPattern(df_seq[
                         max(1, (mut_position - 4)):
-                        min((mut_position + nchar(df_mutation[i, "Alt"]) +
-                               indel_length - 1),
-                            length(df_seq))],
+                          min((mut_position + nchar(df_mutation[i, "Alt"]) +
+                                 indel_length - 1),
+                              length(df_seq))],
                         ref_indel[(ref_width - 3):
-                                  (ref_width + nchar(df_mutation[i, "Alt"]) +
-                                     indel_length)],
+                                    (ref_width + nchar(df_mutation[i, "Alt"]) +
+                                       indel_length)],
                         max.mismatch = comut,
                         min.mismatch = comut,
                         with.indels = FALSE,
@@ -1118,12 +1111,12 @@ fun_read_check <- function(short_homology_search_length,
                                 alt_length - 1))])
               if (minimum_hairpin_length <= length(hairpin_seq)) {
                 hairpin_status <- fun_hairpin_check(
-                          hairpin_seq[(length(hairpin_seq) -
-                                         minimum_hairpin_length + 1):
-                                      length(hairpin_seq)],
-                          ref_seq,
-                          hairpin_length,
-                          minimum_hairpin_length)
+                  hairpin_seq[(length(hairpin_seq) -
+                                 minimum_hairpin_length + 1):
+                                length(hairpin_seq)],
+                  ref_seq,
+                  hairpin_length,
+                  minimum_hairpin_length)
                 hairpin_length <- max(hairpin_length, hairpin_status[[1]])
                 flag_hairpin_tmp <- max(flag_hairpin_tmp, hairpin_status[[2]])
               }
@@ -1143,33 +1136,33 @@ fun_read_check <- function(short_homology_search_length,
                 flag_hairpin_tmp <- max(flag_hairpin_tmp, hairpin_status[[2]])
               }
               flag_hairpin <- flag_hairpin + flag_hairpin_tmp
-
+              
               # supporting length calculation
               support_status <- fun_support(df_cigar,
-                                     df_seq,
-                                     mut_read_strand[[j]],
-                                     adapter_1,
-                                     adapter_2,
-                                     mut_position,
-                                     alt_length,
-                                     indel_status)
+                                            df_seq,
+                                            mut_read_strand[[j]],
+                                            adapter_1,
+                                            adapter_2,
+                                            mut_position,
+                                            alt_length,
+                                            indel_status)
               pre_support_length_tmp <- support_status[[1]]
               post_support_length_tmp <- support_status[[2]]
               soft_clipped_read_tmp <- support_status[[3]]
-
+              
               # adjustment for consecutive snv
               if (mut_type == "snv") {
                 post_support_length_tmp <-
                   post_support_length_tmp - alt_length + 1
               }
-
+              
               # read quality check
               low_quality_base <-
                 low_quality_base + sum(df_qual < 51) / length(df_seq)
               df_qual_pre = df_qual[max(1, mut_position - 11):
-                                    max(1, mut_position - 1)]
+                                      max(1, mut_position - 1)]
               df_qual_post = df_qual[min(length(df_seq), mut_position + 1):
-                                    min(length(df_seq), mut_position + 10)]
+                                       min(length(df_seq), mut_position + 10)]
               pre_mutation_quality_score <-
                 pre_mutation_quality_score + sum(df_qual_pre < 51)
               pre_mutation_quality_num <-
@@ -1182,61 +1175,61 @@ fun_read_check <- function(short_homology_search_length,
               if (flag_hairpin_tmp == 0 & flag_hairpin == 0) {
                 if (indel_status == 1) {
                   pre_homology_search_seq <- df_seq[1:
-                    min(length(df_seq),
-                        mut_position + short_homology_search_length +
-                                       post_rep_short + alt_length - 1)]
+                                                      min(length(df_seq),
+                                                          mut_position + short_homology_search_length +
+                                                            post_rep_short + alt_length - 1)]
                   post_homology_search_seq <- df_seq[
                     max(1, mut_position - short_homology_search_length
-                                        - pre_rep_short):
-                    length(df_seq)]
+                        - pre_rep_short):
+                      length(df_seq)]
                 } else if (indel_flag == 1) {
-                    pre_homology_search_seq <- df_seq[1:
-                          min(length(df_seq),
-                              mut_position + short_homology_search_length +
-                                  post_rep_short + alt_length)]
-                    post_homology_search_seq <- df_seq[
-                      max(1, mut_position - short_homology_search_length
-                          - pre_rep_short):
-                        length(df_seq)]
+                  pre_homology_search_seq <- df_seq[1:
+                                                      min(length(df_seq),
+                                                          mut_position + short_homology_search_length +
+                                                            post_rep_short + alt_length)]
+                  post_homology_search_seq <- df_seq[
+                    max(1, mut_position - short_homology_search_length
+                        - pre_rep_short):
+                      length(df_seq)]
                 } else {
                   pre_homology_search_seq <- df_seq[1:
-                    min(length(df_seq),
-                     mut_position + short_homology_search_length + alt_length)]
+                                                      min(length(df_seq),
+                                                          mut_position + short_homology_search_length + alt_length)]
                   post_homology_search_seq <- df_seq[
                     max(1, mut_position - short_homology_search_length):
-                    length(df_seq)]
+                      length(df_seq)]
                 }
                 homology_search_tmp <- rbind(homology_search_tmp,
-                  data.frame(sample_name,
-                             Chr = df_mutation[i, "Chr"],
-                             Pos = df_mutation[i, "Pos"],
-                             Ref = df_mutation[i, "Ref"],
-                             Alt = df_mutation[i, "Alt"],
-                             Direction = "pre",
-                             Seq = as.character(pre_homology_search_seq)))
+                                             data.frame(sample_name,
+                                                        Chr = df_mutation[i, "Chr"],
+                                                        Pos = df_mutation[i, "Pos"],
+                                                        Ref = df_mutation[i, "Ref"],
+                                                        Alt = df_mutation[i, "Alt"],
+                                                        Direction = "pre",
+                                                        Seq = as.character(pre_homology_search_seq)))
                 homology_search_tmp <- rbind(homology_search_tmp,
-                  data.frame(sample_name,
-                             Chr = df_mutation[i, "Chr"],
-                             Pos = df_mutation[i, "Pos"],
-                             Ref = df_mutation[i, "Ref"],
-                             Alt = df_mutation[i, "Alt"],
-                             Direction = "post",
-                             Seq = as.character(post_homology_search_seq)))
+                                             data.frame(sample_name,
+                                                        Chr = df_mutation[i, "Chr"],
+                                                        Pos = df_mutation[i, "Pos"],
+                                                        Ref = df_mutation[i, "Ref"],
+                                                        Alt = df_mutation[i, "Alt"],
+                                                        Direction = "post",
+                                                        Seq = as.character(post_homology_search_seq)))
               }
-
+              
               # summary
               soft_clipped_read <- soft_clipped_read + soft_clipped_read_tmp
               pre_support_length <- max(pre_support_length,
-                                       pre_support_length_tmp)
+                                        pre_support_length_tmp)
               post_support_length <- max(post_support_length,
-                                        post_support_length_tmp)
+                                         post_support_length_tmp)
               short_support_length <-
                 max(short_support_length,
                     min(pre_support_length_tmp, post_support_length_tmp))
               pre_minimum_length <- min(pre_minimum_length,
-                                       pre_support_length_tmp)
+                                        pre_support_length_tmp)
               post_minimum_length <- min(post_minimum_length,
-                                        post_support_length_tmp)
+                                         post_support_length_tmp)
             }
           }
         }
@@ -1247,9 +1240,9 @@ fun_read_check <- function(short_homology_search_length,
           penalty_pre <- max(0, 4 * alt_length - 5) + 5 * co_mut_pre
           penalty_post <- max(0, 4 * alt_length - 5) + 5 * co_mut_post
         }
-
+        
         if (fun_zero(near_indel_pre, near_indel_pre_candidate) == 1 &
-             pre_minimum_length >= 10){
+            pre_minimum_length >= 10){
           post_support_length <- min(post_support_length + pre_minimum_length,
                                      read_length)
           pre_minimum_length <- 0
@@ -1265,7 +1258,7 @@ fun_read_check <- function(short_homology_search_length,
                            "because of neighbor co-mutations,")
         } 
         if (fun_zero(near_indel_post, near_indel_post_candidate) == 1 &
-             post_minimum_length >= 10) {
+            post_minimum_length >= 10) {
           pre_support_length <- min(pre_support_length + post_minimum_length,
                                     read_length)
           post_minimum_length <- 0
@@ -1277,10 +1270,10 @@ fun_read_check <- function(short_homology_search_length,
             penalty_post <- max(0, 4 * alt_length - 5)
           }
           caution <- paste(caution,
-                          "minimum_lengths are set to be 0",
-                          "because of neighbor co-mutations,")
+                           "minimum_lengths are set to be 0",
+                           "because of neighbor co-mutations,")
         }
-
+        
         # data formatting
         msec_tmp <- df_mutation[i, ] %>% dplyr::mutate(
           read_length = read_length,
