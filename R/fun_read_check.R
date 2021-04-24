@@ -40,8 +40,7 @@
 #' fun_read_check(short_homology_search_length = 4)
 #' }
 #' @export
-fun_read_check <- function(short_homology_search_length,
-                           ref_width) {
+fun_read_check <- function(short_homology_search_length) {
   if (!exists("df_mutation")) {
     df_mutation <<- exampleMutation
   }
@@ -102,7 +101,7 @@ fun_read_check <- function(short_homology_search_length,
     post_search_length_default <- 20
     post_search_length <- 20
     minimum_hairpin_length <- 15
-    # ref_width <- 150
+    ref_width <- 200
     hairpin_search_length_1 <- 5
     hairpin_search_length_2 <- 10
     max_mutation_search <- 50
