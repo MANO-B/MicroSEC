@@ -10,3 +10,4 @@ LICENSE
 MicroSEC*.tsv
 MicroSEC*.xlsx
 .DS_Store
+.ipynb_checkpoints
