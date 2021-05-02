@@ -1,0 +1,160 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.11.1
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+---
+
+```{r}
+# private source codes
+
+## Setting
+wd = "/Users/ikegami/MicroSEC"
+knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, warning=TRUE, message=TRUE, comment = "#>")
+knitr::opts_knit$set(root.dir = wd)
+options(rmarkdown.html_vignette.check_title = FALSE)
+fun_zero <- function(a, b)ifelse(b == 0, 0, a / b)
+setwd(wd)
+
+## Necessary packages
+library(tidyr)
+library(openxlsx)
+library(data.table)
+library(R.utils)
+library(stringr)
+library(magrittr)
+library(dplyr)
+library(Biostrings)
+library(BSgenome.Hsapiens.UCSC.hg38)
+library(GenomicAlignments)
+library(Rsamtools)
+library(tcltk)
+library(gtools)
+library(MicroSEC)
+library(tidyverse)
+library(ggplot2)
+
+```
+
+```{r}
+# target sequencing
+target_info = read.csv("source/target_info.txt", header=TRUE, stringsAsFactors=FALSE, sep="\t")
+target_info$Sample_gene = str_replace_all(target_info$Sample_gene, pattern="-", replacement="_")
+
+files_R1 = data.frame(file = list.files(paste(wd, "/source/validation", sep = ""), pattern="R1_001.fastq", full.names=T))
+files_R2 = data.frame(file = list.files(paste(wd, "/source/validation", sep = ""), pattern="R2_001.fastq", full.names=T))
+files_R1_2 = data.frame(file = list.files(paste(wd, "/source/validation_2", sep = ""), pattern="R1_001.fastq", full.names=T))
+files_R2_2 = data.frame(file = list.files(paste(wd, "/source/validation_2", sep = ""), pattern="R2_001.fastq", full.names=T))
+
+```
+
+```{r}
+for(i in 1:length(files_R1$file)){
+  Sample_name = as.character(files_R1$file[i])
+  Sample_name = str_split(str_split(Sample_name, pattern = "/")[[1]][7], "_S")[[1]][1]
+  Sample_name = str_replace_all(Sample_name, pattern = "-", replacement = "_")
+  info_tmp = target_info %>% dplyr::filter(Sample_gene == Sample_name)
+  forward = nchar(info_tmp$forward)
+  reverse = nchar(info_tmp$reverse)
+  Alt = nchar(info_tmp$Alt_all)
+  Ref = nchar(info_tmp$Ref_all)
+  seq_alt_f = DNAString(info_tmp$Alt_all)[(forward - 3):(Alt - reverse + 4)]
+  seq_alt_r = reverseComplement(seq_alt_f)
+  seq_ref_f = DNAString(info_tmp$Ref_all)[(forward - 3):(Ref - reverse + 4)]
+  seq_ref_r = reverseComplement(seq_ref_f)
+  df_fastq = c(readDNAStringSet(as.character(files_R1$file[i]), format="fastq"),  readDNAStringSet(as.character(files_R2$file[i]), format="fastq"))
+  print(paste(Sample_name, "ref:", sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0),
+                "alt:", sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)))
+  target_info[target_info$Sample_gene == Sample_name, "Ref_no"] = sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0)
+  target_info[target_info$Sample_gene == Sample_name, "Alt_no"] = sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)
+}
+```
+
+```{r}
+for(i in 1:length(files_R1_2$file)){
+  Sample_name = as.character(files_R1_2$file[i])
+  Sample_name = str_split(str_split(Sample_name, pattern = "/")[[1]][7], "_GAGA")[[1]][1]
+  Sample_name = str_split(Sample_name, "_CTGA")[[1]][1]
+  Sample_name = str_split(Sample_name, "_ATTC")[[1]][1]
+  Sample_name = str_split(Sample_name, "_GAAT")[[1]][1]
+  Sample_name = str_split(Sample_name, "_TAAT")[[1]][1]
+  Sample_name = str_replace_all(Sample_name, pattern = "-", replacement = "_")
+  info_tmp = target_info %>% dplyr::filter(Sample_gene == Sample_name)
+  forward = nchar(info_tmp$forward)
+  reverse = nchar(info_tmp$reverse)
+  Alt = nchar(info_tmp$Alt_all)
+  Ref = nchar(info_tmp$Ref_all)
+  seq_alt_f = DNAString(info_tmp$Alt_all)[(forward - 3):(Alt - reverse + 4)]
+  seq_alt_r = reverseComplement(seq_alt_f)
+  seq_ref_f = DNAString(info_tmp$Ref_all)[(forward - 3):(Ref - reverse + 4)]
+  seq_ref_r = reverseComplement(seq_ref_f)
+  df_fastq = c(readDNAStringSet(as.character(files_R1_2$file[i]), format="fastq"),  readDNAStringSet(as.character(files_R2_2$file[i]), format="fastq"))
+  print(paste(Sample_name, "ref:", sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0),
+                "alt:", sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)))
+  target_info[target_info$Sample_gene == Sample_name, "Ref_no"] = sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0)
+  target_info[target_info$Sample_gene == Sample_name, "Alt_no"] = sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)
+}
+```
+
+```{r}
+utils::write.table(target_info, "output/target_seq_result.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+
+```
+
+```{r}
+sessionInfo()
+```
+
+```{r}
+# target sequencing
+target_info = read.xlsx("source/SL_validation_revise.xlsx", sheet = 1)
+target_info$Sample_gene = str_replace_all(target_info$Sample_gene, pattern="-", replacement="_")
+
+files_R1 = data.frame(file = list.files(paste(wd, "/source/validation_revise", sep = ""), pattern="R1_001.fastq", full.names=T))
+files_R2 = data.frame(file = list.files(paste(wd, "/source/validation_revise", sep = ""), pattern="R2_001.fastq", full.names=T))
+
+for(i in 1:length(files_R1$file)){
+  Sample_name = as.character(files_R1$file[i])
+  Sample_name = str_split(str_split(Sample_name, pattern = "/")[[1]][7], "_S")[[1]][1]
+  Sample_name = str_replace_all(Sample_name, pattern = "-", replacement = "_")
+  info_tmp = target_info %>% dplyr::filter(Sample_gene == Sample_name)
+  forward = nchar(info_tmp$forward)
+  reverse = nchar(info_tmp$reverse)
+  Alt = nchar(info_tmp$Alt_all)
+  Ref = nchar(info_tmp$Ref_all)
+  seq_alt_f = DNAString(info_tmp$Alt_all)[(forward - 3):(Alt - reverse + 4)]
+  seq_alt_r = reverseComplement(seq_alt_f)
+  seq_ref_f = DNAString(info_tmp$Ref_all)[(forward - 3):(Ref - reverse + 4)]
+  seq_ref_r = reverseComplement(seq_ref_f)
+  df_fastq = c(readDNAStringSet(as.character(files_R1$file[i]), format="fastq"),  readDNAStringSet(as.character(files_R2$file[i]), format="fastq"))
+  print(paste(Sample_name, "ref:", sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0),
+                "alt:", sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)))
+  target_info[target_info$Sample_gene == Sample_name, "Ref_no"] = sum(vcountPattern(pattern = seq_ref_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_ref_r, subject = df_fastq) > 0)
+  target_info[target_info$Sample_gene == Sample_name, "Alt_no"] = sum(vcountPattern(pattern = seq_alt_f, subject = df_fastq) > 0) +
+                  sum(vcountPattern(pattern = seq_alt_r, subject = df_fastq) > 0)
+}
+
+utils::write.table(target_info, "output/target_seq_result_revise.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+
+
+```
