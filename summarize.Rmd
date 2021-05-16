@@ -29,6 +29,7 @@ library(MicroSEC)
 library(tidyverse)
 library(ggplot2)
 library(ggsci)
+library(epiR)
 ```
 
 ## data division
@@ -87,8 +88,11 @@ isNumeric <- function(st) {
 #MUTATION_LIST_TOP = "/Users/ikegami/Desktop/FFPE/MicroSEC/TOP_revise.xlsx"
 MUTATION_LIST = "source/supplementary_data_revise.xlsx"
 MUTATION_LIST_TOP = "source/supplementary_data_revise.xlsx"
-df_mutation =  read.xlsx(MUTATION_LIST, sheet = 1)
-df_mutation_TOP =  read.xlsx(MUTATION_LIST_TOP, sheet = 1)
+SOBD_LIST = "source/SOBDetector_df_210511.xlsx"
+df_mutation = read.xlsx(MUTATION_LIST, sheet = 1)
+df_mutation_TOP = read.xlsx(MUTATION_LIST_TOP, sheet = 1)
+df_SOBD = rbind(read.xlsx(SOBD_LIST, sheet = 1), read.xlsx(SOBD_LIST, sheet = 2))
+df_SOBD$artiStatus[is.na(df_SOBD$artiStatus)] <- "NA"
 df_mutation[is.na(df_mutation)] <- FALSE
 df_mutation_TOP[is.na(df_mutation_TOP)] <- FALSE
 df_mutation <- dplyr::mutate_all(df_mutation, ~gsub(.,pattern="Artifact suspicious",replacement = TRUE))
@@ -158,12 +162,20 @@ df_TOP = df_TOP %>% dplyr::filter(SimpleRepeat_TRF == "N")
 df_filter_5 = df_filter %>% dplyr::filter(total_read >= 5)
 df_filter = df_filter %>% dplyr::filter(total_read >= 10)
 df_TOP = df_TOP %>% dplyr::filter(total_read >= 10)
+
+df_filter$artiStatus = "NA"
+for (i in 1:length(df_filter$artiStatus)) {
+  j = df_SOBD[df_SOBD$Sample == df_filter[i,"Sample"] & df_SOBD$Chr == df_filter[i,"Chr"] & df_SOBD$Pos == df_filter[i,"Pos"],"artiStatus"]
+  if (length(j) ==1) {
+    df_filter[i,"artiStatus"] = j
+  }
+}
+
 df_filter_frozen_normal = df_filter %>% dplyr::filter(Sample %in% df_frozen_normal$Sample)
 df_filter_FFPE_normal = df_filter %>% dplyr::filter(Sample %in% df_FFPE_normal$Sample)
 df_filter_frozen_tumor = df_filter %>% dplyr::filter(Sample %in% df_frozen_tumor$Sample)
 df_filter_FFPE_tumor = df_filter %>% dplyr::filter(Sample %in% df_FFPE_tumor$Sample)
 df_filter_TOP = df_TOP
-#a = table(df_filter_FFPE_normal$Sample) #count each sample 
 df_matched = NULL
 for (i in 1:length(matched_FFPE)){
   df_matched = rbind(df_matched, dplyr::inner_join(df_filter_FFPE_tumor %>% dplyr::filter(Sample %in% matched_FFPE[i]),
@@ -413,7 +425,7 @@ df_coverage$percent9 = df_coverage$p_9 / df_coverage$coverage * 3000
 
 g = ggplot() +
   xlab("Coverage")+ ylab("Called mutations")+ 
-  ggtitle("Coverage and filtering rate") + 
+  ggtitle("Coverage and filtering rate of frozen breast tumor") + 
   scale_x_continuous(breaks=c(0, 30, 50, 100, 200, 300, 400, 1000), limits=c(0,1000)) +
   scale_y_continuous(breaks=seq(0,3000,length=6),limits=c(0,3000), sec.axis = sec_axis(~ . / 30, breaks = seq(0,100,length=6), name = "Filtering rate (%)")) +
   theme_set(theme_bw(base_size = 10)) +
@@ -736,7 +748,7 @@ df_coverage$percent9 = df_coverage$p_9 / df_coverage$coverage * 100
 
 g = ggplot() +
   xlab("Coverage")+ ylab("Called mutations")+ 
-  ggtitle("Coverage and filtering rate") + 
+  ggtitle("Coverage and filtering rate of FFPE normal breast tissue") + 
   scale_x_continuous(breaks=c(0, 30, 50, 100, 200, 300, 400, 1000), limits=c(0,1000)) +
   scale_y_continuous(breaks=seq(0,100,length=6),limits=c(0,100), sec.axis = sec_axis(~ . / 1, breaks = seq(0,100,length=6), name = "Filtering rate (%)")) +
   theme_set(theme_bw(base_size = 10)) +
@@ -1577,7 +1589,7 @@ g = g + geom_bar(stat = "identity", position = position_dodge(0.9))
 g = g + theme_set(theme_bw(base_size = 15))
 g = g + xlab("Searched length for palindromic sequences")
 g = g + ylab("Mutations filtered out by filter-2")
-g = g + ggtitle("Palindromic sequence-induced artifacts")
+g = g + ggtitle("Searching length for palindromes")
 g = g + ylim(0,500)
 g = g + scale_fill_manual(values = c("#999999", "#222222"))
 g = g + geom_text(aes(label=filter_2), position = position_dodge(0.9), vjust=-1.5)
@@ -1747,21 +1759,40 @@ ggsave(paste(wd, "/output/p_value_threshold_", Sys.Date(), ".pdf", sep=""), plot
 
 # target sequencing
 ```{r}
-target_file = "source/target.txt"
-df_target =  read.csv(target_file, stringsAsFactors=FALSE, header=TRUE, check.names=F, sep="\t")
-df_target = df_target %>% mutate(group = ifelse(MicroSEC == "Passed", "Passed", ifelse(MicroSEC == "Passed (Cg>Tg)", "Cg>Tg", "Filtered")))
+target_file = "source/target_edit_2.xlsx"
+df_target =  read.xlsx(target_file, sheet=1)
+#df_target$Transition = ""
+#df_target$Total_read_C = as.integer(df_target$Total_read_C)
+#for (i in 1:length(df_target$Sample)) {
+#  if (length(df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"Transition"])[1] > 0) {
+#    df_target[i,"Transition"] = df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"Transition"]
+#    df_target[i,"Total_read_C"] = as.integer(df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"Total_QV>=20"])
+#    df_target[i,"VAF_C"] = as.numeric(df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"%Alt"])
+#    df_target[i,"Mutation_depth_C"] = round(df_target[i,"Total_read_C"] * df_target[i,"VAF_C"] / 100)
+#  }
+#}
+#write.xlsx(df_target, "source/target_edit.xlsx")
+
+df_target = df_target %>% dplyr::mutate(group = ifelse(MicroSEC == "Passed", "Passed", ifelse(MicroSEC == "Passed (Cg>Tg)", "Cg>Tg", "Filtered")))
+df_target = df_target %>% dplyr::arrange(MicroSEC)
 #df_target = df_target %>% mutate(group = ifelse(MicroSEC == "Passed", "Passed", ifelse(MicroSEC == "Passed (Cg>Tg)", "Passed", "Filtered")))
 
-g <- ggplot(df_target, aes(x = VAF_C, y = VAF_T, size = 3, color = group))
-g <- g + geom_point()
+g <- ggplot(df_target, aes(x = VAF_C, y = VAF_T, color = group, shape = group))
+g <- g + geom_point(size = 3, alpha = 0.8)
 g <- g + scale_fill_brewer(palette = "Set1")
 g = g + theme_set(theme_bw(base_size = 15))
 g = g + xlab("VAF of capture-based sequencing (%)")
 g = g + ylab("VAF of amplicon-based sequencing (%)")
 g = g + ggtitle("Variant allele frequency")
-g = g + scale_x_continuous(breaks=seq(0,50,by=10),limits=c(0,50))
+g = g + scale_x_continuous(breaks=seq(0,70,by=20),limits=c(0,70))
 g = g + guides(colour=guide_legend(override.aes = list(size=3)))
-ggsave(paste(wd, "/output/VAF_validation_", Sys.Date(), ".pdf", sep=""), plot=g, width=8.4, height=6)
+g = g + scale_shape_discrete(solid=T)
+g = g + annotate("text", x=15, y=2, label="CENPA p.Leu91Pro, filter passed")
+g = g + annotate("text", x=14, y=-3, label="BRCA2	p.Arg2520*, filter passed, CG-to-TG")
+g = g + annotate("text", x=12, y=4, label="NFYA p.Gln155Pro, filter 1, 2")
+g = g + annotate("text", x=18, y=-1.5, label="ESR1 p.Arg394Cys, filter passed, CG-to-TG")
+
+ggsave(paste(wd, "/output/VAF_validation_", Sys.Date(), ".pdf", sep=""), plot=g, width=13, height=11)
 
 ```
 
@@ -1775,8 +1806,10 @@ g = ggplot(data=df, aes(x=`%Alt`)) +
   ggtitle("Mutations passing the filter (normal, FFPE)") +
   geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black") + 
   theme(legend.position="right")
+g = g + ylim(0,1200)
 g = g + theme_set(theme_bw(base_size = 25))
-g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + annotate("text", x=80, y=1200, size = 12, label=paste(dim(df)[1], "mutations"))
 ggsave(paste(wd, "/output/VAF_passing_FFPE_normal_", Sys.Date(), ".pdf", sep=""), plot=g, width=10, height=8)
 
 df = df_filter_FFPE_normal
@@ -1786,8 +1819,10 @@ g = ggplot(data=df, aes(x=`%Alt`)) +
   ggtitle("Total mutations (normal, FFPE)") +
   geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black") + 
   theme(legend.position="right")
+g = g + ylim(0,1200)
 g = g + theme_set(theme_bw(base_size = 25))
-g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + annotate("text", x=80, y=1200, size = 12, label=paste(dim(df)[1], "mutations"))
 ggsave(paste(wd, "/output/VAF_total_FFPE_normal_", Sys.Date(), ".pdf", sep=""), plot=g, width=10, height=8)
 
 df = df_filter_FFPE_normal %>% dplyr::filter(msec_filter_1234)
@@ -1797,8 +1832,10 @@ g = ggplot(data=df, aes(x=`%Alt`)) +
   ggtitle("Filtered out mutations (normal, FFPE)") +
   geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black") + 
   theme(legend.position="right")
+g = g + ylim(0,1200)
 g = g + theme_set(theme_bw(base_size = 25))
-g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + annotate("text", x=80, y=1200, size = 12, label=paste(dim(df)[1], "mutations"))
 ggsave(paste(wd, "/output/VAF_filtered_FFPE_normal_", Sys.Date(), ".pdf", sep=""), plot=g, width=10, height=8)
 
 df = df_filter_FFPE_tumor %>% dplyr::filter(!msec_filter_1234)
@@ -1808,8 +1845,10 @@ g = ggplot(data=df, aes(x=`%Alt`)) +
   ggtitle("Mutations passing the filter (tumor, FFPE)") +
   geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black") + 
   theme(legend.position="right")
+g = g + ylim(0,120)
 g = g + theme_set(theme_bw(base_size = 25))
-g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + annotate("text", x=80, y=120, size = 12, label=paste(dim(df)[1], "mutations"))
 ggsave(paste(wd, "/output/VAF_passing_FFPE_tumor_", Sys.Date(), ".pdf", sep=""), plot=g, width=10, height=8)
 
 df = df_filter_FFPE_tumor
@@ -1819,8 +1858,10 @@ g = ggplot(data=df, aes(x=`%Alt`)) +
   ggtitle("Total mutations (tumor, FFPE)") +
   geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black") + 
   theme(legend.position="right")
+g = g + ylim(0,120)
 g = g + theme_set(theme_bw(base_size = 25))
-g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + annotate("text", x=80, y=120, size = 12, label=paste(dim(df)[1], "mutations"))
 ggsave(paste(wd, "/output/VAF_total_FFPE_tumor_", Sys.Date(), ".pdf", sep=""), plot=g, width=10, height=8)
 
 df = df_filter_FFPE_tumor %>% dplyr::filter(msec_filter_1234)
@@ -1830,8 +1871,10 @@ g = ggplot(data=df, aes(x=`%Alt`)) +
   ggtitle("Filtered out mutations (tumor, FFPE)") +
   geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black") + 
   theme(legend.position="right")
+g = g + ylim(0,120)
 g = g + theme_set(theme_bw(base_size = 25))
-g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
+g = g + annotate("text", x=80, y=120, size = 12, label=paste(dim(df)[1], "mutations"))
 ggsave(paste(wd, "/output/VAF_filtered_FFPE_tumor_", Sys.Date(), ".pdf", sep=""), plot=g, width=10, height=8)
 
 
@@ -1879,7 +1922,7 @@ g = ggplot(data=df) +
   geom_smooth(aes(x=threshold,y=Filtered_rate),
               method = "loess",
               se = FALSE,
-              colour="black")
+              colour="red")
 #  theme(legend.position="right")
 #g = g + geom_vline(xintercept=10, linetype="dashed", colour="red")
 g = g + theme_set(theme_bw(base_size = 25))
@@ -1895,6 +1938,7 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of low-quality bases (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,2500)
 g = g + geom_vline(xintercept=10, linetype="dashed", colour="red")
 g = g + ggtitle("FFPE samples of normal breast tissue")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
@@ -1906,6 +1950,7 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of low-quality bases (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,100)
 g = g + geom_vline(xintercept=10, linetype="dashed", colour="red")
 g = g + ggtitle("Frozen samples of breast tumor")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
@@ -1920,6 +1965,7 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of soft-clipped reads (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,125)
 #g = g + geom_vline(xintercept=90, linetype="dashed", colour="red")
 g = g + ggtitle("FFPE samples of normal breast tissue")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
@@ -1931,6 +1977,7 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of soft-clipped reads (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,30)
 #g = g + geom_vline(xintercept=90, linetype="dashed", colour="red")
 g = g + ggtitle("Frozen samples of breast tumor")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
@@ -1945,6 +1992,7 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of reads derived from the hairpin structure (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,2000)
 g = g + geom_vline(xintercept=50, linetype="dashed", colour="red")
 g = g + ggtitle("FFPE samples of normal breast tissue.")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
@@ -1956,6 +2004,7 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of reads derived from the hairpin structure (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,100)
 g = g + geom_vline(xintercept=50, linetype="dashed", colour="red")
 g = g + ggtitle("Frozen samples of breast tumor.")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
@@ -1970,6 +2019,7 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of reads derived from homologous regions (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,1250)
 g = g + geom_vline(xintercept=15, linetype="dashed", colour="red")
 g = g + ggtitle("FFPE samples of normal breast tissue")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
@@ -1981,10 +2031,21 @@ g = g + geom_histogram(binwidth=2.5, boundary=0, fill = "grey", color = "black")
 g = g + theme_set(theme_bw(base_size = 25))
 g = g + xlab("Rate of reads derived from homologous regions (%)")
 g = g + ylab("Mutations")
+g = g + ylim(0,100)
 g = g + geom_vline(xintercept=15, linetype="dashed", colour="red")
 g = g + ggtitle("Frozen samples of breast tumor")
 g = g +scale_x_continuous(breaks=seq(0,100,by=20),limits=c(0,100))
 ggsave(paste(wd, "/output/distant_homology_rate_frozen_tumor_", Sys.Date(), ".pdf", sep=""), plot=g, width=10, height=8)
+```
+
+# Sensitivity and specificity analysis
+```{r}
+dat <- as.table(matrix(c(28,3,1,65), nrow = 2, byrow = TRUE))
+colnames(dat) <- c("True mutation","Artifact")
+rownames(dat) <- c("Filter passed","Filtered out")
+rval <- epi.tests(dat, conf.level = 0.95)
+print(rval); summary(rval)
+
 ```
 
 ## Information about the current R session
