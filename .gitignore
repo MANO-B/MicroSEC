@@ -9,3 +9,6 @@ Meta
 LICENSE
 MicroSEC*.tsv
 MicroSEC*.xlsx
+.DS_Store
+._.DS_Store
+.ipynb_checkpoints
