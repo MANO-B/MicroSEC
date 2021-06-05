@@ -21,3 +21,4 @@
 ^MicroSEC_summarize\.Rmd$
 ^MicroSEC_target\.Rmd$
 ^MicroSEC_test\.Rmd$
+^.ipynb_checkpoints$

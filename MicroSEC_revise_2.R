@@ -9,8 +9,8 @@
 # An additional file is preferable: mutation supporting read ID information file.  
 # A sample information tsv file is mandatory if multiple samples are processed simultaneously.  
 #
-# File 1: mutation information file (mandatory)
-# This excel file should contain at least these columns:
+# File 1: mutation information file
+# This excel file should contain at least these contents:
 #       Sample     Gene HGVS.c HGVS.p Mut_type Total_QV>=20   %Alt  Chr       Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  Transition
 # SL_1010-N6-B SLC25A24   _  _    1-snv          366 1.0929 chr1 108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  C>T_t
 # Total_QV>=20: The read number with total Q-value >=20. 
@@ -20,38 +20,37 @@
 # Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
 # If you do not know the Neighborhood_sequence, enter "-".
 #
-# File 2: BAM file (mandatory)
+# File 2: BAM file
 #
-# File 3: mutation supporting read ID information file (optional)
+# File 3: mutation supporting read ID information file
 # This file should contain at least these contents:
 #  Chr     Pos Ref Alt                                                                                                Mut_ID     Mut
 # chr1 2561609   T   A  _;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f,ID008-1:1953407r,ID002-2:749570r  .;A;N#
 #
-# File 4: sample information tsv file  (mandatory, if multiple samples are processed in a batch)
-# Six to eight columns are necessary (without column names).
-# Optional columns can be deleted if they are not applicable.
+# File 4: sample information tsv file  
+# Seven or eight columns are necessary.  
 # [sample name] [mutation information excel file] [BAM file] [optional: read ID information directory] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse]
 # PC9	./source/CCLE.xlsx	./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam	./source/PC9_Cell_line	127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
-# A375	./source/CCLE.xlsx	./source/Cell_line/A375_Cell_line_Ag_TDv4.realigned.bam	127	 AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human
-
-# Reference genome: Human (hg38 or hg19) or Mouse (mm10)
+#
+# Reference genome: Human (hg3 or hg19) or Mouse (mm10)
 #
 # This pipeline contains 8 filtering processes.
 #
-# Filter 1  : Shorter-supporting lengths distribute too unevenly to occur (1-1 and 1-2).  
+# Filter 1  : Shorter-supporting lengths distribute too short to occur (1-1 and 1-2).  
 # Filter 1-1: P-values are less than the threshold_p(default: 10^(-6)).  
-# Filter 1-2: The shorter-supporting lengths distributed over less than 75% of the read length.  
-# Filter 2  : Hairpin-structure induced error detection (2-1 and 2-2).  
+# Filter 1-2: The longest shorter-supporting lengths is shorter than 40% of the read length.  
+# Filter 2  : Hairpin-structure induced error detection (2-1 or 2-2).  
 # Filter 2-1: Palindromic sequences exist within 150 bases. 
 # Filter 2-2: >=50% mutation-supporting reads contains a reverse complementary sequence of the opposite strand consisting >= 15 bases.  
-# Filter 3  : 3’-/5’-supporting lengths are too unevenly distributed to occur (3-1 and 3-3).  
+# Filter 3  : 3’-/5’-supporting lengths are too densely distributed to occur (3-1, 3-2, and 3-3).  
 # Filter 3-1: P-values are less than the threshold_p(default: 10^(-6)).  
-# Filter 3-2: The distributions of 3’-/5’-supporting lengths are within 75% of the read length.  
+# Filter 3-2: The distributions of 3’-/5’-supporting lengths are shorter than 80% of the read length.  
+# Filter 3-3: <10% of bases are low quality (Quality score <18).
 # Filter 4  : >=15% mutations were called by chimeric reads comprising two distant regions.
 # Filter 5  : Mutations locating at simple repeat sequences.
 # Filter 6  : C>T_g false positive calls in FFPE samples.
 # Filter 7  : Mutations locating at a >=15 homopolymer.
-# Filter 8  : >=10% low quality bases (Quality score <18) in the mutation supporting reads.
+# Filter 8  : >=10% low quality bases in the mutation supporting reads.
 #
 # Supporting lengths are adjusted considering small repeat sequences around the mutations.
 #
@@ -74,9 +73,13 @@
 
 # load necessary packages
 library(MicroSEC)
+library(openxlsx)
+library(stringr)
 
 # set arguments
 args <- commandArgs(trailingOnly = T)
+cover_to = 50
+seed = 123
 
 if (args[3] == "N" | args[3] == "Y") {
   wd <- args[1]
@@ -84,7 +87,10 @@ if (args[3] == "N" | args[3] == "Y") {
   progress_bar <- args[3]
   
   setwd(wd)
-  
+
+  READ_SUMMARY = "/Users/ikegami/Desktop/FFPE/SL_read_summary_201219.xlsx"
+  df_read_summary = read.xlsx(READ_SUMMARY, sheet = 1)[,1:16]
+
   # load sample information tsv file
   sample_info <- read.csv(sample_list,
                          header = FALSE,
@@ -100,6 +106,9 @@ if (args[3] == "N" | args[3] == "Y") {
     sample_name = sample_info[sample, 1]
     mutation_file = sample_info[sample, 2]
     bam_file = sample_info[sample, 3]
+
+    sample_TDv4 = paste(str_sub(sample_name, 1, -3), "_TDv4", sep="")
+    
     if (is.character(sample_info[sample, 4]) == TRUE) {
       list_exist <- TRUE
       read_list <- sample_info[sample, 4]
@@ -129,7 +138,7 @@ if (args[3] == "N" | args[3] == "Y") {
 
     bam_file_bai = paste(bam_file, ".bai", sep="")
     if (!file.exists(bam_file_bai)) {
-      print("Sorting a BAM file...")
+      print("sorting BAM file")
       bam_file_sort = paste(bam_file, "_sort.bam", sep="")
       syscom = paste("samtools sort -@ 4 -o ",
                      bam_file_sort,
@@ -150,7 +159,7 @@ if (args[3] == "N" | args[3] == "Y") {
     
     # load mutation information
     fun_load_mutation(mutation_file, sample_name) # df_mutation
-    df_mutation = df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+    df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
     sep_new = TRUE
     continuous = FALSE
     chr_last = ""
@@ -350,16 +359,16 @@ if (args[3] == "N" | args[3] == "Y") {
           }
         }
       }
-      syscom = paste("samtools view -bS ",
-                     bam_file_slim,
-                     " > ",
+      syscom = paste("samtools sort -@ 4 -o ",
                      bam_file_tmp2,
+                     " ",
+                     bam_file_slim,
                      sep="")
       system(syscom)
-      syscom = paste("samtools sort -@ 4 -o ",
-                     bam_file_slim,
-                     " ",
+      syscom = paste("samtools view -bS ",
                      bam_file_tmp2,
+                     " > ",
+                     bam_file_slim,
                      sep="")
       system(syscom)
       syscom = paste("rm ",
@@ -376,20 +385,49 @@ if (args[3] == "N" | args[3] == "Y") {
       system(syscom)
       print(paste("Slimmed BAM files were saved as ", bam_file_slim, sep=""))
     }
+
+    bam_file_extract = paste(bam_file_slim, ".extract.bam", sep="")
+    cover_no = df_read_summary[df_read_summary$Sample == sample_TDv4,]$Mean_coverage
+    ext_rate = round(min(seed + 0.999, seed + cover_to / cover_no), digits = 3)
+    print(paste("extracting for depth ",
+                cover_to,
+                "...",
+                sep=""))
+    syscom = paste("samtools view -s ",
+                   ext_rate,
+                   " -b ",
+                   bam_file_slim,
+                   " > ",
+                   bam_file_tmp2,
+                   sep="")
+    system(syscom)
+    syscom = paste("samtools sort -@ 4 -o ",
+                   bam_file_extract,
+                   " ",
+                   bam_file_tmp2,
+                   sep="")
+    system(syscom)
+    syscom = paste("samtools index ",
+                   bam_file_extract,
+                   sep="")
+    system(syscom)
+    syscom = paste("rm ",
+                   bam_file_tmp2,
+                   sep="")
+    system(syscom)
     
-    bam_file = bam_file_slim
+    bam_file = bam_file_extract
     fun_load_bam(bam_file) # df_bam
     if (list_exist) {
       fun_load_id(read_list) # df_mut_call
     }
     
     # analysis
-    result = fun_read_check(short_homology_search_length = 4)
+    result = fun_read_check(short_homology_search_length = 4,
+                            ref_width = 150)
     msec = rbind(msec, result[[1]])
     homology_search = rbind(homology_search, result[[2]])
-    mut_depth = list(rbind(mut_depth[[1]], result[[3]][[1]]),
-                     rbind(mut_depth[[2]], result[[3]][[2]]),
-                     rbind(mut_depth[[3]], result[[3]][[3]])) 
+    mut_depth = rbind(mut_depth, result[[3]])
   }
   # search homologous sequences
   msec = fun_homology(msec,
@@ -424,13 +462,15 @@ if (args[3] == "N" | args[3] == "Y") {
   progress_bar = "N"
   list_exist <- TRUE
   
+  sample_TDv4 = paste(str_sub(sample_name, 1, -3), "_TDv4", sep="")
+  
   # load genomic sequence
   fun_load_genome(organism) # ref_genome
   fun_load_chr_no(organism) # chr_no
 
   # load mutation information
   fun_load_mutation_gz(mutation_file) # df_mutation
-  df_mutation = df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+  df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
   sep_new = TRUE
   continuous = FALSE
   chr_last = ""
@@ -630,16 +670,16 @@ if (args[3] == "N" | args[3] == "Y") {
         }
       }
     }
-    syscom = paste("samtools view -bS ",
-                   bam_file_slim,
-                   " > ",
+    syscom = paste("samtools sort -@ 4 -o ",
                    bam_file_tmp2,
+                   " ",
+                   bam_file_slim,
                    sep="")
     system(syscom)
-    syscom = paste("samtools sort -@ 4 -o ",
-                   bam_file_slim,
-                   " ",
+    syscom = paste("samtools view -bS ",
                    bam_file_tmp2,
+                   " > ",
+                   bam_file_slim,
                    sep="")
     system(syscom)
     syscom = paste("rm ",
@@ -662,7 +702,8 @@ if (args[3] == "N" | args[3] == "Y") {
   fun_load_id(read_list) # df_mut_call
 
   # analysis
-  result = fun_read_check(short_homology_search_length = 4)
+  result = fun_read_check(short_homology_search_length = 4,
+                          ref_width = 150)
   msec = result[[1]]
   homology_search = result[[2]]
   mut_depth = result[[3]]

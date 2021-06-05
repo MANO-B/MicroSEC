@@ -116,9 +116,6 @@ fun_load_mutation <- function(mutation_file,
       Neighborhood_sequence =
         paste(Pre_Neighbor, Alt, Post_Neighbor, sep = ""))
   }
-  #df_mutation <<- df_mutation %>%
-  #  select(Sample, Gene, HGVS.c, HGVS.p, Mut_type, `Total_QV>=20`, `%Alt`, Chr,
-  #         Pos, Ref, Alt, SimpleRepeat_TRF, Neighborhood_sequence, Transition)
   df_mutation$Pos <<- as.integer(df_mutation$Pos)
   df_mutation <<- df_mutation %>%
     filter(Sample == sample_name) %>%
