@@ -1759,9 +1759,11 @@ ggsave(paste(wd, "/output/p_value_threshold_", Sys.Date(), ".pdf", sep=""), plot
 
 # target sequencing
 ```{r}
-target_file = "source/target_edit_2.xlsx"
+target_file = "source/target_edit_3.xlsx"
 df_target =  read.xlsx(target_file, sheet=1)
 #df_target$Transition = ""
+#df_target$hairpin = 0
+#df_target$distant_homology_rate = 0
 #df_target$Total_read_C = as.integer(df_target$Total_read_C)
 #for (i in 1:length(df_target$Sample)) {
 #  if (length(df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"Transition"])[1] > 0) {
@@ -1769,9 +1771,12 @@ df_target =  read.xlsx(target_file, sheet=1)
 #    df_target[i,"Total_read_C"] = as.integer(df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"Total_QV>=20"])
 #    df_target[i,"VAF_C"] = as.numeric(df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"%Alt"])
 #    df_target[i,"Mutation_depth_C"] = round(df_target[i,"Total_read_C"] * df_target[i,"VAF_C"] / 100)
+#    df_target[i,"hairpin"] = df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"flag_hairpin"] /
+#                              df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"total_read"] * 100
+#    df_target[i,"distant_homology_rate"] = df_filter[df_filter$Sample == df_target[i,"Sample"] & df_filter$Gene == df_target[i,"Gene"] & df_filter$Pos == df_target[i,"Pos"],"distant_homology_rate"] * 100
 #  }
 #}
-#write.xlsx(df_target, "source/target_edit.xlsx")
+#write.xlsx(df_target, "source/target_edit_3.xlsx")
 
 df_target = df_target %>% dplyr::mutate(group = ifelse(MicroSEC == "Passed", "Passed", ifelse(MicroSEC == "Passed (Cg>Tg)", "Cg>Tg", "Filtered")))
 df_target = df_target %>% dplyr::arrange(MicroSEC)
