@@ -556,7 +556,9 @@ for (sample in seq_len(dim(sample_info)[1])) {
   result <- fun_read_check(short_homology_search_length = 4)
   msec <- rbind(msec, result[[1]])
   homology_search <- rbind(homology_search, result[[2]])
-  mut_depth <- rbind(mut_depth, result[[3]])
+  mut_depth = list(rbind(mut_depth[[1]], result[[3]][[1]]),
+                   rbind(mut_depth[[2]], result[[3]][[2]]),
+                   rbind(mut_depth[[3]], result[[3]][[3]])) 
 }
 # search homologous sequences
 msec <- fun_homology(msec,
