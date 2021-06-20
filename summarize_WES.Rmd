@@ -1,0 +1,312 @@
+# private source codes
+
+## Setting
+```{r, eval=FALSE}
+wd = "/Users/ikegami/MicroSEC"
+knitr::opts_chunk$set(collapse = TRUE, fig.width=12, fig.height=8, echo=TRUE, warning=FALSE, message=TRUE, comment = "#>")
+knitr::opts_knit$set(root.dir = wd)
+options(rmarkdown.html_vignette.check_title = FALSE)
+fun_zero <- function(a, b)ifelse(b == 0, 0, a / b)
+setwd(wd)
+```
+
+## Necessary packages
+```{r packages, eval=FALSE}
+library(tidyr)
+library(openxlsx)
+library(data.table)
+library(R.utils)
+library(stringr)
+library(magrittr)
+library(dplyr)
+library(Biostrings)
+library(BSgenome.Hsapiens.UCSC.hg38)
+library(GenomicAlignments)
+library(Rsamtools)
+library(tcltk)
+library(gtools)
+library(MicroSEC)
+library(tidyverse)
+library(ggplot2)
+library(ggsci)
+library(epiR)
+```
+# analysis
+```{r}
+
+isNumeric <- function(st) {
+  return(!is.na(suppressWarnings(as.numeric(st))))
+}
+
+MUTATION_LIST = "/Users/ikegami/MicroSEC/source/SEC_data/summary_WES.xlsx"
+SAMPLE_LIST = "/Users/ikegami/MicroSEC/source/SEC_data/Sample_WES.xlsx"
+df_sample = read.xlsx(SAMPLE_LIST, sheet = 1)
+df_mutation = read.xlsx(MUTATION_LIST, sheet = 1)
+df_mutation[is.na(df_mutation)] <- FALSE
+df_mutation <- dplyr::mutate_all(df_mutation, ~gsub(.,pattern="Artifact suspicious",replacement = TRUE))
+for (i in 1:dim(df_mutation)[2]) {
+  if (isNumeric(df_mutation[1,i])){
+    df_mutation[,i] <- as.numeric(df_mutation[,i])
+  }
+  if (df_mutation[1,i] %in% c("TRUE", "FALSE")){
+    df_mutation[,i] <- as.logical(df_mutation[,i])
+  }
+}
+
+
+df_mutation = df_mutation %>% dplyr::mutate(Transition =
+            ifelse(Mut_type == "1-snv" & (str_sub(Neighborhood_sequence, 21, 22) == "TG" & Ref == "C") | (str_sub(Neighborhood_sequence, 20, 21) == "CA" & Ref == "G"), "C>T_g", Transition))
+df_mutation = df_mutation %>% dplyr::mutate(filter_6_c_to_t_artifact =
+            ifelse(Transition == "C>T_g", TRUE, FALSE))
+matched_FFPE = c("SEC-10_CRC-004-T1_FFPE_00-B1_00",
+"SEC-10_CRC-007-T1_FFPE_00-B1_00",
+"SEC-10_CRC-008-T1_FFPE_00-B1_00",
+"SEC-10_CRC-009-T1_FFPE_00-B1_00",
+"SEC-10_CRC-010-T1_FFPE_00-B1_00",
+"SEC-10_CRC-011-T1_FFPE_00-B1_00",
+"SEC-10_CRC-012-T1_FFPE_00-B1_00",
+"SEC-10_CRC-013-T1_FFPE_00-B1_00",
+"SEC-10_CRC-017-T1_FFPE_00-B1_00",
+"SEC-10_CRC-018-T1_FFPE_00-B1_00",
+"SEC-10_CRC-019-T1_FFPE_00-B1_00",
+"SEC-10_CRC-020-T1_FFPE_00-B1_00",
+"SEC-10_OSCC-014-T1_FFPE_02-B1_02",
+"SEC-10_OSCC-015-T1_FFPE_02-N1")
+
+matched_frozen = c("SEC-10_CRC-004-T1_FR_00-B1_00",
+"SEC-10_CRC-007-T1_FR_00-B1_00",
+"SEC-10_CRC-008-T1_FR_00-B1_00",
+"SEC-10_CRC-009-T1_FR_00-B1_00",
+"SEC-10_CRC-010-T1_FR_00-B1_00",
+"SEC-10_CRC-011-T1_FR_00-B1_00",
+"SEC-10_CRC-012-T1_FR_00-B1_00",
+"SEC-10_CRC-013-T1_FR_00-B1_00",
+"SEC-10_CRC-017-T1_FR_00-B1_00",
+"SEC-10_CRC-018-T1_FR_00-B1_00",
+"SEC-10_CRC-019-T1_FR_00-B1_00",
+"SEC-10_CRC-020-T1_FR_00-B1_00",
+"SEC-10_OSCC-014-T1_FR_02-B1_02",
+"SEC-10_OSCC-015-T1_FR_02-B1_02")
+Homo_length = 10
+df_mutation = df_mutation %>% dplyr::mutate(Homopolymer =
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, 21 - Homo_length, 20), str_dup("C", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, -20, -(21 - Homo_length)), str_dup("C", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("A", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("T", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("G", Homo_length)) > 0 |
+            str_count(str_sub(Neighborhood_sequence, (22 - Homo_length), -(22 - Homo_length)), str_dup("C", Homo_length)) > 0)
+df_filter = df_mutation %>% dplyr::filter(filter_7_mutation_at_homopolymer == FALSE & !filter_8_low_quality)
+df_filter = df_filter %>% dplyr::filter(`%Alt` >= 5)
+df_filter = df_filter %>% dplyr::filter(SimpleRepeat_TRF == "N")
+df_filter = df_filter %>% dplyr::filter(total_read >= 10)
+
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample)
+df_matched = NULL
+for (i in 1:length(matched_FFPE)){
+  df_matched = rbind(df_matched, dplyr::inner_join(df_filter_FFPE_WES %>% dplyr::filter(Sample %in% matched_FFPE[i]),
+                                       df_filter_frozen_WES %>% dplyr::filter(Sample %in% matched_frozen[i]),
+                                       by=c("Chr", "Pos", "Ref", "Alt")))
+}
+data_matched = data.frame("Number" = "Total_mutations",
+                          "FF_only" = dim(df_filter_frozen_WES %>% dplyr::filter(Sample %in% matched_frozen))[1] - dim(df_matched)[1],
+                          "FF_and_FFPE"= dim(df_matched)[1],
+                          "FFPE_only" = dim(df_filter_FFPE_WES %>% dplyr::filter(Sample %in% matched_FFPE))[1] - dim(df_matched)[1])
+data_mutations = data.frame("Number" = "ALL_samples_No_filter",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+utils::write.table(df_filter_frozen_WES, "output/df_filter_frozen_WES.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+utils::write.table(df_filter_FFPE_WES, "output/df_filter_FFPE_WES.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+```
+
+## summarize
+```{r}
+# Median not used and not correct
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & filter_1_mutation_intra_hairpin_loop)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & filter_1_mutation_intra_hairpin_loop)
+data_mutations_tmp = data.frame("Number" = "Filter_1",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & filter_2_hairpin_structure)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & filter_2_hairpin_structure)
+data_mutations_tmp = data.frame("Number" = "Filter_2",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & filter_3_microhomology_induced_mutation)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & filter_3_microhomology_induced_mutation)
+data_mutations_tmp = data.frame("Number" = "Filter_3",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & filter_4_highly_homologous_region)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & filter_4_highly_homologous_region)
+data_mutations_tmp = data.frame("Number" = "Filter_4",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & msec_filter_1234)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & msec_filter_1234)
+data_mutations_tmp = data.frame("Number" = "Filter_1234",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_matched = NULL
+for (i in 1:length(matched_FFPE)){
+  df_matched = rbind(df_matched, dplyr::inner_join(df_filter_FFPE_WES %>% dplyr::filter(Sample %in% matched_FFPE[i]),
+                                       df_filter_frozen_WES %>% dplyr::filter(Sample %in% matched_frozen[i]),
+                                       by=c("Chr", "Pos", "Ref", "Alt")))
+}
+data_matched_tmp = data.frame("Number" = "Filtered_mutations",
+                          "FF_only" = dim(df_filter_frozen_WES %>% dplyr::filter(Sample %in% matched_frozen))[1] - dim(df_matched)[1],
+                          "FF_and_FFPE"= dim(df_matched)[1],
+                          "FFPE_only" = dim(df_filter_FFPE_WES %>% dplyr::filter(Sample %in% matched_FFPE))[1] - dim(df_matched)[1])
+data_matched = rbind(data_matched, data_matched_tmp)
+data_matched_tmp = data.frame("Number" = "Filter_passing_mutations",
+                          "FF_only" = data_matched$FF_only[1] - data_matched$FF_only[2],
+                          "FF_and_FFPE"= data_matched$FF_and_FFPE[1] - data_matched$FF_and_FFPE[2],
+                          "FFPE_only" = data_matched$FFPE_only[1] - data_matched$FFPE_only[2])
+data_matched = rbind(data_matched, data_matched_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & !msec_filter_1234)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & !msec_filter_1234)
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & !msec_filter_1234 & (Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & !msec_filter_1234 & (Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_T>C",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & !msec_filter_1234)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & !msec_filter_1234 & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g"))
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_notC>T",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & !msec_filter_1234 & Homopolymer)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & !msec_filter_1234 & Homopolymer)
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_Homo",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+df_filter_frozen_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FF"))$Sample & !msec_filter_1234 & !Homopolymer)
+df_filter_FFPE_WES = df_filter %>% dplyr::filter(Sample %in% (df_sample %>% dplyr::filter(type == "FFPE"))$Sample & !msec_filter_1234 & !(Transition == "C>T_g_FFPE" | Transition == "C>T_g") & !Homopolymer)
+data_mutations_tmp = data.frame("Number" = "Filter_passing_1234_notC>T_notHomo",
+                          "FF_WES_sample" = 14,
+                          "FFPE_WES_sample" = 14,
+                          "FF_WES_min" = min(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_min" = min(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_max" = max(sort(rle(sort(df_filter_frozen_WES$Sample))$lengths)),
+                          "FFPE_WES_max" = max(sort(rle(sort(df_filter_FFPE_WES$Sample))$lengths)),
+                          "FF_WES_sum" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths),
+                          "FFPE_WES_sum" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths),
+                          "FF_WES_mean" = sum(rle(sort(df_filter_frozen_WES$Sample))$lengths) / 14,
+                          "FFPE_WES_mean" = sum(rle(sort(df_filter_FFPE_WES$Sample))$lengths) / 14
+                          )
+data_mutations = rbind(data_mutations, data_mutations_tmp)
+utils::write.table(data_matched, "output/data_matched_WES.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+utils::write.table(data_mutations, "output/data_mutations_WES.tsv", sep = "\t", na = "",
+              row.names = FALSE, col.names = TRUE, quote = FALSE)
+```
