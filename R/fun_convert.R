@@ -64,7 +64,6 @@ fun_convert <- function(mutation_file,
   fun_load_genome(organism)
   # genome sequence extraction functions
   fun_genome <- function(x, y) {
-    ref_genome <- NULL
     r <- NULL
     for (i in seq_len(length(x))) {
       r <- c(r, as.character(ref_genome[[x[i]]][y[i]]))
@@ -72,7 +71,6 @@ fun_convert <- function(mutation_file,
     return(r)
   }
   fun_genome_2 <- function(x, y, z) {
-    ref_genome <- NULL
     r <- NULL
     for (i in seq_len(length(x))) {
       r <- c(r, as.character(ref_genome[[x[i]]][y[i]:z[i]]))
@@ -105,6 +103,10 @@ fun_convert <- function(mutation_file,
     Mut_type = ifelse(Mut_type == "snp", "snv", Mut_type))
   df_mutation <- df_mutation %>% dplyr::mutate(
     Mut_type = ifelse(Mut_type == "dnp", "snv", Mut_type))
+  df_mutation <- df_mutation %>% dplyr::mutate(
+    Mut_type = ifelse(Mut_type == "tnp", "snv", Mut_type))
+  df_mutation <- df_mutation %>% dplyr::mutate(
+    Mut_type = ifelse(Mut_type == "onp", "snv", Mut_type))
   df_mutation <- df_mutation %>% dplyr::mutate(
     Alt_length = (((Alt_length_1 - Alt_length_2) +
                    abs(Alt_length_1 - Alt_length_2)) / 2) +
