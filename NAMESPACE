@@ -2,6 +2,7 @@
 
 export(fun_analysis)
 export(fun_convert)
+export(fun_convert_fast)
 export(fun_homology)
 export(fun_insert_length)
 export(fun_load_bam)

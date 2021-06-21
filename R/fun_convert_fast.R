@@ -15,13 +15,13 @@
 #' @importFrom stringr str_detect
 #' @examples
 #' \donttest{
-#' fun_convert(
+#' fun_convert_fast(
 #'   system.file("extdata", "convert_test.xlsx", package = "MicroSEC"),
 #'   "hg19"
 #' )
 #' }
 #' @export
-fun_convert <- function(mutation_file,
+fun_convert_fast <- function(mutation_file,
                         organism) {
   Hugo_Symbol <- NULL
   Protein_Change <- NULL
@@ -66,14 +66,8 @@ fun_convert <- function(mutation_file,
   fun_genome <- function(x, y) {
     r <- NULL
     for (i in seq_len(length(x))) {
+      print(i)
       r <- c(r, as.character(ref_genome[[x[i]]][y[i]]))
-    }
-    return(r)
-  }
-  fun_genome_2 <- function(x, y, z) {
-    r <- NULL
-    for (i in seq_len(length(x))) {
-      r <- c(r, as.character(ref_genome[[x[i]]][y[i]:z[i]]))
     }
     return(r)
   }
