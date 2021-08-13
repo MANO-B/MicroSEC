@@ -19,7 +19,7 @@ This function attempts to convert the mutation information file.
 }
 \examples{
 \donttest{
-fun_convert(
+fun_convert_fast(
   system.file("extdata", "convert_test.xlsx", package = "MicroSEC"),
   "hg19"
 )
