@@ -22,10 +22,10 @@
 ^MicroSEC_target\.Rmd$
 ^MicroSEC_test\.Rmd$
 ^.ipynb_checkpoints$
-summarize_WES.Rmd
-MicroSEC_revise.R
-WES_revise.xlsx
-target_revise.Rmd
-BAM_slim.R
-MANOSEC.ipynb
-MANOSEC-Copy1.ipynb
+^summarize_WES\.Rmd$
+^MicroSEC_revise\.R$
+^WES_revise\.xlsx$
+^target_revise\.Rmd$
+^BAM_slim\.R$
+^MANOSEC\.ipynb$
+^MANOSEC-Copy1\.ipynb$
