@@ -47,6 +47,7 @@ fun_load_mutation <- function(mutation_file,
 
   # load somatic mutation list
   df_mutation <<- read.xlsx(mutation_file, sheet = 1)
+  df_mutation <<- df_mutation[complete.cases(df_mutation$Sample),]
   # data formatting
   if (!"HGVS.c" %in% colnames(df_mutation)) {
     df_mutation$HGVS.c <<- "NA"
@@ -84,6 +85,9 @@ fun_load_mutation <- function(mutation_file,
       return(r)
     }
     df_mutation$Chr <<- as.character(df_mutation$Chr)
+    if(str_sub(df_mutation$Chr[[1]], start=1, end=3) != "chr"){
+      df_mutation$Chr = paste("chr", df_mutation$Chr, sep="")
+    }
     df_mutation$Pos <<- as.integer(df_mutation$Pos)
     mut_len <- as.integer(str_split(df_mutation[,"Mut_type"], "-",
                                     simplify = TRUE)[,1])
