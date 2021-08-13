@@ -22,3 +22,5 @@
 ^MicroSEC_target\.Rmd$
 ^MicroSEC_test\.Rmd$
 ^.ipynb_checkpoints$
+MANOSEC.ipynb
+MANOSEC-Copy1.ipynb
