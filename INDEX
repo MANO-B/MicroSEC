@@ -1,0 +1,32 @@
+exampleBAM              An example BAM file.
+exampleMutCall          An example mutated read ID file.
+exampleMutation         An example mutation file.
+fun_analysis            Analyzing function.
+fun_convert             Mutation data file converter
+fun_convert_fast        Mutation data file converter
+fun_hairpin_check       Hairpin-structure sequence check function
+fun_hairpin_trimming    Adapter sequence trimming function
+fun_homology            Homology check function.
+fun_insert_length       Insert length checker for BAM file
+fun_load_bam            BAM file loader
+fun_load_chr_no         Chromosome number loading function.
+fun_load_genome         Genome loading function.
+fun_load_id             Mutation-supporting read ID files loader
+fun_load_mutation       Mutation data file loader
+fun_load_mutation_gz    Mutation data file loader
+fun_normal_support      Supporting length calculation function.
+fun_read_check          Read check function.
+fun_repeat_check        Repeat check function.
+fun_save                Save function.
+fun_save_gz             Save function.
+fun_setting             Mutated position search function.
+fun_summary             Summarizing function.
+fun_support             Supporting length calculation function.
+fun_zero                Devide function without 0/0 errors
+homology_searched       An example sequence infromation file.
+msec_analyzed           An example mutation file.
+msec_homology_searched
+                        An example mutation file.
+msec_read_checked       An example mutation file.
+msec_summarized         An example mutation file.
+mut_depth_checked       An example sequence infromation file.

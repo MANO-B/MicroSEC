@@ -19,26 +19,26 @@ LazyData: true
 Depends: R (>= 3.4.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Imports:
-  tidyr,
-  openxlsx,
-  data.table,
-  R.utils,
-  stringr,
-  magrittr,
-  dplyr,
-  gtools,
-  Biostrings,
-  GenomicAlignments,
-  Rsamtools,
-  GenomeInfoDb,
-  BiocGenerics
-Suggests: 
-  BSgenome.Hsapiens.UCSC.hg38,
-  BSgenome.Hsapiens.UCSC.hg19,
-  BSgenome.Mmusculus.UCSC.mm10,
-  knitr,
-  rmarkdown
+Imports: tidyr, openxlsx, data.table, R.utils, stringr, magrittr,
+        dplyr, gtools, Biostrings, GenomicAlignments, Rsamtools,
+        GenomeInfoDb, BiocGenerics
+Suggests: BSgenome.Hsapiens.UCSC.hg38, BSgenome.Hsapiens.UCSC.hg19,
+        BSgenome.Mmusculus.UCSC.mm10, knitr, rmarkdown
 VignetteBuilder: knitr
 URL: https://github.com/MANO-B/MicroSEC/
 BugReports: https://github.com/MANO-B/MicroSEC/issues
+RemoteType: github
+RemoteHost: api.github.com
+RemoteRepo: MicroSEC
+RemoteUsername: MANO-B
+RemoteRef: HEAD
+RemoteSha: beb3de29b3dafcc3503e790046aa11da21dc55b4
+GithubRepo: MicroSEC
+GithubUsername: MANO-B
+GithubRef: HEAD
+GithubSHA1: beb3de29b3dafcc3503e790046aa11da21dc55b4
+NeedsCompilation: no
+Packaged: 2021-07-03 15:38:19 UTC; ikegami
+Author: Masachika Ikegami [aut, cre]
+Maintainer: Masachika Ikegami <ikegamitky@gmail.com>
+Built: R 3.4.1; ; 2021-07-03 15:38:21 UTC; unix

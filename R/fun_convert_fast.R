@@ -125,7 +125,7 @@ fun_convert_fast <- function(mutation_file,
     -Alt_length, -Ref_ins, -Ref_del, -Ref_snv, -Alt_ins, -Alt_del, -Alt_snv,
     -Alt_indel, -Ref_indel,
     -Hugo_Symbol, -Start_position, -End_position, -Variant_Type,
-    -Reference, -Tumor_Seq, -Protein_Change, -Start, -End)
+    -Reference, -Tumor_Seq, -Start, -End)
   return(df_mutation)
 }
 
