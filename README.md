@@ -52,7 +52,7 @@ SL_1010-N6-B SLC25A24    _      _      1-snv    366            1.0929 chr1 10813
     - Mut_type: [altered bases]-[mutation type (snv, ins, or del)]. 1-snv, 3-snv, 3-del, 1-ins, etc.  
     - Total_QV>=20: The read number with total Q-value >=20.  
     - Chr: chr1-22, chrX, and chrY for hg19 and hg38. 1-20, X, and Y for mm10.  
-           Depending on the version of the package, "chr" may or may not be necessary.  
+           MicroSEC handle both "chr1" and "1" format chromosomes.  
     - Pos/Ref/Alt: There are some difference from HGVS nomenclature as follows:  
           - 131C>T -> Pos/Ref/Alt 131/C/T.  
           - 514_515insC and 514A -> Pos/Ref/Alt 514/A/AC  
