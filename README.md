@@ -667,6 +667,7 @@ df_CCLE <- utils::read.csv("CCLE_DepMap_18q3_maf_20180718.txt",
 df_CCLE <- df_CCLE %>% dplyr::filter(Tumor_Sample_Barcode == "NCIH2286_LUNG")
 df_CCLE$Sample <- df_CCLE$Tumor_Sample_Barcode
 df_CCLE$Chr <- df_CCLE$Chromosome
+df_CCLE$Chr <- as.character(df_CCLE$Chr)
 df_CCLE$Reference <- df_CCLE$Reference_Allele
 df_CCLE$Tumor_Seq <- df_CCLE$Tumor_Seq_Allele1
 seqlevelsStyle(df_CCLE$Chr) <- "UCSC"
