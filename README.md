@@ -607,6 +607,7 @@ A conversion function is prepared.
 ```
 # Conversion example
 # Set column names correctly.
+# Sort by "Chr" and "Start_position" before conversion.
 #
 # Before (hg19)
 # Sample Hugo_Symbol    Chr   Start_position   End_position Variant_Type Reference Tumor_Seq Protein_Change
