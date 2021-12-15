@@ -23,10 +23,7 @@ paper:
 paraffin-embedded samples"  
 
 ## Supplementary Code
-> M. Ikegami et al., "MicroSEC: Sequence error filtering pipeline for 
-formalin-fixed and paraffin-embedded samples", in preparation.
-DOI: 10.21203/rs.3.rs-153650/v1
-https://www.researchsquare.com/article/rs-153650/v1
+> M. Ikegami et al., "MicroSEC filters sequence errors for formalin-fixed and paraffin-embedded samples", Commun Biol 4, 1396 (2021). https://doi.org/10.1038/s42003-021-02930-4
 
 ## Contents
 
