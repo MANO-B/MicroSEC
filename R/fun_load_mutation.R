@@ -94,25 +94,25 @@ fun_load_mutation <- function(mutation_file,
     mut_type <- str_split(df_mutation[,"Mut_type"], "-",
                                     simplify = TRUE)[,2]
     df_mutation <<- df_mutation %>% dplyr::mutate(
-      Mut_len = mut_len,
-      Mut_type = mut_type)
+      mut_len = mut_len,
+      mut_type = mut_type)
     df_mutation <<- df_mutation %>% dplyr::mutate(
       Neighbor_start_1 =
         ifelse(
-          Mut_type == "ins", Pos - 19,
+          mut_type == "ins", Pos - 19,
           ifelse(
-            Mut_type == "del", Pos - 19, Pos - 20)),
+            mut_type == "del", Pos - 19, Pos - 20)),
       Neighbor_end_1 = Pos - 1,
       Neighbor_start_2 =
         ifelse(
-          Mut_type == "ins", Pos + 1,
+          mut_type == "ins", Pos + 1,
           ifelse(
-            Mut_type == "del", Pos + Mut_len + 1, Pos + Mut_len)),
+            mut_type == "del", Pos + mut_len + 1, Pos + mut_len)),
       Neighbor_end_2 =
         ifelse(
-          Mut_type == "ins", Pos + 20,
+          mut_type == "ins", Pos + 20,
           ifelse(
-            Mut_type == "del", Pos + Mut_len + 20, Pos + Mut_len + 19)))
+            mut_type == "del", Pos + mut_len + 20, Pos + mut_len + 19)))
       df_mutation <<- df_mutation %>% dplyr::mutate(
       Pre_Neighbor = fun_genome(Chr, Neighbor_start_1, Neighbor_end_1),
       Post_Neighbor = fun_genome(Chr, Neighbor_start_2, Neighbor_end_2))
