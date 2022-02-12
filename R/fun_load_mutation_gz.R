@@ -32,6 +32,7 @@ fun_load_mutation_gz <- function(mutation_file) {
     if (!"Transition" %in% colnames(df_mutation)) {
       df_mutation$Transition <<- "NA"
     }
+    df_mutation$Chr_original <<- df_mutation$Chr
     df_mutation$Pos <<- as.integer(df_mutation$Pos)
     df_mutation <<- df_mutation %>%
       mutate(Ref = toupper(Ref)) %>%
