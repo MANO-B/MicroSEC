@@ -85,6 +85,7 @@ fun_load_mutation <- function(mutation_file,
       return(r)
     }
     df_mutation$Chr <<- as.character(df_mutation$Chr)
+    df_mutation$Chr_original <<- df_mutation$Chr
     if(str_sub(df_mutation$Chr[[1]], start=1, end=3) != "chr"){
       df_mutation$Chr <<- paste("chr", df_mutation$Chr, sep="")
     }
