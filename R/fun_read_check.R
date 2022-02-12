@@ -85,7 +85,9 @@ fun_read_check <- function(short_homology_search_length) {
   if (!is.character(df_chr)) {
     df_chr <- as.character(df_chr)
   }
-  GenomeInfoDb::seqlevelsStyle(df_chr) <- "UCSC"
+  if(str_sub(df_chr[[1]], start=1, end=3) != "chr"){
+    GenomeInfoDb::seqlevelsStyle(df_chr) <- "UCSC"
+  }
   
   if (length(df_mutation[, 1]) > 0) {
     # initialize
