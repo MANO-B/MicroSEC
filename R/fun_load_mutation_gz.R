@@ -8,6 +8,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
+#' @importFrom stringr str_sub
 #' @examples
 #' fun_load_mutation_gz(
 #'   system.file("extdata", "test_mutation.tsv", package = "MicroSEC")
@@ -33,6 +34,10 @@ fun_load_mutation_gz <- function(mutation_file) {
       df_mutation$Transition <<- "NA"
     }
     df_mutation$Chr_original <<- df_mutation$Chr
+    if(str_sub(df_mutation$Chr[[1]], start=1, end=3) != "chr"){
+      df_mutation$Chr <<- paste("chr", df_mutation$Chr, sep="")
+    }
+
     df_mutation$Pos <<- as.integer(df_mutation$Pos)
     df_mutation <<- df_mutation %>%
       mutate(Ref = toupper(Ref)) %>%
