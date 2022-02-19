@@ -93,10 +93,13 @@ fun_convert <- function(mutation_file,
   df_mutation$Pos <- as.integer(df_mutation$Pos)
   df_mutation$Start <- as.integer(df_mutation$Start)
   df_mutation$End <- as.integer(df_mutation$End)
+  if(str_sub(df_mutation$Chr[[1]], start=1, end=3) != "chr"){
+      df_mutation$Chr_ <- paste("chr", df_mutation$Chr, sep="")
+  }
   df_mutation <- df_mutation %>% dplyr::mutate(
-    PRE_del = fun_genome(Chr, Start - 1),
-    PRE_ins = fun_genome(Chr, Start),
-    POST_ins = fun_genome(Chr, End),
+    PRE_del = fun_genome(Chr_, Start - 1),
+    PRE_ins = fun_genome(Chr_, Start),
+    POST_ins = fun_genome(Chr_, End),
     Alt_length_1 = nchar(Ref),
     Alt_length_2 = nchar(Alt))
   df_mutation <- df_mutation %>% dplyr::mutate(
@@ -126,8 +129,8 @@ fun_convert <- function(mutation_file,
     Neighbor_start_2 = End + 1,
     Neighbor_end_2 = End + 20)
   df_mutation <- df_mutation %>% dplyr::mutate(
-    Pre_Neighbor = fun_genome_2(Chr, Neighbor_start_1, Neighbor_end_1),
-    Post_Neighbor = fun_genome_2(Chr, Neighbor_start_2, Neighbor_end_2))
+    Pre_Neighbor = fun_genome_2(Chr_, Neighbor_start_1, Neighbor_end_1),
+    Post_Neighbor = fun_genome_2(Chr_, Neighbor_start_2, Neighbor_end_2))
   df_mutation <- df_mutation %>% dplyr::mutate(
     Neighborhood_sequence =
       ifelse(
@@ -151,7 +154,7 @@ fun_convert <- function(mutation_file,
     -Neighbor_end_1, -Neighbor_end_2,
     -Pre_Neighbor, -Post_Neighbor,
     -Hugo_Symbol, -Start_position, -End_position, -Variant_Type,
-    -Reference, -Tumor_Seq, -Protein_Change, -Start, -End)
+    -Reference, -Tumor_Seq, -Protein_Change, -Start, -End, -Chr_)
   return(df_mutation)
 }
 
