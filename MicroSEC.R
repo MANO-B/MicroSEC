@@ -128,8 +128,6 @@ if (args[3] == "N" | args[3] == "Y") {
     }
 
     bam_file_bai = paste(bam_file, ".bai", sep="")
-    bam_file_tmp1 = paste(bam_file, ".tmp1", sep="")
-    bam_file_tmp2 = paste(bam_file, ".tmp2", sep="")
     bam_file_slim = paste(bam_file, ".SLIM", sep="")
     if (!file.exists(bam_file_bai) & !file.exists(bam_file_slim)) {
       print("Sorting a BAM file...")
@@ -146,7 +144,10 @@ if (args[3] == "N" | args[3] == "Y") {
       system(syscom)
       bam_file = bam_file_sort
     }
-    
+    bam_file_tmp1 = paste(bam_file, ".tmp1", sep="")
+    bam_file_tmp2 = paste(bam_file, ".tmp2", sep="")
+    bam_file_slim = paste(bam_file, ".SLIM", sep="")
+
     # load genomic sequence
     fun_load_genome(organism) # ref_genome
     fun_load_chr_no(organism) # chr_no
