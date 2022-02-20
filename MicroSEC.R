@@ -128,7 +128,10 @@ if (args[3] == "N" | args[3] == "Y") {
     }
 
     bam_file_bai = paste(bam_file, ".bai", sep="")
-    if (!file.exists(bam_file_bai)) {
+    bam_file_tmp1 = paste(bam_file, ".tmp1", sep="")
+    bam_file_tmp2 = paste(bam_file, ".tmp2", sep="")
+    bam_file_slim = paste(bam_file, ".SLIM", sep="")
+    if (!file.exists(bam_file_bai) & !file.exists(bam_file_slim)) {
       print("Sorting a BAM file...")
       bam_file_sort = paste(bam_file, "_sort.bam", sep="")
       syscom = paste("samtools sort -@ 4 -o ",
@@ -155,9 +158,6 @@ if (args[3] == "N" | args[3] == "Y") {
     continuous = FALSE
     chr_last = ""
     pos_last = 0
-    bam_file_tmp1 = paste(bam_file, ".tmp1", sep="")
-    bam_file_tmp2 = paste(bam_file, ".tmp2", sep="")
-    bam_file_slim = paste(bam_file, ".SLIM", sep="")
     if (!file.exists(bam_file_slim)) {
       for (mut_no in seq_len(dim(df_mutation)[1])) {
         print(paste(mut_no, "/", dim(df_mutation)[1]))
