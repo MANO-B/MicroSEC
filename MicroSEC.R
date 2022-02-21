@@ -159,6 +159,7 @@ if (args[3] == "N" | args[3] == "Y") {
     continuous = FALSE
     chr_last = ""
     pos_last = 0
+    df_mutation$Chr_original = df_mutation$Chr
     if (!file.exists(bam_file_slim)) {
       for (mut_no in seq_len(dim(df_mutation)[1])) {
         print(paste(mut_no, "/", dim(df_mutation)[1]))
