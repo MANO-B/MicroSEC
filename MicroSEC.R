@@ -72,6 +72,12 @@
 # Results are saved in a excel file.
 # The explatation of the results is written in detail in the second sheet of the excel file.
 
+# Unzip and concatenate fasta gzip file(s) into 1 file.
+command <- list("./01_MergeFa.sh", "dirname")
+system2("sh", args = command,
+        stdout = "./test_stdout.txt",
+        stderr = "./test_stderr.txt")
+    
 # load necessary packages
 library(MicroSEC)
 
