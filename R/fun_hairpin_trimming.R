@@ -26,7 +26,7 @@ fun_hairpin_trimming <- function(hairpin_seq,
                                  subject = hairpin_seq,
                                  max.Rmismatch = 0.1,
                                  with.Rindels = TRUE)
-    hairpin_seq <- str_split(hairpin_seq,
+    hairpin_seq <- str_split(as.character(hairpin_seq),
                             str_sub(adapter_1, 1, 15))[[1]]
     if (length(hairpin_seq) > 1) {
       hairpin_seq <- hairpin_seq[[1]]
@@ -46,7 +46,7 @@ fun_hairpin_trimming <- function(hairpin_seq,
     hairpin_seq <- trimLRPatterns(Rpattern = adapter_2,
                                  subject = hairpin_seq,
                                  max.Rmismatch = 0.1)
-    hairpin_seq <- str_split(hairpin_seq,
+    hairpin_seq <- str_split(as.character(hairpin_seq),
                             str_sub(adapter_1, 1, 15))[[1]]
     if (length(hairpin_seq) > 1) {
       hairpin_seq <- hairpin_seq[[1]]
