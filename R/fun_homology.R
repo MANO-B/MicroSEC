@@ -93,7 +93,7 @@ fun_homology <- function(msec,
       df_distant$distant_homology <- distant_homology
       if (progress_bar == "Y") {
         pb <- utils::txtProgressBar(min = 0,
-                            max = max(1, dim(df_distant)[1]),
+                            max = max(1, max_no),
                             width = 20,
                             style = 3)
         pb_t <- ceiling(max_no / 100)
