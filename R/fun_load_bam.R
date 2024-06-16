@@ -21,6 +21,7 @@ fun_load_bam <- function(bam_file) {
   df_bam$strand[which(is.na(df_bam$strand))] <<- "NA"
   df_bam$pos[which(is.na(df_bam$pos))] <<- 0
   df_bam$cigar[which(is.na(df_bam$cigar))] <<- "150H"
+  df_bam$cigar[which(df_bam$cigar == "*")] <<- "150H"
 }
 
 # The following block is used by usethis to automatically manage
