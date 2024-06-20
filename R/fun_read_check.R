@@ -1234,10 +1234,10 @@ fun_read_check <- function(short_homology_search_length) {
 
               pre_farthest_tmp = pre_support_length
               post_farthest_tmp = post_support_length
-              if(df_strand == "+" & df_isize < 5000 & df_isize > 0){
+              if(df_strand == "+" & df_isize < 1000 & df_isize > 0){
                 post_farthest_tmp = max(post_farthest_tmp, df_isize - pre_support_length_tmp - alt_length)
               }
-              if(df_strand == "-" & df_isize > -5000 & df_isize < 0){
+              if(df_strand == "-" & df_isize > -1000 & df_isize < 0){
                 pre_farthest_tmp = max(pre_farthest_tmp, - df_isize - post_support_length - alt_length)
               }
               
@@ -1255,9 +1255,9 @@ fun_read_check <- function(short_homology_search_length) {
               post_minimum_length <- min(post_minimum_length,
                                          post_support_length_tmp)
               pre_farthest <- max(pre_farthest,
-                                        pre_farthest_tmp)
+                                  pre_farthest_tmp)
               post_farthest <- max(post_farthest,
-                                         post_farthest_tmp)
+                                   post_farthest_tmp)
             }
           }
         }
