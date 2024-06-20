@@ -150,6 +150,7 @@ fun_read_check <- function(short_homology_search_length) {
         df_bam_cigar_chr <- df_bam$cigar[id_no]
         df_bam_qual_chr <- df_bam$qual[id_no]
         df_bam_pos_chr <- df_bam$pos[id_no]
+        df_bam_isize_chr <- df_bam$isize[id_no]
         ref_genome <<- NULL
         gc()
         gc()
@@ -216,6 +217,7 @@ fun_read_check <- function(short_homology_search_length) {
         df_bam_cigar <- df_bam_cigar_chr[id_no]
         df_bam_pos <- df_bam_pos_chr[id_no]
         df_bam_qual <- df_bam_qual_chr[id_no]
+        df_bam_isize <- df_bam_isize_chr[id_no]
         check_first <- TRUE
         mut_position_cigar <- logical(0)
         if (length(df_bam_pos) > 0) {
@@ -457,6 +459,8 @@ fun_read_check <- function(short_homology_search_length) {
         pre_support_length <- 0
         post_support_length <- 0
         short_support_length <- 0
+        pre_farthest <- 0
+        post_farthest <- 0
         pre_minimum_length <- read_length
         post_minimum_length <- read_length
         pre_rep_status <- 0
@@ -587,16 +591,21 @@ fun_read_check <- function(short_homology_search_length) {
           df_strand <- df_bam_strand[id_no]
           df_cigar <- df_bam_cigar[id_no]
           df_qual <- df_bam_qual[id_no]
+          df_isize <- df_bam_isize[id_no]
           df_seq <- df_seq[df_strand == mut_read_strand[[j]]]
           df_cigar <- df_cigar[df_strand == mut_read_strand[[j]]]
           df_qual <- df_qual[df_strand == mut_read_strand[[j]]]
+          df_isize <- df_isize[df_strand == mut_read_strand[[j]]]
+          df_strand = mut_read_strand[[j]]
           if (length(df_seq) > 1) {
             df_cigar <- df_cigar[which.max(width(df_seq))]
             df_qual <- df_qual[which.max(width(df_seq))]
+            df_isize <- df_isize[which.max(width(df_seq))]
             df_seq <- df_seq[which.max(width(df_seq))]
           }
           df_seq <- df_seq[[1]]
           df_qual <- as.vector(asc(as.character(df_qual[1])))
+          df_isize <- as.integer(df_isize[[1]])
           if (length(df_seq) > 20) {
             # determine mutation position in each read
             if (list_exist) {
@@ -1222,6 +1231,15 @@ fun_read_check <- function(short_homology_search_length) {
                                                         Direction = "post",
                                                         Seq = as.character(post_homology_search_seq)))
               }
+
+              pre_farthest_tmp = pre_support_length
+              post_farthest_tmp = post_support_length
+              if(df_strand == "+" & df_isize < 5000 & df_isize > 0){
+                post_farthest_tmp = max(post_farthest_tmp, df_isize - pre_support_length_tmp - alt_length)
+              }
+              if(df_strand == "-" & df_isize > -5000 & df_isize < 0){
+                pre_farthest_tmp = max(pre_farthest_tmp, - df_isize - post_support_length - alt_length)
+              }
               
               # summary
               soft_clipped_read <- soft_clipped_read + soft_clipped_read_tmp
@@ -1236,6 +1254,10 @@ fun_read_check <- function(short_homology_search_length) {
                                         pre_support_length_tmp)
               post_minimum_length <- min(post_minimum_length,
                                          post_support_length_tmp)
+              pre_farthest <- max(pre_farthest,
+                                        pre_farthest_tmp)
+              post_farthest <- max(post_farthest,
+                                         post_farthest_tmp)
             }
           }
         }
@@ -1294,6 +1316,8 @@ fun_read_check <- function(short_homology_search_length) {
           short_support_length = short_support_length,
           pre_minimum_length = pre_minimum_length,
           post_minimum_length = post_minimum_length,
+          pre_farthest = pre_farthest,
+          post_farthest = post_farthest,
           low_quality_base_rate_under_q18 =
             fun_zero(low_quality_base, total_read),
           low_quality_pre =
@@ -1328,6 +1352,8 @@ fun_read_check <- function(short_homology_search_length) {
           short_support_length = 0,
           pre_minimum_length = 0,
           post_minimum_length = 0,
+          pre_farthest = 0,
+          post_farthest = 0,
           low_quality_base_rate_under_q18 = 0,
           low_quality_pre = 0,
           low_quality_post = 0,
