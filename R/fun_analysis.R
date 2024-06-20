@@ -30,7 +30,7 @@
 #'              threshold_distant_homology = 0.15,
 #'              threshold_low_quality_rate = 0.1,
 #'              homopolymer_length = 15,
-                )
+#'              farthest_position = 60)
 #' @export
 fun_analysis <- function(msec,
                         mut_depth,
