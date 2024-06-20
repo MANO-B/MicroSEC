@@ -48,7 +48,6 @@ fun_homology <- function(msec,
   fixed_seq_post <- NULL
   if (!is.null(df_distant)) {
     msec$distant_homology <- 0
-    msec$distant_homology_total <- 0
     df_distant <- df_distant %>% dplyr::mutate(
       Seq = as.character(Seq))
     df_distant <- df_distant %>% dplyr::mutate(
@@ -106,16 +105,6 @@ fun_homology <- function(msec,
             cat(paste(" Homology count:", i, "/", max_no, "      "))
           }
         }
-        msec[msec$Sample == tmp_distant$sample_name &
-                   msec$Chr == tmp_distant$Chr &
-                   msec$Pos == tmp_distant$Pos &
-                   msec$Ref == tmp_distant$Ref &
-                   msec$Alt == tmp_distant$Alt, ]$distant_homology_total <-
-        msec[msec$Sample == tmp_distant$sample_name &
-                   msec$Chr == tmp_distant$Chr &
-                   msec$Pos == tmp_distant$Pos &
-                   msec$Ref == tmp_distant$Ref &
-                   msec$Alt == tmp_distant$Alt, ]$distant_homology_total + 1
         if (dim(df_distant[df_distant$number == i, ])[1] == 1) {
           tmp_distant <- df_distant[df_distant$number == i, ][1, ]
           if (tmp_distant$distant_homology > 0) {
