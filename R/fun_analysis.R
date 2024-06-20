@@ -29,8 +29,7 @@
 #'              threshold_short_length = 0.8,
 #'              threshold_distant_homology = 0.15,
 #'              threshold_low_quality_rate = 0.1,
-#'              homopolymer_length = 15,
-#'              farthest_position = 60
+#'              homopolymer_length = 15
 #' )
 #' @export
 fun_analysis <- function(msec,
@@ -42,8 +41,7 @@ fun_analysis <- function(msec,
                         threshold_short_length,
                         threshold_distant_homology,
                         threshold_low_quality_rate,
-                        homopolymer_length,
-                        farthest_position = 60) {
+                        homopolymer_length) {
   if (dim(msec)[1] > 0) {
     short_support_length_total <- NULL
     half_length_total <- NULL
@@ -280,7 +278,7 @@ fun_analysis <- function(msec,
                TRUE, FALSE),
       filter_4_highly_homologous_region =
         ifelse((distant_homology_rate >= threshold_distant_homology &
-                (pre_farthest < farthest_position | post_farthest < farthest_position) &
+                (pre_farthest == pre_support_length | post_farthest == post_support_length) &
                   not_long_repeat),
                TRUE, FALSE),
       filter_5_simple_repeat =
@@ -368,27 +366,7 @@ fun_analysis <- function(msec,
           "Artifact suspicious", ""),
         comment = caution
       )
-    msec <- msec %>% select(-mut_type, -alt_length, -hairpin_length,
-            -pre_minimum_length, -post_minimum_length,
-            -pre_rep_status, -post_rep_status,
-            -homopolymer_status, -indel_status, -indel_length, -penalty_pre,
-            -penalty_post, -caution, -pre_minimum_length_adj, -half_length,
-            -post_minimum_length_adj, -pre_support_length_adj,
-            -post_support_length_adj, -shortest_support_length_adj,
-            -minimum_length_1, -minimum_length_2, -minimum_length,
-            -short_support_length_adj, -altered_length, -distant_homology,
-            -short_support_length_total, -pre_support_length_total,
-            -post_support_length_total, -half_length_total,
-            -total_length_total, -high_rate_q18,
-            -short_short_support, -short_pre_support, -short_post_support,
-            -not_long_repeat,
-            -short_short_support_sum, -short_pre_support_sum,
-            -short_post_support_sum,
-            -short_support_length_adj_sum,
-            -pre_support_length_adj_sum, -post_support_length_adj_sum,
-            -half_length_adj_sum, -total_length_pre_adj_sum,
-            -total_length_post_adj_sum
-            )
+    msec <- msec %>% select(-caution)
   }
   return(msec)
 }
