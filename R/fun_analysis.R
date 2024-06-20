@@ -29,7 +29,8 @@
 #'              threshold_short_length = 0.8,
 #'              threshold_distant_homology = 0.15,
 #'              threshold_low_quality_rate = 0.1,
-#'              homopolymer_length = 15)
+#'              homopolymer_length = 15,
+                )
 #' @export
 fun_analysis <- function(msec,
                         mut_depth,
@@ -40,7 +41,8 @@ fun_analysis <- function(msec,
                         threshold_short_length,
                         threshold_distant_homology,
                         threshold_low_quality_rate,
-                        homopolymer_length) {
+                        homopolymer_length,
+                        farthest_position = 60) {
   if (dim(msec)[1] > 0) {
     short_support_length_total <- NULL
     half_length_total <- NULL
@@ -277,7 +279,7 @@ fun_analysis <- function(msec,
                TRUE, FALSE),
       filter_4_highly_homologous_region =
         ifelse((distant_homology_rate >= threshold_distant_homology &
-                (pre_farthest < 60 | post_farthest < 60) &
+                (pre_farthest < farthest_position | post_farthest < farthest_position) &
                   not_long_repeat),
                TRUE, FALSE),
       filter_5_simple_repeat =
