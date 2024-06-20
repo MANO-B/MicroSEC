@@ -1232,8 +1232,8 @@ fun_read_check <- function(short_homology_search_length) {
                                                         Seq = as.character(post_homology_search_seq)))
               }
 
-              pre_farthest_tmp = pre_support_length
-              post_farthest_tmp = post_support_length
+              pre_farthest_tmp = pre_support_length_tmp
+              post_farthest_tmp = post_support_length_tmp
               if(df_strand == "+" & df_isize < 1000 & df_isize > 0){
                 post_farthest_tmp = max(post_farthest_tmp, df_isize - pre_support_length_tmp - alt_length)
               }
