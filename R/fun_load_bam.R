@@ -16,11 +16,12 @@ fun_load_bam <- function(bam_file) {
   file_bam <- BamFile(bam_file)
   df_bam <<- scanBam(file_bam)[[1]]
   df_bam <<- df_bam[c("qname", "rname", "strand", "cigar",
-                      "seq", "qual", "pos")]
+                      "seq", "qual", "pos", "isize")]
   df_bam$strand <<- as.character(df_bam$strand)
   df_bam$strand[which(is.na(df_bam$strand))] <<- "NA"
   df_bam$pos[which(is.na(df_bam$pos))] <<- 0
   df_bam$cigar[which(is.na(df_bam$cigar))] <<- "150H"
+  df_bam$isize[which(is.na(df_bam$isize))] <<- 10000
 }
 
 # The following block is used by usethis to automatically manage
