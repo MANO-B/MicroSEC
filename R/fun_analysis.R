@@ -70,6 +70,8 @@ fun_analysis <- function(msec,
     short_post_support <- NULL
     short_post_support_sum <- NULL
     soft_clipped_read <- NULL
+    pre_farthest <- NULL
+    post_farthest <- NULL    
     distant_homology_rate <- NULL
     not_long_repeat <- NULL
     SimpleRepeat_TRF <- NULL
@@ -275,6 +277,7 @@ fun_analysis <- function(msec,
                TRUE, FALSE),
       filter_4_highly_homologous_region =
         ifelse((distant_homology_rate >= threshold_distant_homology &
+                (pre_farthest < 60 | post_farthest < 60) &
                   not_long_repeat),
                TRUE, FALSE),
       filter_5_simple_repeat =
