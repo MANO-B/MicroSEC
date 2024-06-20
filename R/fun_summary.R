@@ -44,6 +44,10 @@ fun_summary <- function(msec) {
       distant_homology_rate = fun_zero(distant_homology, total_read)
     )
     msec <- msec %>% mutate(
+      penalty_pre = ifelse(penalty_pre == 1, 0, penalty_pre),
+      penalty_post = ifelse(penalty_post == 1, 0, penalty_post),
+    )
+    msec <- msec %>% mutate(
       pre_minimum_length_adj = ifelse(indel_status == 1,
           (((pre_minimum_length - (indel_length + penalty_pre + 1)) +
           abs(pre_minimum_length - (indel_length + penalty_pre + 1))) / 2) +
