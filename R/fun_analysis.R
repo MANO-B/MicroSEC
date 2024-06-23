@@ -278,7 +278,7 @@ fun_analysis <- function(msec,
                TRUE, FALSE),
       filter_4_highly_homologous_region =
         ifelse((distant_homology_rate >= threshold_distant_homology &
-                (pre_farthest == pre_support_length | post_farthest == post_support_length) &
+                #(pre_farthest == pre_support_length | post_farthest == post_support_length) &
                   not_long_repeat),
                TRUE, FALSE),
       filter_5_simple_repeat =
