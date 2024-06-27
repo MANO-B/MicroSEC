@@ -382,7 +382,7 @@ fun_analysis <- function(msec,
                           -post_support_length_adj,
                           -shortest_support_length_adj,
                           -minimum_length_1, -minimum_length_2, -minimum_length,
-                          -short_support_length_adj, -altered_length
+                          -short_support_length_adj, -altered_length,
                           -distant_homology,
                           -short_support_length_total,
                           -pre_support_length_total,
