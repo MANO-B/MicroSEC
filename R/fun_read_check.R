@@ -656,8 +656,8 @@ fun_read_check <- function(df_mutation,
                   comut_flag <- TRUE
                   for (comut in 0:3) {
                     if (comut_flag == TRUE) {
+                      print(9)
                       co_mut_pre_tmp <- length(
-                        print(9)
                         matchPattern(df_seq[
                           max(1, (mut_position - max(1, alt_length * 4 - 5))):
                             mut_position],
