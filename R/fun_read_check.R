@@ -558,7 +558,7 @@ fun_read_check <- function(df_mutation,
             df_isize <- df_isize[which.max(width(df_seq))]
             df_seq <- df_seq[which.max(width(df_seq))]
           }
-          df_seq <- df_seq[[1]]
+          df_seq <- df_seq[[1]
           df_qual <- as.vector(asc(as.character(df_qual[1])))
           df_isize <- as.integer(df_isize[[1]])
           if (length(df_seq) > 20) {
@@ -571,8 +571,9 @@ fun_read_check <- function(df_mutation,
               # search co-mutations on neighbor
               if (mut_position > 10) {
                 near_indel_pre_candidate <- near_indel_pre_candidate + 1
-                print(df_seq)
-                print(df_seq[[1]])
+                print(df_seq[(mut_position - 10):mut_position],
+                      ref_indel[(ref_width - 9):(ref_width + 1)])
+                print(class(df_seq))
                 co_mut_pre_tmp <- length(
                   matchPattern(
                     df_seq[(mut_position - 10):mut_position],
