@@ -38,7 +38,8 @@ fun_summary <- function(msec) {
   altered_length <- NULL
   short_support_length_adj <- NULL
   half_length <- NULL
-
+  soft_clipped_rate <- NULL
+  
   if (dim(msec)[1] > 0) {
     msec <- msec %>% mutate(
       distant_homology_rate = fun_zero(distant_homology, total_read)
@@ -163,7 +164,8 @@ fun_summary <- function(msec) {
       half_length_total =
         half_length - minimum_length + 1,
       total_length_total =
-        read_length - altered_length - minimum_length_1 - minimum_length_2 + 1
+        read_length - altered_length - minimum_length_1 - minimum_length_2 + 1,
+      soft_clipped_rate = fun_zero(soft_clipped_read, total_read)
     )
   }
   return(msec)

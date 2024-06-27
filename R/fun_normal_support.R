@@ -18,7 +18,7 @@ fun_normal_support <- function(df_cigar,
   cigar_num <- as.integer(str_split(df_cigar, "[:upper:]")[[1]])
   cigar_type <- str_split(df_cigar, "[:digit:]+")[[1]][-1]
   tmp_pos <- df_pos - 1
-  alt <- alt_length * (1 - indel_status)
+  alt <- (alt_length - 1) * (1 - indel_status)
   for (k in seq_len(length(cigar_type))) {
     if (cigar_type[k] == "D") {
       tmp_pos <- tmp_pos + cigar_num[k]

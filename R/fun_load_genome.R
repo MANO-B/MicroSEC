@@ -13,19 +13,19 @@ fun_load_genome <- function(organism) {
       stop("Install BSgenome.Hsapiens.UCSC.hg38 package.",
            call. = FALSE)
     }
-    ref_genome <<- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+    return(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
   } else if (organism %in% c("Mouse", "mm10")) {
     if (!requireNamespace("BSgenome.Mmusculus.UCSC.mm10", quietly = TRUE)) {
       stop("Install BSgenome.Mmusculus.UCSC.mm10 package.",
            call. = FALSE)
     }
-    ref_genome <<- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+    return(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
   } else if (organism %in% c("hg19")) {
     if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
       stop("Install BSgenome.Hsapiens.UCSC.hg19 package.",
            call. = FALSE)
     }
-    ref_genome <<- BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
+    return(BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19)
   }
 }
 

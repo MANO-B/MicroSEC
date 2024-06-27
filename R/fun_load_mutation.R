@@ -16,26 +16,22 @@
 #' @importFrom stringr str_detect
 #' @examples
 #' fun_load_mutation(
-#'   system.file("extdata", "test_mutation.xlsx", package = "MicroSEC"),
-#'  "H15-11943-1-T_TDv3"
+#'   system.file("extdata", "test_mutation.tsv", package = "MicroSEC"),
+#'   "H15-11943-1-T_TDv3",
+#'   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 #' )
 #' @export
 fun_load_mutation <- function(mutation_file,
-                             sample_name) {
+                             sample_name,
+                             ref_genome) {
   Sample <- NULL
-  Gene <- NULL
-  `HGVS.c` <- NULL
-  `HGVS.p` <- NULL
   Mut_type <- NULL
-  `Total_QV>=20` <- NULL
-  `%Alt` <- NULL
   Chr <- NULL
   Pos <- NULL
   Ref <- NULL
   Alt <- NULL
   SimpleRepeat_TRF <- NULL
   Neighborhood_sequence <- NULL
-  Transition <- NULL
   Neighbor_start_1 <- NULL
   Neighbor_start_2 <- NULL
   eighbor_end_1 <- NULL
@@ -44,38 +40,77 @@ fun_load_mutation <- function(mutation_file,
   Post_Neighbor <- NULL
   Mut_len <- NULL
 
-
   # load somatic mutation list
-  df_mutation <<- read.xlsx(mutation_file, sheet = 1)
-  df_mutation <<- df_mutation[complete.cases(df_mutation$Sample),]
+  df_mutation <- utils::read.csv(mutation_file,
+                                 stringsAsFactors = FALSE,
+                                 header = TRUE,
+                                 check.names = F,
+                                 sep = "\t")
+  df_mutation <- df_mutation[complete.cases(df_mutation$Sample),] %>%
+    filter(Sample == sample_name)
+  df_mutation <- df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
+  
   # data formatting
-  if (!"HGVS.c" %in% colnames(df_mutation)) {
-    df_mutation$HGVS.c <<- "NA"
-  }
-  if (!"HGVS.p" %in% colnames(df_mutation)) {
-    df_mutation$HGVS.p <<- "NA"
-  }
-  if (!"HGVS.c" %in% colnames(df_mutation)) {
-    df_mutation$`Total_QV>=20` <<- "NA"
-  }
-  if (!"Total_QV>=20" %in% colnames(df_mutation)) {
-    df_mutation$`Total_QV>=20` <<- "NA"
-  }
-  if (!"%Alt" %in% colnames(df_mutation)) {
-    df_mutation$`%Alt` <<- "NA"
+  df_mutation <- df_mutation %>% mutate(
+    Alt = case_when(
+      Alt == "*" ~ str_sub(Ref, 1, 1),
+      TRUE ~ Alt
+    )
+  )
+  if (df_mutation$Neighborhood_sequence[[1]] == "-") {
+    df_mutation$RefLen = nchar(df_mutation$Ref)
+    df_mutation$AltLen = nchar(df_mutation$Alt)
+    df_mutation = df_mutation %>% mutate(
+      Mut_type = case_when(
+        RefLen == AltLen ~ paste0(RefLen, "-snv"),
+        RefLen > AltLen ~ paste0(RefLen-1, "-del"),
+        RefLen < AltLen ~ paste0(AltLen-1, "-ins"),
+      )
+    ) %>% select(-RefLen, -AltLen)
+    
   }
   if (!"SimpleRepeat_TRF" %in% colnames(df_mutation)) {
-    df_mutation$SimpleRepeat_TRF <<- "NA"
+    df_mutation$SimpleRepeat_TRF <- "-"
   }
-  if (!"Transition" %in% colnames(df_mutation)) {
-    df_mutation$Transition <<- "NA"
+  
+  if ("simple_repeat_list" %in% ls() &
+      !df_mutation$SimpleRepeat_TRF[1] %in% c("Y", "N")) {
+    simple_repeat_info <- data.frame(readr::read_tsv(
+      progress = F,
+      col_names = FALSE,
+      show_col_types = F,
+      simple_repeat_list))[,1:3]
+    simple_repeat_info <- simple_repeat_info %>%
+      filter(X1 %in% chromosomes)
+    chr_now <- chromosomes[1]
+    simple_repeat_now <- simple_repeat_info %>%
+      filter(X1 == chr_now)
+    for (k in seq_len(length(df_mutation$SimpleRepeat_TRF))) {
+      if (df_mutation$Chr[k] != chr_now) {
+        chr_now <- df_mutation$Chr[k]
+        simple_repeat_now <- simple_repeat_info %>%
+          filter(X1 == chr_now)
+      }
+      if (length((simple_repeat_now %>%
+                  filter(X1 == df_mutation$Chr[k] &
+                         X2 <= df_mutation$Pos[k] &
+                         X3 >= df_mutation$Pos[k]))$X1)) {
+        df_mutation$SimpleRepeat_TRF[k] <- "Y"
+      }
+    }
   }
-  if (df_mutation$SimpleRepeat_TRF[[1]] == "-") {
-    df_mutation$SimpleRepeat_TRF <<- "NA"
-  }
-  if (df_mutation$Transition[[1]] == "-") {
-    df_mutation$Transition <<- "NA"
-  }
+  df_mutation = df_mutation %>% mutate(
+    SimpleRepeat_TRF = case_when(
+      is.na(SimpleRepeat_TRF) ~ "N",
+      SimpleRepeat_TRF == "-" ~ "N",
+      SimpleRepeat_TRF == "" ~ "N",
+      SimpleRepeat_TRF == "Y" ~ "Y",
+      SimpleRepeat_TRF == "N" ~ "N",
+      SimpleRepeat_TRF == TRUE ~ "Y",
+      TRUE ~ "N"
+    )
+  )
+
   if (df_mutation$Neighborhood_sequence[[1]] == "-") {
     fun_genome <- function(x, y, z) {
       r <- NULL
@@ -84,20 +119,21 @@ fun_load_mutation <- function(mutation_file,
       }
       return(r)
     }
-    df_mutation$Chr <<- as.character(df_mutation$Chr)
-    df_mutation$Chr_original <<- df_mutation$Chr
-    if(str_sub(df_mutation$Chr[[1]], start=1, end=3) != "chr"){
-      df_mutation$Chr <<- paste("chr", df_mutation$Chr, sep="")
+    df_mutation$Chr <- as.character(df_mutation$Chr)
+    df_mutation$Chr_original <- df_mutation$Chr
+    if (str_sub(df_mutation$Chr[[1]], start=1, end=3) != "chr" &
+         ref_genome@user_seqnames[[1]] == "chr1") {
+      df_mutation$Chr <- paste("chr", df_mutation$Chr, sep="")
     }
-    df_mutation$Pos <<- as.integer(df_mutation$Pos)
+    df_mutation$Pos <- as.integer(df_mutation$Pos)
     mut_len <- as.integer(str_split(df_mutation[,"Mut_type"], "-",
                                     simplify = TRUE)[,1])
     mut_type <- str_split(df_mutation[,"Mut_type"], "-",
                                     simplify = TRUE)[,2]
-    df_mutation <<- df_mutation %>% dplyr::mutate(
+    df_mutation <- df_mutation %>% mutate(
       mut_len = mut_len,
       mut_type = mut_type)
-    df_mutation <<- df_mutation %>% dplyr::mutate(
+    df_mutation <- df_mutation %>% mutate(
       Neighbor_start_1 =
         ifelse(
           mut_type == "ins", Pos - 19,
@@ -114,21 +150,23 @@ fun_load_mutation <- function(mutation_file,
           mut_type == "ins", Pos + 20,
           ifelse(
             mut_type == "del", Pos + mut_len + 20, Pos + mut_len + 19)))
-      df_mutation <<- df_mutation %>% dplyr::mutate(
+      df_mutation <- df_mutation %>% mutate(
       Pre_Neighbor = fun_genome(Chr, Neighbor_start_1, Neighbor_end_1),
       Post_Neighbor = fun_genome(Chr, Neighbor_start_2, Neighbor_end_2))
-    df_mutation <<- df_mutation %>% dplyr::mutate(
+    df_mutation <- df_mutation %>% mutate(
       Neighborhood_sequence =
-        paste(Pre_Neighbor, Alt, Post_Neighbor, sep = ""))
+        paste0(Pre_Neighbor, Alt, Post_Neighbor)) %>%
+      select(-Pre_Neighbor, -Post_Neighbor, -mut_len, -mut_type,
+             -Neighbor_start_1, -Neighbor_start_2,
+             -Neighbor_end_1, -Neighbor_end_2)
   }
-  df_mutation$Pos <<- as.integer(df_mutation$Pos)
-  df_mutation <<- df_mutation %>%
-    filter(Sample == sample_name) %>%
+  df_mutation$Pos <- as.integer(df_mutation$Pos)
+  df_mutation <- df_mutation %>%
     mutate(Ref = toupper(Ref)) %>%
     mutate(Alt = toupper(Alt)) %>%
     mutate(Neighborhood_sequence = toupper(Neighborhood_sequence)) %>%
     arrange(Chr)
-  
+    return(df_mutation)
 }
 
 # The following block is used by usethis to automatically manage

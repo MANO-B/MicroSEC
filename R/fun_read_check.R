@@ -210,7 +210,7 @@ fun_read_check <- function(short_homology_search_length) {
         }
       } else {
         id_no <- (df_bam_pos_chr > (df_mutation[i, "Pos"] - 200) &
-                    df_bam_pos_chr < (df_mutation[i, "Pos"] + 1))
+                  df_bam_pos_chr < (df_mutation[i, "Pos"] + 1))
         df_bam_qname <- df_bam_qname_chr[id_no]
         df_bam_seq <- df_bam_seq_chr[id_no]
         df_bam_strand <- df_bam_strand_chr[id_no]
@@ -1189,29 +1189,43 @@ fun_read_check <- function(short_homology_search_length) {
               # save sequence for homologous region search
               if (flag_hairpin_tmp == 0 & flag_hairpin == 0) {
                 if (indel_status == 1) {
-                  pre_homology_search_seq <- df_seq[1:
-                                                      min(length(df_seq),
-                                                          mut_position + short_homology_search_length +
-                                                            post_rep_short + alt_length - 1)]
+                  pre_homology_search_seq <-
+                    df_seq[1:min(length(df_seq),
+                                  max(40,
+                                      mut_position +
+                                        short_homology_search_length +
+                                        post_rep_short +
+                                        alt_length - 1))]
                   post_homology_search_seq <- df_seq[
-                    max(1, mut_position - short_homology_search_length
-                        - pre_rep_short):
-                      length(df_seq)]
+                    min(length(df_seq)-39,
+                      max(1, mut_position -
+                               short_homology_search_length -
+                               pre_rep_short)):
+                    length(df_seq)]
                 } else if (indel_flag == 1) {
-                  pre_homology_search_seq <- df_seq[1:
-                                                      min(length(df_seq),
-                                                          mut_position + short_homology_search_length +
-                                                            post_rep_short + alt_length)]
+                  pre_homology_search_seq <-
+                    df_seq[1:min(length(df_seq),
+                                 max(40,
+                                     mut_position +
+                                     short_homology_search_length +
+                                     post_rep_short + alt_length))]
                   post_homology_search_seq <- df_seq[
-                    max(1, mut_position - short_homology_search_length
-                        - pre_rep_short):
-                      length(df_seq)]
+                    min(length(df_seq)-39,
+                        max(1, mut_position -
+                                 short_homology_search_length -
+                                 pre_rep_short)):
+                    length(df_seq)]
                 } else {
-                  pre_homology_search_seq <- df_seq[1:
-                                                      min(length(df_seq),
-                                                          mut_position + short_homology_search_length + alt_length)]
+                  pre_homology_search_seq <-
+                    df_seq[1:min(length(df_seq),
+                                 max(40,
+                                     mut_position +
+                                       short_homology_search_length +
+                                       alt_length))]
                   post_homology_search_seq <- df_seq[
-                    max(1, mut_position - short_homology_search_length):
+                    min(length(df_seq)-39,
+                        max(1, mut_position -
+                                 short_homology_search_length)):
                       length(df_seq)]
                 }
                 homology_search_tmp <- rbind(homology_search_tmp,

@@ -12,6 +12,7 @@
 #' @param threshold_short_length Reads shorter than that are analyzed.
 #' @param threshold_distant_homology The smallest rate of reads from other
 #'   regions.
+#' @param threshold_soft_clip_ratio The rate of soft-clipped reads.
 #' @param threshold_low_quality_rate The smallest rate of low quality bases.
 #' @param homopolymer_length The smallest length of homopolymers.
 #' @return msec
@@ -26,8 +27,9 @@
 #'              min_homology_search = 40,
 #'              threshold_p = 10 ^ (-6),
 #'              threshold_hairpin_ratio = 0.50,
-#'              threshold_short_length = 0.8,
+#'              threshold_short_length = 0.75,
 #'              threshold_distant_homology = 0.15,
+#'              threshold_soft_clip_ratio = 0.50,
 #'              threshold_low_quality_rate = 0.1,
 #'              homopolymer_length = 15
 #' )
@@ -40,6 +42,7 @@ fun_analysis <- function(msec,
                         threshold_hairpin_ratio,
                         threshold_short_length,
                         threshold_distant_homology,
+                        threshold_soft_clip_ratio,
                         threshold_low_quality_rate,
                         homopolymer_length) {
   if (dim(msec)[1] > 0) {
@@ -76,15 +79,15 @@ fun_analysis <- function(msec,
     distant_homology_rate <- NULL
     not_long_repeat <- NULL
     SimpleRepeat_TRF <- NULL
-    Transition <- NULL
     homopolymer_status <- NULL
+    soft_clipped_rate <- NULL
     caution <- NULL
     filter_1_mutation_intra_hairpin_loop <- NULL
     filter_2_hairpin_structure <- NULL
     filter_3_microhomology_induced_mutation <- NULL
     filter_4_highly_homologous_region <- NULL
-    filter_5_simple_repeat <- NULL
-    filter_6_c_to_t_artifact <- NULL
+    filter_5_soft_clipped_reads <- NULL
+    filter_6_simple_repeat <- NULL
     filter_7_mutation_at_homopolymer <- NULL
     filter_8_low_quality <- NULL
     mut_type <- NULL
@@ -281,11 +284,11 @@ fun_analysis <- function(msec,
                 #(pre_farthest == pre_support_length | post_farthest == post_support_length) &
                   not_long_repeat),
                TRUE, FALSE),
-      filter_5_simple_repeat =
-        ifelse((SimpleRepeat_TRF == "Y"),
+      filter_5_soft_clipped_reads =
+        ifelse((soft_clipped_rate >= threshold_soft_clip_ratio),
                TRUE, FALSE),
-      filter_6_c_to_t_artifact =
-        ifelse((Transition == "C>T_g_FFPE"),
+      filter_6_simple_repeat =
+        ifelse((SimpleRepeat_TRF == "Y"),
                TRUE, FALSE),
       filter_7_mutation_at_homopolymer =
         ifelse((homopolymer_status  >= homopolymer_length),
@@ -359,8 +362,8 @@ fun_analysis <- function(msec,
           filter_2_hairpin_structure |
           filter_3_microhomology_induced_mutation |
           filter_4_highly_homologous_region |
-          filter_5_simple_repeat |
-          filter_6_c_to_t_artifact |
+          filter_5_soft_clipped_reads |
+          filter_6_simple_repeat |
           filter_7_mutation_at_homopolymer |
           filter_8_low_quality,
           "Artifact suspicious", ""),
@@ -368,6 +371,34 @@ fun_analysis <- function(msec,
       )
     msec <- msec %>% select(-caution)
   }
+  msec <- msec %>% select(-mut_type, -alt_length, -hairpin_length,
+                          -pre_minimum_length, -post_minimum_length,
+                          -pre_rep_status, -post_rep_status,
+                          -homopolymer_status, -indel_status, -indel_length,
+                          -penalty_pre,
+                          -penalty_post, -caution, -pre_minimum_length_adj,
+                          -half_length,
+                          -post_minimum_length_adj, -pre_support_length_adj,
+                          -post_support_length_adj,
+                          -shortest_support_length_adj,
+                          -minimum_length_1, -minimum_length_2, -minimum_length,
+                          -short_support_length_adj, -altered_length
+                          -distant_homology,
+                          -short_support_length_total,
+                          -pre_support_length_total,
+                          -post_support_length_total, -half_length_total,
+                          -total_length_total, -high_rate_q18,
+                          -short_short_support, -short_pre_support,
+                          -short_post_support,
+                          -not_long_repeat,
+                          -short_short_support_sum, -short_pre_support_sum,
+                          -short_post_support_sum,
+                          -short_support_length_adj_sum,
+                          -pre_support_length_adj_sum,
+                          -post_support_length_adj_sum,
+                          -half_length_adj_sum, -total_length_pre_adj_sum,
+                          -total_length_post_adj_sum
+  )
   return(msec)
 }
 

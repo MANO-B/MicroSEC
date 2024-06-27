@@ -9,10 +9,10 @@
 #' @export
 fun_load_chr_no <- function(organism) {
   if (organism %in% c("Human", "hg19", "hg38")) {
-    chr_no <<- 24
+    return(24)
   }
   if (organism %in% c("Mouse", "mm10")) {
-    chr_no <<- 21
+    return(21)
   }
 }
 

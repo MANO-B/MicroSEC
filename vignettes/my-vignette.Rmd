@@ -15,51 +15,41 @@ editor_options:
 This pipeline is designed for filtering mutations found in formalin-fixed and 
 paraffin-embedded (FFPE) samples. The MicroSEC filter utilizes a statistical 
 analysis, and the results for mutations with less than 10 supporting reads are 
-not reliable. Four files are nessesary for the analysis: mutation information 
-file, BAM file, and mutation supporting read ID information file.  
+not reliable. Three files are nessesary for the analysis: mutation information 
+file and BAM file, and two files optional.  
   
-File 1: mutation information file  
-This excel file should contain at least these contents:  
+File 1: mutation information tsv file (mandatory)  
+This tsv file with column names should contain at least these contents:  
+       Sample Mut_type  Chr        Pos Ref Alt SimpleRepeat_TRF
+       Neighborhood_sequence  
+ SL_1010-N6-B    1-snv chr1  108130741   C   T                N
+ CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  
   
-       Sample     Gene HGVS.c  HGVS.p Mut_type Total_QV>=20   %Alt  Chr  
- SL_1010-N6-B SLC25A24      _       _    1-snv          366 1.0929 chr1  
-  
-      Pos Ref Alt SimpleRepeat_TRF                     Neighborhood_sequence  
-108130741   C   T                N CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC  
-
-Transition  
-     C>T_t  
-  
-Total_QV>=20: The read number with total Q-value >=20.  
 SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or 
-not.  
+not (please set "Y" or "N").  
 Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
-Transition: 1-snv mutation pattern with a 3'-base. C>T_t represents CT to TT 
-mutation. C>T_g_FFPE represents the possible FFPE artifact.  
-Sample, Mut_type, Chr, Pos, Ref, and Alt should be set exactly.  
-Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can 
-be set to any values.  
-If you do not know the Neighborhood_sequence, enter "-".
-File 2: BAM file  
+Sample, Chr, Pos, Ref, and Alt should be set exactly.  
+If you do not know the SimpleRepeat_TRF, Mut_type, or Neighborhood_sequence, 
+enter "-". Automatically detected.  
   
-File 3: mutation supporting read ID information file  
-This file should contain at least these contents:  
-  
- Chr     Pos Ref Alt  
-chr1 2561609   T   A  
-  
-                                                             Mut_ID     Mut  
-_;ID001-1:579185f,ID004-1:1873933f;ID006-1:1131647f,ID001-1:570086f  .;A;N#  
-  
-File 4: sample information tsv file  
-Seven or eight columns are necessary.  
-[sample name] [mutation information excel file] [BAM file] 
-[optional: read ID information directory] [read length] 
+File 2: BAM file (mandatory)  
+File 3: sample information tsv file (mandatory)  
+Seven to nine columns are necessary.  
+[sample name] [mutation information excel/tsv file] [BAM file] [read length] 
 [adapter sequence read 1] [optional: adapter sequence read 2] 
-[sample type: Human or Mouse]  
+[sample type: Human or Mouse] [panel name] 
+[optional: reference genome fastq file] 
+[optional: simple repeat region bed file]  
 PC9	./source/CCLE.xlsx ./source/Cell_line/PC9_Cell_line_Ag_TDv4.realigned.bam 
 ./source/PC9_Cell_line 127 
-AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38  
+AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT hg38 
+TOP ./reference/hg38.fa ./reference/simpleRepeat.bed.gz  
+  
+File 4: Reference genome: Human (hg38 or hg19) or Mouse (mm10) 
+(optional, but mandatory with cram files)  
+
+File 5: simple repeat region bed file 
+(optional, but mandatory to detect simple repeat derived artifacts)  
   
 This pipeline contains 8 filtering processes.  
   
@@ -80,18 +70,16 @@ of the read length.
 Filter 3-3: <10% of bases are low quality (Quality score <18).  
 Filter 4  : >=15% mutations were called by chimeric reads comprising two 
 distant regions.  
-Filter 5  : Mutations locating at simple repeat sequences.  
-Filter 6  : C>T_g positive artifacts in FFPE samples.  
+Filter 5  : >=50% mutations were called by soft-clipped reads.
+Filter 6  : Mutations locating at simple repeat sequences.
 Filter 7  : Indel mutations locating at a >=15 homopolymer.  
 Filter 8  : >=10% low quality bases in the mutation supporting reads.  
 
 Supporting lengths are adjusted considering small repeat sequences around the 
 mutations.  
   
-Results are saved in a excel file.  
-The explatation of the results is written in detail in the second sheet of the 
-excel file.  
-  
+Results are saved in a tsv file.  
+
 github url: https://github.com/MANO-B/MicroSEC  
   
 ## Setting
@@ -118,11 +106,12 @@ library(MicroSEC)
 
 ## Analysis
 ```{r}
+# please use MicroSEC.R script file which can be downloaded from github website.
+
 # initialize
 msec <- NULL
 homology_search <- NULL
 mut_depth <- NULL
-list_exist <- TRUE
 
 # test data
 sample_name <- "H15-11943-1-T_TDv3"
@@ -131,29 +120,44 @@ adapter_1 <- "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
 adapter_2 <- "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
 organism <- "hg38"
 
-# load mutation information
-data(exampleMutation)
-data(exampleBAM)
-data(exampleMutCall)
-
-df_mutation <- exampleMutation
-df_bam <- exampleBAM
-df_mut_call <- exampleMutCall
-
 # load genomic sequence
-fun_load_genome(organism)
-fun_load_chr_no(organism)
+ref_genome <- fun_load_genome(organism)
+chr_no <- fun_load_chr_no(organism)
+
+# load mutation information
+df_mutation <- fun_load_mutation(
+  system.file("extdata", "test_mutation.tsv", package = "MicroSEC"),
+  "H15-11943-1-T_TDv3",
+  ref_genome
+)
+
+# load bam file (cram file with reference file acceptable)
+df_bam <- fun_load_bam(
+ system.file("extdata", "test.bam", package = "MicroSEC")
+)
 
 # analysis
-result <- fun_read_check(short_homology_search_length = 4)
+result = fun_read_check(df_mutation = exampleMutation,
+                        df_bam = exampleBAM,
+                        df_mut_call = exampleMutCall,
+                        ref_genome = ref_genome,
+                        sample_name = sample_name,
+                        read_length = read_length,
+                        adapter_1 = adapter_1,
+                        adapter_2 = adapter_2,
+                        short_homology_search_length = 4,
+                        progress_bar = progress_bar)
 msec <- rbind(msec, result[[1]])
 homology_search <- rbind(homology_search, result[[2]])
 mut_depth <- rbind(mut_depth, result[[3]])
 
 # search homologous sequences
 msec <- fun_homology(msec,
-                    homology_search,
-                    min_homology_search = 40)
+                     homology_search,
+                     min_homology_search = 40,
+                     ref_genome,
+                     chr_no,
+                     progress_bar = progress_bar)
 
 # statistical analysis
 msec <- fun_summary(msec)
@@ -165,11 +169,12 @@ msec <- fun_analysis(msec,
                     threshold_hairpin_ratio = 0.50,
                     threshold_short_length = 0.75,
                     threshold_distant_homology = 0.15,
+                    threshold_soft_clip_ratio = 0.50,
                     threshold_low_quality_rate = 0.1,
                     homopolymer_length = 15)
 
 # save the results in the working/output directory.
-# fun_save(msec, sample_name, wd)
+# fun_save_gz(msec, "./test_data.tsv")
 ```
 
 ## Results

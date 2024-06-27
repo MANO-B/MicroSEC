@@ -22,30 +22,25 @@
 #' \donttest{
 #' fun_homology(msec = msec_read_checked,
 #'              df_distant = homology_searched,
-#'              min_homology_search = 40)
+#'              min_homology_search = 40,
+#'              ref_genome = BSgenome.Hsapiens.UCSC.hg38::
+#'                             BSgenome.Hsapiens.UCSC.hg38,
+#'              chr_no = 24,
+#'              progress_bar = "Y")
 #' }
 #' @export
 fun_homology <- function(msec,
                          df_distant,
-                         min_homology_search) {
+                         min_homology_search,
+                         ref_genome,
+                         chr_no,
+                         progress_bar) {
   # initialize
-  if (!exists("ref_genome")) {
-    ref_genome <<- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-  }
-  if (!exists("organism")) {
-    organism <<- "hg38"
-  }
-  if (!exists("chr_no")) {
-    chr_no <<- 24
-  }
-  if (!exists("progress_bar")) {
-    progress_bar <<- "Y"
-  }
-
   Seq <- NULL
   Direction <- NULL
   fixed_seq_pre <- NULL
   fixed_seq_post <- NULL
+  
   if (!is.null(df_distant)) {
     msec$distant_homology <- 0
     df_distant <- df_distant %>% dplyr::mutate(
@@ -80,7 +75,7 @@ fun_homology <- function(msec,
       for (seqname in 1:chr_no) {
         if (progress_bar == "Y") {
           utils::setTxtProgressBar(pb, seqname)
-          cat(paste(" Chromosome screening:", seqname, "/", chr_no, "  "))
+          cat(paste0("Chromosome screening: ", seqname, "/", chr_no, "    "))
         }
         target <- ref_genome[[seqnames(ref_genome)[[seqname]]]]
         distant_homology <- distant_homology + countPDict(search_seq_f, target)
@@ -102,7 +97,7 @@ fun_homology <- function(msec,
         if (progress_bar == "Y") {
           utils::setTxtProgressBar(pb, i)
           if ((i - 1) %% pb_t == 0) {
-            cat(paste(" Homology count:", i, "/", max_no, "      "))
+            cat(paste0("Homology count: ", i, "/", max_no, "      "))
           }
         }
         if (dim(df_distant[df_distant$number == i, ])[1] == 1) {
