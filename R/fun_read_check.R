@@ -453,9 +453,16 @@ fun_read_check <- function(df_mutation,
         ref_seq <- ref_genome[[df_mutation[i, "Chr"]]][
           (df_mutation[i, "Pos"] - ref_width):
             (df_mutation[i, "Pos"] + ref_width)]
+        print(ref_seq[1:ref_width])
+        print(DNAString(df_mutation[i, "Alt"]))
+        print((ref_width + nchar(df_mutation[i, "Ref"]) + 1))
+        print((2 * ref_width + 1))
+        length(ref_seq)
+        
         ref_indel <- c(ref_seq[1:ref_width], DNAString(df_mutation[i, "Alt"]),
                        ref_seq[(ref_width + nchar(df_mutation[i, "Ref"]) + 1):
                                  (2 * ref_width + 1)])
+        print(ref_indel)
         # sequence information around the mutation position
         setting <- fun_setting(pre = pre_search_length_default,
                                post = post_search_length_default,
@@ -571,14 +578,7 @@ fun_read_check <- function(df_mutation,
               # search co-mutations on neighbor
               if (mut_position > 10) {
                 near_indel_pre_candidate <- near_indel_pre_candidate + 1
-                print(mut_position)
-                print(df_seq)
-                print(ref_indel)
-                print(class(df_seq))
-                print(ref_width)
-                print(df_seq[(mut_position - 10):mut_position],
-                      ref_indel[(ref_width - 9):(ref_width + 1)])
-                co_mut_pre_tmp <- length(
+               co_mut_pre_tmp <- length(
                   matchPattern(
                     df_seq[(mut_position - 10):mut_position],
                     ref_indel[(ref_width - 9):(ref_width + 1)],
