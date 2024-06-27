@@ -453,15 +453,6 @@ fun_read_check <- function(df_mutation,
         ref_seq <- ref_genome[[df_mutation[i, "Chr"]]][
           (df_mutation[i, "Pos"] - ref_width):
             (df_mutation[i, "Pos"] + ref_width)]
-        print(ref_genome)
-        print(df_mutation[i, "Pos"])
-        print(ref_width)
-        print(ref_seq[1:ref_width])
-        print(DNAString(df_mutation[i, "Alt"]))
-        print((ref_width + nchar(df_mutation[i, "Ref"]) + 1))
-        print((2 * ref_width + 1))
-        length(ref_seq)
-        
         ref_indel <- c(ref_seq[1:ref_width], DNAString(df_mutation[i, "Alt"]),
                        ref_seq[(ref_width + nchar(df_mutation[i, "Ref"]) + 1):
                                  (2 * ref_width + 1)])
