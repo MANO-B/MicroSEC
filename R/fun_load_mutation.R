@@ -10,6 +10,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
+#' @importFrom dplyr case_when
 #' @importFrom dplyr arrange
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom stringr str_sub
