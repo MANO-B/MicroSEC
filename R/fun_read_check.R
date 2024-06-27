@@ -476,8 +476,8 @@ fun_read_check <- function(df_mutation,
                    Pos >= (df_mutation[i, "Pos"] - pos_err - post_search_length) &
                    Pos <= (df_mutation[i, "Pos"] + pre_search_length) &
                    Pos != (df_mutation[i, "Pos"] - pos_err))
-        mut_near_1 <- dim(near_list_1)[1]
-        mut_near_2 <- dim(near_list_2)[1]
+        mut_near_1 <- dim(near_list_1)[[1]]
+        mut_near_2 <- dim(near_list_2)[[1]]
         # short repeat around indel mutations
         if (str_count(neighbor_seq, str_dup("A", 15)) > 0 |
             str_count(neighbor_seq, str_dup("T", 15)) > 0 |
