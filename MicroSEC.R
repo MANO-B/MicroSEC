@@ -122,7 +122,7 @@ for (sample in seq_len(dim(sample_info)[1])) {
       simple_repeat_list <- sample_info[sample, 10]
     }
   }
-  bam_file_slim <- paste0(bam_file, ".SLIM")
+  bam_file_slim <- paste0(bam_file, ".SLIM.bam")
   bam_file_tmp = paste0(bam_file, ".tmp.bam")
   
   # load genomic sequence

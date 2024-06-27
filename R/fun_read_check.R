@@ -4,7 +4,6 @@
 #'
 #' @param df_mutation Mutation information.
 #' @param df_bam Data from the BAM file.
-#' @param df_mut_call Read ID list.
 #' @param ref_genome Reference genome for the data.
 #' @param sample_name Sample name (character)
 #' @param read_length The read length in the sequence.
@@ -165,72 +164,115 @@ fun_read_check <- function(df_mutation,
         fun_load_genome(organism)
       }
       mut_type <- str_split(df_mutation[i, "Mut_type"], "-")[[1]][[2]]
-      if (list_exist) {
+
+      id_no <- (df_bam_pos_chr > (df_mutation[i, "Pos"] - 200) &
+                df_bam_pos_chr < (df_mutation[i, "Pos"] + 1))
+      df_bam_qname <- df_bam_qname_chr[id_no]
+      df_bam_seq <- df_bam_seq_chr[id_no]
+      df_bam_strand <- df_bam_strand_chr[id_no]
+      df_bam_cigar <- df_bam_cigar_chr[id_no]
+      df_bam_pos <- df_bam_pos_chr[id_no]
+      df_bam_qual <- df_bam_qual_chr[id_no]
+      df_bam_isize <- df_bam_isize_chr[id_no]
+      check_first <- TRUE
+      mut_position_cigar <- logical(0)
+      if (length(df_bam_pos) > 0) {
         if (mut_type == "snv") {
-          mut_read <- df_mut_call %>%
-            filter(Chr == df_mutation[i, "Chr"] & Pos == df_mutation[i, "Pos"])
-          if (dim(mut_read)[1] > 0) {
-            mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-            mut_read_id_list <- str_split(mut_read$Mut_ID, pattern = ";")[[1]]
-            mut_call <- which(mut_detail == str_sub(df_mutation[i, "Alt"],
-                                                    start = 1, end = 1))
+          alt <- nchar(df_mutation[i, "Alt"])
+          for (depth in seq_len(length(df_bam_pos))) {
+            if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+              cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                "[:upper:]")[[1]])
+              cigar_type <- str_split(df_bam_cigar[depth],
+                                      "[:digit:]+")[[1]][-1]
+              cigar_pos <- df_bam_pos[depth]
+              cigar_seq <- df_bam_seq[depth][[1]]
+              cigar_qname <- df_bam_qname[depth]
+              cigar_strand <- gsub("\\-", "r",
+                                   gsub("\\+", "f", df_bam_strand[depth]))
+              cigar_qual <- as.vector(
+                asc(as.character(df_bam_qual[[depth]])))
+              if (mean(cigar_qual) >= 53) {
+                read_pos <- 1
+                for (k in seq_len(length(cigar_type))) {
+                  if ((cigar_pos <= df_mutation[i, "Pos"]) &
+                      ((cigar_pos + cigar_num[k]) >=
+                       df_mutation[i, "Pos"]) &
+                      cigar_type[k] == "M") {
+                    snv_pos <- read_pos + df_mutation[i, "Pos"] - cigar_pos
+                    if (snv_pos > 0 &
+                        (snv_pos + alt - 1) <= length(cigar_seq)) {
+                      if (as.character(
+                        cigar_seq[snv_pos:(snv_pos + alt - 1)]) ==
+                        df_mutation[i, "Alt"]) {
+                        if (check_first) {
+                          mut_read_id_list <- paste(cigar_qname,
+                                                    cigar_strand, sep = "")
+                          check_first <- FALSE
+                        } else {
+                          mut_read_id_list <- paste(mut_read_id_list,
+                                                    ",",
+                                                    cigar_qname,
+                                                    cigar_strand, sep ="")
+                        }
+                        mut_position_cigar <- c(mut_position_cigar, snv_pos) 
+                        mut_call <- 1
+                      }
+                    }
+                  }
+                  if (cigar_type[k] == "D" | cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                  if (cigar_type[k] != "D" & cigar_type[k] != "H") {
+                    read_pos <- read_pos + cigar_num[k]
+                  }
+                }
+              }
+            }
           }
+          mut_read_id_list = list(mut_read_id_list)
         } else if (mut_type == "ins") {
           indel_length <- nchar(df_mutation[i, "Alt"]) - 1
           indel_status <- 1
-          for (tmp in 0:max_mutation_search) {
-            if (length(mut_call) == 0) {
-              mut_read <- df_mut_call %>%
-                filter(Chr == df_mutation[i, "Chr"] &
-                         Pos == (df_mutation[i, "Pos"] - tmp))
-              pos_err <- tmp
-              if (dim(mut_read)[[1]] > 0) {
-                mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-                mut_read_id_list <- str_split(
-                  mut_read$Mut_ID, pattern = ";")[[1]]
-                mut_call <- which(mut_detail ==
-                                    str_replace(df_mutation[i, "Alt"],
-                                                pattern = df_mutation[i, "Ref"],
-                                                replacement = ".+"))
+          alt <- nchar(df_mutation[i, "Alt"]) - 1
+          mut_pos <- NULL
+          for (depth in seq_len(length(df_bam_pos))) {
+            if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+              cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                "[:upper:]")[[1]])
+              cigar_type <- str_split(df_bam_cigar[depth],
+                                      "[:digit:]+")[[1]][-1]
+              cigar_pos <- df_bam_pos[depth]
+              cigar_qual <- as.vector(
+                asc(as.character(df_bam_qual[[depth]])))
+              if (mean(cigar_qual) >= 53) {
+                read_pos <- 1
+                mut_pos_tmp <- NULL
+                for (k in seq_len(length(cigar_type))) {
+                  if ((cigar_num[k] == alt) &
+                      cigar_type[k] == "I") {
+                    cigar_seq <- df_bam_seq[depth][[1]]
+                    if (as.character(
+                      cigar_seq[read_pos:(read_pos + alt - 1)]) ==
+                      str_sub(df_mutation[i, "Alt"], start = 2, end = -1)) {
+                      mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
+                    }
+                  }
+                  if (cigar_type[k] == "D" | cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                  if (cigar_type[k] != "D" & cigar_type[k] != "H") {
+                    read_pos <- read_pos + cigar_num[k]
+                  }
+                }
+                if (cigar_pos >= (df_mutation[i, "Pos"] + alt + 1)) {
+                  mut_pos <- c(mut_pos, mut_pos_tmp)
+                }
               }
             }
           }
-        } else if (mut_type == "del") {
-          indel_length <- nchar(df_mutation[i, "Ref"]) - 1
-          indel_status <- 1
-          for (tmp in 0:max_mutation_search) {
-            if (length(mut_call) == 0) {
-              mut_read <- df_mut_call %>%
-                filter(Chr == df_mutation[i, "Chr"] &
-                         Pos == (df_mutation[i, "Pos"] - tmp))
-              pos_err <- tmp
-              if (dim(mut_read)[[1]] > 0) {
-                mut_detail <- str_split(mut_read$Mut, pattern = ";")[[1]]
-                mut_read_id_list <- str_split(
-                  mut_read$Mut_ID, pattern = ";")[[1]]
-                mut_call <- which(mut_detail ==
-                                    str_replace(df_mutation[i, "Ref"],
-                                                pattern = df_mutation[i, "Alt"],
-                                                replacement = ".-"))
-              }
-            }
-          }
-        }
-      } else {
-        id_no <- (df_bam_pos_chr > (df_mutation[i, "Pos"] - 200) &
-                  df_bam_pos_chr < (df_mutation[i, "Pos"] + 1))
-        df_bam_qname <- df_bam_qname_chr[id_no]
-        df_bam_seq <- df_bam_seq_chr[id_no]
-        df_bam_strand <- df_bam_strand_chr[id_no]
-        df_bam_cigar <- df_bam_cigar_chr[id_no]
-        df_bam_pos <- df_bam_pos_chr[id_no]
-        df_bam_qual <- df_bam_qual_chr[id_no]
-        df_bam_isize <- df_bam_isize_chr[id_no]
-        check_first <- TRUE
-        mut_position_cigar <- logical(0)
-        if (length(df_bam_pos) > 0) {
-          if (mut_type == "snv") {
-            alt <- nchar(df_mutation[i, "Alt"])
+          if (!is.null(mut_pos)){
+            mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
             for (depth in seq_len(length(df_bam_pos))) {
               if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
                 cigar_num <- as.integer(str_split(df_bam_cigar[depth],
@@ -238,38 +280,38 @@ fun_read_check <- function(df_mutation,
                 cigar_type <- str_split(df_bam_cigar[depth],
                                         "[:digit:]+")[[1]][-1]
                 cigar_pos <- df_bam_pos[depth]
-                cigar_seq <- df_bam_seq[depth][[1]]
-                cigar_qname <- df_bam_qname[depth]
-                cigar_strand <- gsub("\\-", "r",
-                                     gsub("\\+", "f", df_bam_strand[depth]))
+                cigar_qual <- as.vector(
+                  asc(as.character(df_bam_qual[[depth]])))
+                read_pos <- 1
                 cigar_qual <- as.vector(
                   asc(as.character(df_bam_qual[[depth]])))
                 if (mean(cigar_qual) >= 53) {
-                  read_pos <- 1
                   for (k in seq_len(length(cigar_type))) {
-                    if ((cigar_pos <= df_mutation[i, "Pos"]) &
-                        ((cigar_pos + cigar_num[k]) >=
-                         df_mutation[i, "Pos"]) &
-                        cigar_type[k] == "M") {
-                      snv_pos <- read_pos + df_mutation[i, "Pos"] - cigar_pos
-                      if (snv_pos > 0 &
-                          (snv_pos + alt - 1) <= length(cigar_seq)) {
-                        if (as.character(
-                          cigar_seq[snv_pos:(snv_pos + alt - 1)]) ==
-                          df_mutation[i, "Alt"]) {
-                          if (check_first) {
-                            mut_read_id_list <- paste(cigar_qname,
-                                                      cigar_strand, sep = "")
-                            check_first <- FALSE
-                          } else {
-                            mut_read_id_list <- paste(mut_read_id_list,
-                                                      ",",
-                                                      cigar_qname,
-                                                      cigar_strand, sep ="")
-                          }
-                          mut_position_cigar <- c(mut_position_cigar, snv_pos) 
-                          mut_call <- 1
+                    if ((cigar_pos == mut_pos) &
+                        (cigar_num[k] == alt) &
+                        cigar_type[k] == "I") {
+                      cigar_seq <- df_bam_seq[depth][[1]]
+                      cigar_qname <- df_bam_qname[depth]
+                      cigar_strand <- gsub("\\-", "r",
+                                           gsub("\\+", "f",
+                                                df_bam_strand[depth]))
+                      if (as.character(
+                        cigar_seq[read_pos:(read_pos + alt - 1)]) ==
+                        str_sub(df_mutation[i, "Alt"],
+                                start = 2, end = -1)) {
+                        if (check_first) {
+                          mut_read_id_list <- paste(cigar_qname,
+                                                    cigar_strand, sep = "")
+                          check_first <- FALSE
+                        } else {
+                          mut_read_id_list <- paste(mut_read_id_list,
+                                                    ",",
+                                                    cigar_qname,
+                                                    cigar_strand, sep ="")
                         }
+                        mut_call <- 1
+                        mut_position_cigar <- c(mut_position_cigar,
+                                                read_pos + df_mutation[i, "Pos"] - mut_pos) 
                       }
                     }
                     if (cigar_type[k] == "D" | cigar_type[k] == "M") {
@@ -283,11 +325,43 @@ fun_read_check <- function(df_mutation,
               }
             }
             mut_read_id_list = list(mut_read_id_list)
-          } else if (mut_type == "ins") {
-            indel_length <- nchar(df_mutation[i, "Alt"]) - 1
-            indel_status <- 1
-            alt <- nchar(df_mutation[i, "Alt"]) - 1
-            mut_pos <- NULL
+          }
+        } else if (mut_type == "del") {
+          indel_length <- nchar(df_mutation[i, "Ref"]) - 1
+          indel_status <- 1
+          alt <- nchar(df_mutation[i, "Ref"]) - 1
+          mut_pos <- NULL
+          for (depth in seq_len(length(df_bam_pos))) {
+            if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
+              cigar_num <- as.integer(str_split(df_bam_cigar[depth],
+                                                "[:upper:]")[[1]])
+              cigar_type <- str_split(df_bam_cigar[depth],
+                                      "[:digit:]+")[[1]][-1]
+              cigar_pos <- df_bam_pos[depth]
+              cigar_qual <- as.vector(asc(as.character(df_bam_qual[[depth]])))
+              mut_pos_tmp <- NULL
+              if (mean(cigar_qual) >= 53) {
+                read_pos <- 1
+                for (k in seq_len(length(cigar_type))) {
+                  if (cigar_num[k] == alt &
+                      cigar_type[k] == "D") {
+                    mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
+                  }
+                  if (cigar_type[k] == "D" | cigar_type[k] == "M") {
+                    cigar_pos <- cigar_pos + cigar_num[k]
+                  }
+                  if (cigar_type[k] != "D" & cigar_type[k] != "H") {
+                    read_pos <- read_pos + cigar_num[k]
+                  }
+                }
+                if (cigar_pos >= (df_mutation[i, "Pos"] + alt + 1)) {
+                  mut_pos <- c(mut_pos, mut_pos_tmp)
+                }
+              }
+            }
+          }
+          if (!is.null(mut_pos)){
+            mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
             for (depth in seq_len(length(df_bam_pos))) {
               if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
                 cigar_num <- as.integer(str_split(df_bam_cigar[depth],
@@ -295,109 +369,31 @@ fun_read_check <- function(df_mutation,
                 cigar_type <- str_split(df_bam_cigar[depth],
                                         "[:digit:]+")[[1]][-1]
                 cigar_pos <- df_bam_pos[depth]
+                read_pos <- 1
                 cigar_qual <- as.vector(
                   asc(as.character(df_bam_qual[[depth]])))
                 if (mean(cigar_qual) >= 53) {
-                  read_pos <- 1
-                  mut_pos_tmp <- NULL
                   for (k in seq_len(length(cigar_type))) {
-                    if ((cigar_num[k] == alt) &
-                        cigar_type[k] == "I") {
-                      cigar_seq <- df_bam_seq[depth][[1]]
-                      if (as.character(
-                        cigar_seq[read_pos:(read_pos + alt - 1)]) ==
-                        str_sub(df_mutation[i, "Alt"], start = 2, end = -1)) {
-                        mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
-                      }
-                    }
-                    if (cigar_type[k] == "D" | cigar_type[k] == "M") {
-                      cigar_pos <- cigar_pos + cigar_num[k]
-                    }
-                    if (cigar_type[k] != "D" & cigar_type[k] != "H") {
-                      read_pos <- read_pos + cigar_num[k]
-                    }
-                  }
-                  if (cigar_pos >= (df_mutation[i, "Pos"] + alt + 1)) {
-                    mut_pos <- c(mut_pos, mut_pos_tmp)
-                  }
-                }
-              }
-            }
-            if (!is.null(mut_pos)){
-              mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
-              for (depth in seq_len(length(df_bam_pos))) {
-                if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
-                  cigar_num <- as.integer(str_split(df_bam_cigar[depth],
-                                                    "[:upper:]")[[1]])
-                  cigar_type <- str_split(df_bam_cigar[depth],
-                                          "[:digit:]+")[[1]][-1]
-                  cigar_pos <- df_bam_pos[depth]
-                  cigar_qual <- as.vector(
-                    asc(as.character(df_bam_qual[[depth]])))
-                  read_pos <- 1
-                  cigar_qual <- as.vector(
-                    asc(as.character(df_bam_qual[[depth]])))
-                  if (mean(cigar_qual) >= 53) {
-                    for (k in seq_len(length(cigar_type))) {
-                      if ((cigar_pos == mut_pos) &
-                          (cigar_num[k] == alt) &
-                          cigar_type[k] == "I") {
-                        cigar_seq <- df_bam_seq[depth][[1]]
-                        cigar_qname <- df_bam_qname[depth]
-                        cigar_strand <- gsub("\\-", "r",
-                                             gsub("\\+", "f",
-                                                  df_bam_strand[depth]))
-                        if (as.character(
-                          cigar_seq[read_pos:(read_pos + alt - 1)]) ==
-                          str_sub(df_mutation[i, "Alt"],
-                                  start = 2, end = -1)) {
-                          if (check_first) {
-                            mut_read_id_list <- paste(cigar_qname,
-                                                      cigar_strand, sep = "")
-                            check_first <- FALSE
-                          } else {
-                            mut_read_id_list <- paste(mut_read_id_list,
-                                                      ",",
-                                                      cigar_qname,
-                                                      cigar_strand, sep ="")
-                          }
-                          mut_call <- 1
-                          mut_position_cigar <- c(mut_position_cigar,
-                                                  read_pos + df_mutation[i, "Pos"] - mut_pos) 
-                        }
-                      }
-                      if (cigar_type[k] == "D" | cigar_type[k] == "M") {
-                        cigar_pos <- cigar_pos + cigar_num[k]
-                      }
-                      if (cigar_type[k] != "D" & cigar_type[k] != "H") {
-                        read_pos <- read_pos + cigar_num[k]
-                      }
-                    }
-                  }
-                }
-              }
-              mut_read_id_list = list(mut_read_id_list)
-            }
-          } else if (mut_type == "del") {
-            indel_length <- nchar(df_mutation[i, "Ref"]) - 1
-            indel_status <- 1
-            alt <- nchar(df_mutation[i, "Ref"]) - 1
-            mut_pos <- NULL
-            for (depth in seq_len(length(df_bam_pos))) {
-              if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
-                cigar_num <- as.integer(str_split(df_bam_cigar[depth],
-                                                  "[:upper:]")[[1]])
-                cigar_type <- str_split(df_bam_cigar[depth],
-                                        "[:digit:]+")[[1]][-1]
-                cigar_pos <- df_bam_pos[depth]
-                cigar_qual <- as.vector(asc(as.character(df_bam_qual[[depth]])))
-                mut_pos_tmp <- NULL
-                if (mean(cigar_qual) >= 53) {
-                  read_pos <- 1
-                  for (k in seq_len(length(cigar_type))) {
-                    if (cigar_num[k] == alt &
+                    if (cigar_pos == mut_pos &
+                        cigar_num[k] == alt &
                         cigar_type[k] == "D") {
-                      mut_pos_tmp <- c(mut_pos_tmp, cigar_pos)
+                      cigar_qname <- df_bam_qname[depth]
+                      cigar_strand <- gsub("\\-", "r",
+                                           gsub("\\+", "f",
+                                                df_bam_strand[depth]))
+                      if (check_first) {
+                        mut_read_id_list <- paste(cigar_qname,
+                                                  cigar_strand, sep = "")
+                        check_first <- FALSE
+                      } else {
+                        mut_read_id_list <- paste(mut_read_id_list,
+                                                  ",",
+                                                  cigar_qname,
+                                                  cigar_strand, sep ="")
+                      }
+                      mut_call <- 1
+                      mut_position_cigar <- c(mut_position_cigar,
+                                  read_pos + df_mutation[i, "Pos"] - mut_pos) 
                     }
                     if (cigar_type[k] == "D" | cigar_type[k] == "M") {
                       cigar_pos <- cigar_pos + cigar_num[k]
@@ -406,59 +402,10 @@ fun_read_check <- function(df_mutation,
                       read_pos <- read_pos + cigar_num[k]
                     }
                   }
-                  if (cigar_pos >= (df_mutation[i, "Pos"] + alt + 1)) {
-                    mut_pos <- c(mut_pos, mut_pos_tmp)
-                  }
                 }
               }
             }
-            if (!is.null(mut_pos)){
-              mut_pos <- as.integer(names(rev(sort(table(mut_pos))))[1])
-              for (depth in seq_len(length(df_bam_pos))) {
-                if (df_bam_pos[depth] <= df_mutation[i, "Pos"]) {
-                  cigar_num <- as.integer(str_split(df_bam_cigar[depth],
-                                                    "[:upper:]")[[1]])
-                  cigar_type <- str_split(df_bam_cigar[depth],
-                                          "[:digit:]+")[[1]][-1]
-                  cigar_pos <- df_bam_pos[depth]
-                  read_pos <- 1
-                  cigar_qual <- as.vector(
-                    asc(as.character(df_bam_qual[[depth]])))
-                  if (mean(cigar_qual) >= 53) {
-                    for (k in seq_len(length(cigar_type))) {
-                      if (cigar_pos == mut_pos &
-                          cigar_num[k] == alt &
-                          cigar_type[k] == "D") {
-                        cigar_qname <- df_bam_qname[depth]
-                        cigar_strand <- gsub("\\-", "r",
-                                             gsub("\\+", "f",
-                                                  df_bam_strand[depth]))
-                        if (check_first) {
-                          mut_read_id_list <- paste(cigar_qname,
-                                                    cigar_strand, sep = "")
-                          check_first <- FALSE
-                        } else {
-                          mut_read_id_list <- paste(mut_read_id_list,
-                                                    ",",
-                                                    cigar_qname,
-                                                    cigar_strand, sep ="")
-                        }
-                        mut_call <- 1
-                        mut_position_cigar <- c(mut_position_cigar,
-                                    read_pos + df_mutation[i, "Pos"] - mut_pos) 
-                      }
-                      if (cigar_type[k] == "D" | cigar_type[k] == "M") {
-                        cigar_pos <- cigar_pos + cigar_num[k]
-                      }
-                      if (cigar_type[k] != "D" & cigar_type[k] != "H") {
-                        read_pos <- read_pos + cigar_num[k]
-                      }
-                    }
-                  }
-                }
-              }
-              mut_read_id_list = list(mut_read_id_list)
-            }
+            mut_read_id_list = list(mut_read_id_list)
           }
         }
       }
@@ -519,12 +466,12 @@ fun_read_check <- function(df_mutation,
         post_search_length <- setting[[2]]
         peri_seq_1 <- setting[[3]]
         peri_seq_2 <- setting[[4]]
-        near_list_1 <- df_mut_call %>%
+        near_list_1 <- df_mutation %>%
           filter(Chr == df_mutation[i, "Chr"] &
                    Pos >= (df_mutation[i, "Pos"] - pos_err - pre_search_length) &
                    Pos <= (df_mutation[i, "Pos"] + post_search_length) &
                    Pos != (df_mutation[i, "Pos"] - pos_err))
-        near_list_2 <- df_mut_call %>%
+        near_list_2 <- df_mutation %>%
           filter(Chr == df_mutation[i, "Chr"] &
                    Pos >= (df_mutation[i, "Pos"] - pos_err - post_search_length) &
                    Pos <= (df_mutation[i, "Pos"] + pre_search_length) &
