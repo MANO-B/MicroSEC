@@ -571,6 +571,7 @@ fun_read_check <- function(df_mutation,
               # search co-mutations on neighbor
               if (mut_position > 10) {
                 near_indel_pre_candidate <- near_indel_pre_candidate + 1
+                print(1)
                 co_mut_pre_tmp <- length(
                   matchPattern(
                     df_seq[(mut_position - 10):mut_position],
@@ -579,12 +580,15 @@ fun_read_check <- function(df_mutation,
                     min.mismatch = 0,
                     with.indels = FALSE,
                     fixed = TRUE))
+                print(2)
+                
                 if (co_mut_pre_tmp == 0) {
                   near_indel_pre <- near_indel_pre + 1
                 }
               }
               if (mut_position <= (length(df_seq) - 9 - alt_length)) {
                 near_indel_post_candidate <- near_indel_post_candidate + 1
+                print(3)
                 co_mut_post_tmp <- length(
                   matchPattern(
                     df_seq[mut_position:(mut_position + 9 + alt_length)],
@@ -593,6 +597,7 @@ fun_read_check <- function(df_mutation,
                     min.mismatch = 0,
                     with.indels = FALSE,
                     fixed = TRUE))
+                print(4)
                 if (co_mut_post_tmp == 0) {
                   near_indel_post <- near_indel_post + 1
                 }
@@ -602,6 +607,8 @@ fun_read_check <- function(df_mutation,
                 comut_flag <- TRUE
                 for (comut in 0:3) {
                   if (comut_flag == TRUE) {
+                    print(5)
+                    
                     co_mut_pre_tmp <- length(
                       matchPattern(df_seq[
                         max(1, (mut_position - indel_length - 1)):
@@ -613,6 +620,7 @@ fun_read_check <- function(df_mutation,
                         min.mismatch = comut,
                         with.indels = FALSE,
                         fixed = TRUE))
+                    print(6)
                   }
                   if (co_mut_pre_tmp > 0) {
                     co_mut_pre <- min(co_mut_pre, comut)
@@ -622,6 +630,7 @@ fun_read_check <- function(df_mutation,
                 comut_flag <- TRUE
                 for (comut in 0:3) {
                   if (comut_flag == TRUE) {
+                    print(7)
                     co_mut_post_tmp <- length(
                       matchPattern(df_seq[
                         max(1, (mut_position - 4)):
@@ -635,6 +644,7 @@ fun_read_check <- function(df_mutation,
                         min.mismatch = comut,
                         with.indels = FALSE,
                         fixed = TRUE))
+                    print(8)
                   }
                   if (co_mut_post_tmp > 0) {
                     co_mut_post <- min(co_mut_post, comut)
@@ -647,6 +657,7 @@ fun_read_check <- function(df_mutation,
                   for (comut in 0:3) {
                     if (comut_flag == TRUE) {
                       co_mut_pre_tmp <- length(
+                        print(9)
                         matchPattern(df_seq[
                           max(1, (mut_position - max(1, alt_length * 4 - 5))):
                             mut_position],
@@ -657,6 +668,7 @@ fun_read_check <- function(df_mutation,
                           min.mismatch = comut,
                           with.indels = FALSE,
                           fixed = TRUE))
+                      print(10)
                     }
                     if (co_mut_pre_tmp > 0) {
                       co_mut_pre <- min(co_mut_pre, comut)
@@ -666,6 +678,7 @@ fun_read_check <- function(df_mutation,
                   comut_flag <- TRUE
                   for (comut in 0:3) {
                     if (comut_flag == TRUE) {
+                      print(11)
                       co_mut_post_tmp <- length(
                         matchPattern(df_seq[
                           mut_position:
@@ -678,6 +691,7 @@ fun_read_check <- function(df_mutation,
                           min.mismatch = comut,
                           with.indels = FALSE,
                           fixed = TRUE))
+                      print(12)
                     }
                     if (co_mut_post_tmp > 0) {
                       co_mut_post <- min(co_mut_post, comut)
