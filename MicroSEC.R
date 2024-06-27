@@ -339,4 +339,4 @@ msec = fun_analysis(msec,
                     homopolymer_length = 15)
 
 # save the results
-fun_save(msec, paste0(wd, "/", sample_info[1,1], ".tsv"))
+fun_save(msec, paste0(wd, "/", sample_info[1,1], ".tsv.gz"))

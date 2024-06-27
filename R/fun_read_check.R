@@ -456,7 +456,6 @@ fun_read_check <- function(df_mutation,
         ref_indel <- c(ref_seq[1:ref_width], DNAString(df_mutation[i, "Alt"]),
                        ref_seq[(ref_width + nchar(df_mutation[i, "Ref"]) + 1):
                                  (2 * ref_width + 1)])
-        print(ref_indel)
         # sequence information around the mutation position
         setting <- fun_setting(pre = pre_search_length_default,
                                post = post_search_length_default,
