@@ -58,13 +58,10 @@ fun_read_check <- function(df_mutation,
                            short_homology_search_length,
                            progress_bar) {
   if (!exists("df_mutation")) {
-    df_mutation <<- exampleMutation
+    df_mutation <- exampleMutation
   }
   if (!exists("df_bam")) {
-    df_bam <<- exampleBAM
-  }
-  if (!exists("df_mut_call")) {
-    df_mut_call <<- exampleMutCall
+    df_bam <- exampleBAM
   }
   if (!exists("organism")) {
     organism <<- "hg38"
@@ -87,16 +84,11 @@ fun_read_check <- function(df_mutation,
   if (!exists("progress_bar")) {
     progress_bar <<- "Y"
   }
-  if (!exists("list_exist")) {
-    list_exist <<- TRUE
-  } else if (!list_exist) {
-    df_mut_call <<- data.frame(logical(0))
-  }
+  list_exist <<- FALSE
   Chr <- NULL
   Pos <- NULL
   options(show.error.messages = TRUE, warn = -1)
-  #options(show.error.messages = FALSE, warn = -1)
-  
+
   df_chr <- df_bam$rname
   if (!is.character(df_chr)) {
     df_chr <- as.character(df_chr)
