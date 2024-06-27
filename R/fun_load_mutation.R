@@ -11,6 +11,7 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @importFrom dplyr arrange
+#' @importFrom dplyr case_when
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_detect

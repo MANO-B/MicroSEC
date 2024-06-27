@@ -37,10 +37,26 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
 #' \donttest{
-#' fun_read_check(short_homology_search_length = 4)
+#' fun_read_check(df_mutation = df_mutation,
+#' df_bam = df_bam,
+#' ref_genome = ref_genome,
+#' sample_name = sample_name,
+#' read_length = read_length,
+#' adapter_1 = adapter_1,
+#' adapter_2 = adapter_2,
+#' short_homology_search_length = 4,
+#' progress_bar = progress_bar)
 #' }
 #' @export
-fun_read_check <- function(short_homology_search_length) {
+fun_read_check <- function(df_mutation,
+                           df_bam,
+                           ref_genome,
+                           sample_name,
+                           read_length,
+                           adapter_1,
+                           adapter_2,
+                           short_homology_search_length,
+                           progress_bar) {
   if (!exists("df_mutation")) {
     df_mutation <<- exampleMutation
   }

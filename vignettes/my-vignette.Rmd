@@ -137,9 +137,8 @@ df_bam <- fun_load_bam(
 )
 
 # analysis
-result = fun_read_check(df_mutation = exampleMutation,
-                        df_bam = exampleBAM,
-                        df_mut_call = exampleMutCall,
+result = fun_read_check(df_mutation = df_mutation,
+                        df_bam = df_bam,
                         ref_genome = ref_genome,
                         sample_name = sample_name,
                         read_length = read_length,
