@@ -10,6 +10,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
+#' @importFrom dplyr case_when
 #' @importFrom dplyr arrange
 #' @importFrom dplyr case_when
 #' @importFrom BiocGenerics as.data.frame
@@ -53,7 +54,7 @@ fun_load_mutation <- function(mutation_file,
   
   # data formatting
   df_mutation <- df_mutation %>% mutate(
-    Alt = case_when(
+    Alt = dplyr::case_when(
       Alt == "*" ~ str_sub(Ref, 1, 1),
       TRUE ~ Alt
     )
