@@ -302,8 +302,6 @@ fun_read_check <- function(df_mutation,
         short_support_length <- 0
         pre_farthest <- 0
         post_farthest <- 0
-        pre_minimum_length <- read_length
-        post_minimum_length <- read_length
         pre_rep_status <- 0
         post_rep_status <- 0
         pre_rep_short <- 0

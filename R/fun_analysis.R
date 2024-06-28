@@ -136,11 +136,6 @@ fun_analysis <- function(msec,
                   alt_length < min_homology_search),
                TRUE, FALSE)
     )
-    print(mut_depth_short)
-    print(1:dim(msec)[1])
-    print(msec$shortest_support_length_adj + 2)
-    print(msec$short_support_length_adj + 2)
-    print(mut_depth_short[4, 6])
     msec$short_support_length_adj_sum <-
       mapply(
         function(x, y) {
@@ -156,7 +151,6 @@ fun_analysis <- function(msec,
         1:dim(msec)[1],
         msec$shortest_support_length_adj + 2
       )
-    print(12)
     msec$pre_support_length_adj_sum <-
       mapply(
         function(x, y) {
