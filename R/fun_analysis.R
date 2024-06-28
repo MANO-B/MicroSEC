@@ -137,6 +137,15 @@ fun_analysis <- function(msec,
                   alt_length < min_homology_search),
                TRUE, FALSE)
     )
+    print(msec$short_support_length_adj)
+    print(msec$shortest_support_length_adj)
+    print(msec$pre_support_length_adj)
+    print(msec$pre_minimum_length_adj)
+    print(msec$post_support_length_adj)
+    print(msec$half_length)
+    print(msec$minimum_length)
+    
+    
     msec$short_support_length_adj_sum <-
       mapply(
         function(x, y) {
