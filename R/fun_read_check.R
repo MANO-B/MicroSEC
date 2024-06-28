@@ -144,6 +144,8 @@ fun_read_check <- function(df_mutation,
       Mut_type <- ifelse(mut_type == "snv", "M",
                          ifelse(mut_type == "del", "D",
                                 ifelse(mut_type == "ins", "I", "")))
+      alt_length <- nchar(df_mutation[i, "Alt"])
+      
       if (length(df_bam_pos) > 0) {
         cigar_num_all <- str_split(df_bam_cigar,
                                    "[:upper:]",
@@ -319,7 +321,6 @@ fun_read_check <- function(df_mutation,
         search_status_2 <- 0
         indel_flag <- 0
         neighbor_seq <- df_mutation[i, "Neighborhood_sequence"]
-        alt_length <- nchar(df_mutation[i, "Alt"])
         ref_seq <- ref_genome_chr[
           (df_mutation[i, "Pos"] - ref_width):
             (df_mutation[i, "Pos"] + ref_width)]
