@@ -234,6 +234,7 @@ fun_read_check <- function(df_mutation,
           mut_seq <- cigar_seq_all[mutated_seq]
           mut_isize <- cigar_isize_all[mutated_seq]
           mut_cigar <- cigar_type_all[mutated_seq,]
+          mut_qname <- cigar_qname_all[mutated_seq]
           mut_pre_supporting_length = pre_supporting_length[mutated_seq]
           mut_post_supporting_length = post_supporting_length[mutated_seq]
 
@@ -508,18 +509,10 @@ fun_read_check <- function(df_mutation,
           }
           # specific read selection
           id_no <- df_bam_qname == mut_read_id[[j]]
-          df_seq <- df_bam_seq[id_no]
-          df_strand <- df_bam_strand[id_no]
-          df_cigar <- df_bam_cigar[id_no]
-          df_seq <- df_seq[df_strand == mut_read_strand[[j]]]
-          df_cigar <- df_cigar[df_strand == mut_read_strand[[j]]]
-          df_strand = mut_read_strand[[j]]
-          if (length(df_seq) > 1) {
-            df_cigar <- df_cigar[which.max(width(df_seq))]
-            df_seq <- df_seq[which.max(width(df_seq))]
-          }
-          df_seq <- df_seq[[1]]
-          if (length(df_seq) > 20) {
+          df_seq <- mut_seq[[j]]
+          df_strand <- mut_read_strand[j]
+          df_cigar <- mut_cigar[j,]
+          if (nchar(df_seq) > 20) {
             # determine mutation position in each read
             mut_position = mut_position_cigar[[j]]
             if (mut_position > 0 & mut_position <= length(df_seq)) {
