@@ -283,7 +283,6 @@ fun_read_check <- function(df_mutation,
                      mut_pre_supporting_length))
 
           # read quality check
-          apply(mut_qual, function(x){x<51})
           low_quality_base <- sum(unlist(lapply(mut_qual,
                                     function(x){sum(x<51)/length(x)})))
           df_qual_pre <- lapply(mut_qual,
