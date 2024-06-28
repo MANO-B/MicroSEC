@@ -229,7 +229,7 @@ fun_read_check <- function(df_mutation,
           mutated_seq <- (mut_pos > 0)
           mut_read_id <- cigar_qname_all[mutated_seq]
           mut_read_strand <- cigar_strand_all[mutated_seq]
-          mut_position <- mut_pos[mutated_seq]
+          mut_position_cigar <- mut_pos[mutated_seq]
           mut_qual <- cigar_qual_all[mutated_seq]
           mut_seq <- cigar_seq_all[mutated_seq]
           mut_isize <- cigar_isize_all[mutated_seq]
@@ -287,11 +287,11 @@ fun_read_check <- function(df_mutation,
           low_quality_base <- sum(unlist(lapply(mut_qual,
                                     function(x){sum(x<51)/length(x)})))
           df_qual_pre <- lapply(mut_qual,
-                                function(x){x[max(1, mut_position - 10):
-                                              max(1, mut_position - 1)]})
+                                function(x){x[max(1, mut_position_cigar - 10):
+                                              max(1, mut_position_cigar - 1)]})
           df_qual_post <- lapply(mut_qual,
-                                 function(x){x[min(length(x), mut_position + 1):
-                                                 min(length(x), mut_position + 10)]})
+                                 function(x){x[min(length(x), mut_position_cigar + 1):
+                                                 min(length(x), mut_position_cigar + 10)]})
           pre_mutation_quality_score <- sum(unlist(df_qual_pre) < 51)
           pre_mutation_quality_num <- length(unlist(df_qual_pre))
           post_mutation_quality_score <- sum(unlist(df_qual_post) < 51)
@@ -388,88 +388,88 @@ fun_read_check <- function(df_mutation,
           pre_homology_search_seq <-
             subseq(mut_seq,
                    1,ifelse(nchar(mut_seq) < 40, nchar(mut_seq),
-                             ifelse(mut_position +
+                             ifelse(mut_position_cigar +
                                       short_homology_search_length +
                                       post_rep_short +
                                       alt_length - 1 < 40, 40,
-                              ifelse(mut_position +
+                              ifelse(mut_position_cigar +
                                       short_homology_search_length +
                                       post_rep_short +
                                       alt_length - 1 > nchar(mut_seq),
                                      nchar(mut_seq),
-                                     mut_position +
+                                     mut_position_cigar +
                                        short_homology_search_length +
                                        post_rep_short +
                                        alt_length - 1))))
           post_homology_search_seq <-
             subseq(mut_seq,
                     ifelse(nchar(mut_seq) < 40, 1,
-                    ifelse(mut_position -
+                    ifelse(mut_position_cigar -
                              short_homology_search_length -
                              pre_rep_short < 1, 1,
                     ifelse(nchar(mut_seq) -
-                             mut_position +
+                             mut_position_cigar +
                              short_homology_search_length +
                              pre_rep_short < 39, nchar(mut_seq) - 39,
-                           mut_position -
+                           mut_position_cigar -
                              short_homology_search_length -
                              pre_rep_short))))
         } else if (indel_flag == 1) {
           pre_homology_search_seq <-
             subseq(mut_seq,
                    1,ifelse(nchar(mut_seq) < 40, nchar(mut_seq),
-                            ifelse(mut_position +
+                            ifelse(mut_position_cigar +
                                      short_homology_search_length +
                                      post_rep_short +
                                      alt_length < 40, 40,
-                                   ifelse(mut_position +
+                                   ifelse(mut_position_cigar +
                                             short_homology_search_length +
                                             post_rep_short +
                                             alt_length > nchar(mut_seq),
                                           nchar(mut_seq),
-                                          mut_position +
+                                          mut_position_cigar +
                                             short_homology_search_length +
                                             post_rep_short +
                                             alt_length))))
           post_homology_search_seq <-
             subseq(mut_seq,
                    ifelse(nchar(mut_seq) < 40, 1,
-                          ifelse(mut_position -
+                          ifelse(mut_position_cigar -
                                    short_homology_search_length -
                                    pre_rep_short < 1, 1,
                                  ifelse(nchar(mut_seq) -
-                                          mut_position +
+                                          mut_position_cigar +
                                           short_homology_search_length +
                                           pre_rep_short < 39, nchar(mut_seq) - 39,
-                                        mut_position -
+                                        mut_position_cigar -
                                           short_homology_search_length -
                                           pre_rep_short))))
         } else {
          pre_homology_search_seq <-
             subseq(mut_seq,
                    1,ifelse(nchar(mut_seq) < 40, nchar(mut_seq),
-                            ifelse(mut_position +
+                            ifelse(mut_position_cigar +
                                      short_homology_search_length +
                                      post_rep_short +
                                      alt_length < 40, 40,
-                                   ifelse(mut_position +
+                                   ifelse(mut_position_cigar +
                                             short_homology_search_length +
                                             post_rep_short +
                                             alt_length - 1 > nchar(mut_seq),
                                           nchar(mut_seq),
-                                          mut_position +
+                                          mut_position_cigar +
                                             short_homology_search_length +
                                             post_rep_short +
                                             alt_length - 1))))
           post_homology_search_seq <-
             subseq(mut_seq,
                    ifelse(nchar(mut_seq) < 40, 1,
-                     ifelse(mut_position -
+                     ifelse(mut_position_cigar -
                        short_homology_search_length < 1, 1,
                      ifelse(nchar(mut_seq) -
-                        mut_position +
+                              mut_position_cigar +
                         short_homology_search_length < 39, nchar(mut_seq) - 39,
-                      mut_position -
+                        mut_position_cigar -
                         short_homology_search_length))))
         }
         homology_search <- 
