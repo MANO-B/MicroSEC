@@ -265,9 +265,6 @@ fun_read_check <- function(df_mutation,
           mut_depth_pre_tmp <- t(cumsum(mut_depth_pre_tmp))
           mut_depth_post_tmp <- t(cumsum(mut_depth_post_tmp))
           mut_depth_short_tmp <- t(cumsum(mut_depth_short_tmp))
-          colnames(mut_depth_pre_tmp) <- c("Zero", paste0("Depth", 0:199))
-          colnames(mut_depth_post_tmp) <- c("Zero", paste0("Depth", 0:199))
-          colnames(mut_depth_short_tmp) <- c("Zero", paste0("Depth", 0:99))
           
           pre_support_length <- max(pre_supporting_length)
           post_support_length <- max(post_supporting_length)
@@ -782,6 +779,9 @@ fun_read_check <- function(df_mutation,
           caution = ""
         )
       }
+      colnames(mut_depth_pre_tmp) <- c("Zero", paste0("Depth", 0:199))
+      colnames(mut_depth_post_tmp) <- c("Zero", paste0("Depth", 0:199))
+      colnames(mut_depth_short_tmp) <- c("Zero", paste0("Depth", 0:99))
       mut_depth_pre <- rbind(mut_depth_pre, mut_depth_pre_tmp)
       mut_depth_post <- rbind(mut_depth_post, mut_depth_post_tmp)
       mut_depth_short <- rbind(mut_depth_short, mut_depth_short_tmp)

@@ -116,13 +116,6 @@ fun_analysis <- function(msec,
     mut_depth_pre <- mut_depth[[1]]
     mut_depth_post <- mut_depth[[2]]
     mut_depth_short <- mut_depth[[3]]
-    print(mut_depth_pre)
-    print(mut_depth_post)
-    print(msec$short_support_length_adj + 2)
-    print(1:dim(msec)[1])
-    print(msec$shortest_support_length_adj + 2)
-    print(msec$half_length + 2)
-    print(msec$minimum_length + 2)
     msec <- msec %>% mutate(
       short_short_support =
         (short_support_length_total <=
