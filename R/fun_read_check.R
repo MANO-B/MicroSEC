@@ -119,6 +119,15 @@ fun_read_check <- function(df_mutation,
       mut_depth_pre_tmp <- rep(0, 201)
       mut_depth_post_tmp <- rep(0, 201)
       mut_depth_short_tmp <- rep(0, 101)
+      pre_support_length <- 0
+      post_support_length <- 0
+      short_support_length <- 0
+      pre_farthest <- 0
+      post_farthest <- 0
+      pre_minimum_length <- read_length
+      post_minimum_length <- read_length
+      soft_clipped_read <- 0
+      low_quality_base <- 0
       caution <- ""
       # extract mutation supporting reads
       if (df_mutation[i, "Chr"] != chrom) {
@@ -297,11 +306,6 @@ fun_read_check <- function(df_mutation,
       }
       # if mutation supporting reads exist
       if (mut_call == 1) {
-        pre_support_length <- 0
-        post_support_length <- 0
-        short_support_length <- 0
-        pre_farthest <- 0
-        post_farthest <- 0
         pre_rep_status <- 0
         post_rep_status <- 0
         pre_rep_short <- 0
@@ -309,8 +313,6 @@ fun_read_check <- function(df_mutation,
         homopolymer_status <- 0
         flag_hairpin <- 0
         hairpin_length <- 0
-        soft_clipped_read <- 0
-        low_quality_base <- 0
         distant_homology <- 0
         search_status_1 <- 0
         search_status_2 <- 0
