@@ -116,7 +116,11 @@ fun_analysis <- function(msec,
     mut_depth_pre <- mut_depth[[1]]
     mut_depth_post <- mut_depth[[2]]
     mut_depth_short <- mut_depth[[3]]
+    
+    
     msec <- msec %>% mutate(
+      distant_homology_rate =
+        fun_zero(distant_homology, total_read),
       short_short_support =
         (short_support_length_total <=
            threshold_short_length * half_length_total),
