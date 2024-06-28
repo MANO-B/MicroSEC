@@ -75,6 +75,9 @@ fun_read_check <- function(df_mutation,
     # initialize
     msec <- NULL
     homology_search <- NULL
+    mut_depth_pre <- NULL
+    mut_depth_post <- NULL
+    mut_depth_short <- NULL
     chrom <- ""
     pre_search_length <- 0
     pre_search_length_default <- 0
@@ -113,9 +116,9 @@ fun_read_check <- function(df_mutation,
       pre_mutation_quality_num <- 0
       post_mutation_quality_score <- 0
       post_mutation_quality_num <- 0
-      mut_depth_pre <- rep(0, 201)
-      mut_depth_post <- rep(0, 201)
-      mut_depth_short <- rep(0, 101)
+      mut_depth_pre_tmp <- rep(0, 201)
+      mut_depth_post_tmp <- rep(0, 201)
+      mut_depth_short_tmp <- rep(0, 101)
       caution <- ""
       # extract mutation supporting reads
       if (df_mutation[i, "Chr"] != chrom) {
@@ -252,19 +255,19 @@ fun_read_check <- function(df_mutation,
 
           # normal supporting status detection
           for (depth in seq_len(length(pre_supporting_length))) {
-            mut_depth_pre[pre_supporting_length[depth] + 2] <-
-              mut_depth_pre[pre_supporting_length[depth] + 2] + 1
-            mut_depth_post[post_supporting_length[depth] + 2] <-
-              mut_depth_post[post_supporting_length[depth] + 2] + 1
-            mut_depth_short[short_supporting_length[depth] + 2] <-
-              mut_depth_short[short_supporting_length[depth] + 2] + 1
+            mut_depth_pre_tmp[pre_supporting_length[depth] + 2] <-
+              mut_depth_pre_tmp[pre_supporting_length[depth] + 2] + 1
+            mut_depth_post_tmp[post_supporting_length[depth] + 2] <-
+              mut_depth_post_tmp[post_supporting_length[depth] + 2] + 1
+            mut_depth_short_tmp[short_supporting_length[depth] + 2] <-
+              mut_depth_short_tmp[short_supporting_length[depth] + 2] + 1
           }
-          mut_depth_pre <- t(cumsum(mut_depth_pre))
-          mut_depth_post <- t(cumsum(mut_depth_post))
-          mut_depth_short <- t(cumsum(mut_depth_short))
-          colnames(mut_depth_pre) <- c("Zero", paste0("Depth", 0:199))
-          colnames(mut_depth_post) <- c("Zero", paste0("Depth", 0:199))
-          colnames(mut_depth_short) <- c("Zero", paste0("Depth", 0:99))
+          mut_depth_pre_tmp <- t(cumsum(mut_depth_pre_tmp))
+          mut_depth_post_tmp <- t(cumsum(mut_depth_post_tmp))
+          mut_depth_short_tmp <- t(cumsum(mut_depth_short_tmp))
+          colnames(mut_depth_pre_tmp) <- c("Zero", paste0("Depth", 0:199))
+          colnames(mut_depth_post_tmp) <- c("Zero", paste0("Depth", 0:199))
+          colnames(mut_depth_short_tmp) <- c("Zero", paste0("Depth", 0:99))
           
           pre_support_length <- max(pre_supporting_length)
           post_support_length <- max(post_supporting_length)
@@ -779,6 +782,9 @@ fun_read_check <- function(df_mutation,
           caution = ""
         )
       }
+      mut_depth_pre <- rbind(mut_depth_pre, mut_depth_pre_tmp)
+      mut_depth_post <- rbind(mut_depth_post, mut_depth_post_tmp)
+      mut_depth_short <- rbind(mut_depth_short, mut_depth_short_tmp)
       msec <- rbind(msec, msec_tmp)
     }
     mut_depth <- list(mut_depth_pre, mut_depth_post, mut_depth_short)
