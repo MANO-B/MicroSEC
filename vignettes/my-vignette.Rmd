@@ -131,10 +131,12 @@ df_mutation <- fun_load_mutation(
   ref_genome
 )
 
+
 # load bam file (cram file with reference file acceptable)
 df_bam <- fun_load_bam(
  system.file("extdata", "test.bam", package = "MicroSEC")
 )
+
 
 # analysis
 result = fun_read_check(df_mutation = df_mutation,
@@ -185,4 +187,19 @@ msec
 ```{r}
 sessionInfo()
 ```
+
+library(MicroSEC)
+wd <- "."
+read_length <- 150
+adapter_1 <- "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+adapter_2 <- "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
+organism <- "hg38"
+sample_name = "sample"
+progress_bar <- "Y"
+ref_genome <- fun_load_genome(organism)
+chr_no <- fun_load_chr_no(organism)
+short_homology_search_length = 4
+df_mutation <- fun_load_mutation("~/MicroSEC/inst/extdata/mutation_list.tsv", sample_name, ref_genome)
+df_bam <- fun_load_bam("~/MicroSEC/inst/extdata/sample.bam")
+
 
