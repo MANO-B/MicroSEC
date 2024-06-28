@@ -137,15 +137,7 @@ fun_analysis <- function(msec,
                   alt_length < min_homology_search),
                TRUE, FALSE)
     )
-    print(msec$short_support_length_adj)
-    print(msec$shortest_support_length_adj)
-    print(msec$pre_support_length_adj)
-    print(msec$pre_minimum_length_adj)
-    print(msec$post_support_length_adj)
-    print(msec$half_length)
-    print(msec$minimum_length)
-    
-    
+
     msec$short_support_length_adj_sum <-
       mapply(
         function(x, y) {
@@ -159,7 +151,7 @@ fun_analysis <- function(msec,
           return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
-        msec$shortest_support_length_adj + 1
+        msec$shortest_support_length_adj + 2
       )
     msec$pre_support_length_adj_sum <-
       mapply(
@@ -174,7 +166,7 @@ fun_analysis <- function(msec,
           return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
-        msec$pre_minimum_length_adj + 1
+        msec$pre_minimum_length_adj + 2
       )
     msec$post_support_length_adj_sum <-
       mapply(
@@ -189,7 +181,7 @@ fun_analysis <- function(msec,
           return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$post_minimum_length_adj + 1
+        msec$post_minimum_length_adj + 2
       )
     msec$half_length_adj_sum <-
       mapply(
@@ -204,7 +196,7 @@ fun_analysis <- function(msec,
           return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
-        msec$minimum_length + 1
+        msec$minimum_length + 2
       )
     msec$total_length_pre_adj_sum <-
       mapply(
@@ -221,7 +213,7 @@ fun_analysis <- function(msec,
           return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
-        msec$minimum_length_1 + 1
+        msec$minimum_length_1 + 2
       )
     msec$total_length_post_adj_sum <-
       mapply(
@@ -238,7 +230,7 @@ fun_analysis <- function(msec,
           return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$minimum_length_1 + 1
+        msec$minimum_length_1 + 2
       )
     msec <- msec %>% mutate(
       short_short_support_sum =

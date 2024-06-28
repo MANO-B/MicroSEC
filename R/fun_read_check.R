@@ -475,8 +475,8 @@ fun_read_check <- function(df_mutation,
                         mut_position_cigar -
                         short_homology_search_length))))
         }
-        homology_search <- 
-          rbind(data.frame(Sample = sample_name,
+        homology_search <- rbind(homology_search,
+                data.frame(Sample = sample_name,
                            Chr = df_mutation[i, "Chr"],
                            Pos = df_mutation[i, "Pos"],
                            Ref = df_mutation[i, "Ref"],
