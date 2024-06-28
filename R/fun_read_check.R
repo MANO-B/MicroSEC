@@ -124,8 +124,8 @@ fun_read_check <- function(df_mutation,
       short_support_length <- 0
       pre_farthest <- 0
       post_farthest <- 0
-      pre_minimum_length <- read_length
-      post_minimum_length <- read_length
+      pre_minimum_length <- 0
+      post_minimum_length <- 0
       soft_clipped_read <- 0
       low_quality_base <- 0
       caution <- ""
@@ -249,7 +249,11 @@ fun_read_check <- function(df_mutation,
           mut_qname <- cigar_qname_all[mutated_seq]
           mut_pre_supporting_length = pre_supporting_length[mutated_seq]
           mut_post_supporting_length = post_supporting_length[mutated_seq]
-
+          mut_short_supporting_length =
+            ifelse(mut_pre_supporting_length < mut_post_supporting_length,
+                   mut_pre_supporting_length,
+                   mut_post_supporting_length)
+          
           covering_seq <- (pre_supporting_length >= 0 &
                              post_supporting_length >= 0)
           pre_supporting_length <- pre_supporting_length[covering_seq]
@@ -262,7 +266,6 @@ fun_read_check <- function(df_mutation,
           mut_call <- 1
           soft_clipped_read <- sum(rowSums(mut_cigar == "S") > 0)
 
-          # normal supporting status detection
           for (depth in seq_len(length(pre_supporting_length))) {
             mut_depth_pre_tmp[pre_supporting_length[depth] + 2] <-
               mut_depth_pre_tmp[pre_supporting_length[depth] + 2] + 1
@@ -272,11 +275,11 @@ fun_read_check <- function(df_mutation,
               mut_depth_short_tmp[short_supporting_length[depth] + 2] + 1
           }
           
-          pre_support_length <- max(pre_supporting_length)
-          post_support_length <- max(post_supporting_length)
-          short_support_length <- max(short_supporting_length)
-          pre_minimum_length <- min(pre_supporting_length)
-          post_minimum_length <- min(post_supporting_length)
+          pre_support_length <- max(mut_pre_supporting_length)
+          post_support_length <- max(mut_post_supporting_length)
+          short_support_length <- max(mut_short_supporting_length)
+          pre_minimum_length <- min(mut_pre_supporting_length)
+          post_minimum_length <- min(mut_post_supporting_length)
 
           post_farthest <- max(ifelse(
             mut_read_strand == "f" & mut_isize < 1000 & mut_isize > 0,
