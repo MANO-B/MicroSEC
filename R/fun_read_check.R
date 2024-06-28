@@ -140,6 +140,10 @@ fun_read_check <- function(df_mutation,
       df_bam_pos <- df_bam_pos_chr[id_no]
       df_bam_qual <- df_bam_qual_chr[id_no]
       df_bam_isize <- df_bam_isize_chr[id_no]
+      mut_type <- mut_type_all[i]
+      Mut_type <- ifelse(mut_type == "snv", "M",
+                         ifelse(mut_type == "del", "D",
+                                ifelse(mut_type == "ins", "I", "")))
       if (length(df_bam_pos) > 0) {
         cigar_num_all <- str_split(df_bam_cigar,
                                    "[:upper:]",
@@ -175,10 +179,6 @@ fun_read_check <- function(df_mutation,
             (cigar_type_all[,k] %in% c("M","D")) *
             cigar_num_all[,k]
         }
-        mut_type <- mut_type_all[i]
-        Mut_type <- ifelse(mut_type == "snv", "M",
-                           ifelse(mut_type == "del", "D",
-                                  ifelse(mut_type == "ins", "I", "")))
         indel_status <- indel_status_all[i]
         indel_length <- indel_length_all[i]
         alt <- alt_all[i] - indel_status
