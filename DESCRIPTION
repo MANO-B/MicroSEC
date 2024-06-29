@@ -22,5 +22,6 @@ Imports: stringr, dplyr, gtools, Biostrings, Rsamtools,
         GenomeInfoDb, BiocGenerics
 Suggests: BSgenome.Hsapiens.UCSC.hg38, testthat, knitr,
         BSgenome.Hsapiens.UCSC.hg19, BSgenome.Mmusculus.UCSC.mm10
+VignetteBuilder: knitr
 URL: https://github.com/MANO-B/MicroSEC/
 BugReports: https://github.com/MANO-B/MicroSEC/issues

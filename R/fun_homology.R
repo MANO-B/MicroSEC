@@ -5,6 +5,9 @@
 #' @param msec Mutation filtering information.
 #' @param df_distant Sequences to be checked.
 #' @param min_homology_search Minimum length to define "homologous".
+#' @param ref_genome Reference genome for the data.
+#' @param chr_no Reference genome chromosome number (human=24, mouse=22).
+#' @param progress_bar "Y": You can see the progress visually.
 #' @return msec
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate

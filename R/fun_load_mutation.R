@@ -4,6 +4,8 @@
 #'
 #' @param mutation_file Path of the mutation information file.
 #' @param sample_name Sample name.
+#' @param ref_genome Reference genome for the data.
+#' @param chr_no Reference genome chromosome number (human=24, mouse=22).
 #' @return df_mutation
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select

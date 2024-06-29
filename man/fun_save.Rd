@@ -14,3 +14,8 @@ fun_save(msec, output)
 \description{
 This function attempts to save the filtering results.
 }
+\examples{
+fun_save(msec = msec_analyzed,
+         output = "./MicroSEC_test.tsv.gz"
+)
+}

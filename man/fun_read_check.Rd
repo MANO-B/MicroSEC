@@ -41,3 +41,15 @@ list(msec, homology_search, mut_depth)
 \description{
 This function attempts to check the mutation profile in each read.
 }
+\examples{
+fun_read_check(df_mutation = exampleMutation,
+df_bam = exampleBam,
+ref_genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
+sample_name = "sample",
+read_length = 150,
+adapter_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
+adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
+short_homology_search_length = 4,
+progress_bar = "Y"
+)
+}
