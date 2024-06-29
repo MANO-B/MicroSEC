@@ -1,4 +1,5 @@
 FFPE
+homopolymer
 homopolymers
 Illumina
 microhomology
@@ -7,5 +8,14 @@ Indel
 BAM
 bam
 Chr
+chr
 CTACCTGGAGAATGGGCCCATGTGTCCAGGTAGCAGTAAGC
 AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+POS
+Pos
+pre
+peri
+msec
+mut
+DNAString
+df

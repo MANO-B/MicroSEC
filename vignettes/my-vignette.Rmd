@@ -15,7 +15,7 @@ editor_options:
 This pipeline is designed for filtering mutations found in formalin-fixed and 
 paraffin-embedded (FFPE) samples. The MicroSEC filter utilizes a statistical 
 analysis, and the results for mutations with less than 10 supporting reads are 
-not reliable. Four files are nessesary for the analysis: mutation information 
+not reliable. Four files are necessary for the analysis: mutation information 
 file, BAM file, and mutation supporting read ID information file.  
   
 # File 1: mutation information file (mandatory)

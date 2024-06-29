@@ -56,8 +56,8 @@
 #'   \item{soft_clipped_read}{number of soft-clipped reads}
 #'   \item{flag_hairpin}{number of reads produced by hairpin structure}
 #'   \item{hairpin_length}{maximum length of palindromic sequences}
-#'   \item{pre_support_length}{muximum 5'-supporting length}
-#'   \item{post_support_length}{muximum 3'-supporting length}
+#'   \item{pre_support_length}{maximum 5'-supporting length}
+#'   \item{post_support_length}{maximum 3'-supporting length}
 #'   \item{short_support_length}{minimum supporting length}
 #'   \item{pre_minimum_length}{minimum 5'-supporting length}
 #'   \item{post_minimum_length}{minimum 3'-supporting length}
@@ -101,8 +101,8 @@
 #'   \item{soft_clipped_read}{number of soft-clipped reads}
 #'   \item{flag_hairpin}{number of reads produced by hairpin structure}
 #'   \item{hairpin_length}{maximum length of palindromic sequences}
-#'   \item{pre_support_length}{muximum 5'-supporting length}
-#'   \item{post_support_length}{muximum 3'-supporting length}
+#'   \item{pre_support_length}{maximum 5'-supporting length}
+#'   \item{post_support_length}{maximum 3'-supporting length}
 #'   \item{short_support_length}{minimum supporting length}
 #'   \item{pre_minimum_length}{minimum 5'-supporting length}
 #'   \item{post_minimum_length}{minimum 3'-supporting length}
@@ -146,8 +146,8 @@
 #'   \item{soft_clipped_read}{number of soft-clipped reads}
 #'   \item{flag_hairpin}{number of reads produced by hairpin structure}
 #'   \item{hairpin_length}{maximum length of palindromic sequences}
-#'   \item{pre_support_length}{muximum 5'-supporting length}
-#'   \item{post_support_length}{muximum 3'-supporting length}
+#'   \item{pre_support_length}{maximum 5'-supporting length}
+#'   \item{post_support_length}{maximum 3'-supporting length}
 #'   \item{short_support_length}{minimum supporting length}
 #'   \item{pre_minimum_length}{minimum 5'-supporting length}
 #'   \item{post_minimum_length}{minimum 3'-supporting length}
@@ -206,8 +206,8 @@
 #'   \item{total_read}{number of mutation supporting reads}
 #'   \item{soft_clipped_read}{number of soft-clipped reads}
 #'   \item{flag_hairpin}{number of reads produced by hairpin structure}
-#'   \item{pre_support_length}{muximum 5'-supporting length}
-#'   \item{post_support_length}{muximum 3'-supporting length}
+#'   \item{pre_support_length}{maximum 5'-supporting length}
+#'   \item{post_support_length}{maximum 3'-supporting length}
 #'   \item{short_support_length}{minimum supporting length}
 #'   \item{pre_farthest}{5'-farthest supported base from the mutated base}
 #'   \item{post_farthest}{3'-farthest supported base from the mutated base}
