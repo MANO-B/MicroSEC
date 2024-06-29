@@ -36,6 +36,8 @@
 #' @importFrom Biostrings subseq
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
+#' data(exampleMutation)
+#' data(exampleBam)
 #' fun_read_check(df_mutation = exampleMutation,
 #' df_bam = exampleBam,
 #' ref_genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,

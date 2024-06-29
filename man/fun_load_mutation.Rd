@@ -10,6 +10,10 @@ fun_load_mutation(mutation_file, sample_name, ref_genome, chr_no)
 \item{mutation_file}{Path of the mutation information file.}
 
 \item{sample_name}{Sample name.}
+
+\item{ref_genome}{Reference genome for the data.}
+
+\item{chr_no}{Reference genome chromosome number (human=24, mouse=22).}
 }
 \value{
 df_mutation

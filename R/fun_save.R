@@ -5,6 +5,7 @@
 #' @param msec Mutation filtering information.
 #' @param output output file name (full path).
 #' @examples
+#' data(msec_analyzed)
 #' fun_save(msec = msec_analyzed,
 #'          output = "./MicroSEC_test.tsv.gz"
 #' )

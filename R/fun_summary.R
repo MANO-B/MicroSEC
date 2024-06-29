@@ -8,6 +8,7 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #' @examples
+#' data(msec_homology_searched)
 #' fun_summary(msec_homology_searched)
 #' @export
 fun_summary <- function(msec) {

@@ -19,6 +19,12 @@ fun_homology(
 \item{df_distant}{Sequences to be checked.}
 
 \item{min_homology_search}{Minimum length to define "homologous".}
+
+\item{ref_genome}{Reference genome for the data.}
+
+\item{chr_no}{Reference genome chromosome number (human=24, mouse=22).}
+
+\item{progress_bar}{"Y": You can see the progress visually.}
 }
 \value{
 msec

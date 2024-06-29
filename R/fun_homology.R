@@ -22,6 +22,8 @@
 #' @importFrom BiocGenerics paste
 #' @importFrom GenomeInfoDb seqnames
 #' @examples
+#' data(msec_read_checked)
+#' data(homology_searched)
 #' fun_homology(msec = msec_read_checked,
 #'    df_distant = homology_searched,
 #'    min_homology_search = 40,
