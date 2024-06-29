@@ -39,6 +39,7 @@ fun_summary <- function(msec) {
   short_support_length_adj <- NULL
   half_length <- NULL
   soft_clipped_rate <- NULL
+  soft_clipped_read <- NULL
   
   if (dim(msec)[1] > 0) {
     msec <- msec %>% mutate(

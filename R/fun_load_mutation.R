@@ -15,6 +15,7 @@
 #' @importFrom BiocGenerics as.data.frame
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_detect
+#' @importFrom stats complete.cases
 #' @examples
 #' fun_load_mutation(
 #'   system.file("extdata", "mutation_list.tsv", package = "MicroSEC"),
@@ -31,15 +32,21 @@ fun_load_mutation <- function(mutation_file,
   Pos <- NULL
   Ref <- NULL
   Alt <- NULL
+  RefLen <- NULL
+  AltLen <- NULL
+  Mut_len <- NULL
   SimpleRepeat_TRF <- NULL
   Neighborhood_sequence <- NULL
   Neighbor_start_1 <- NULL
   Neighbor_start_2 <- NULL
-  eighbor_end_1 <- NULL
-  eighbor_end_2 <- NULL
+  Neighbor_end_1 <- NULL
+  Neighbor_end_2 <- NULL
   Pre_Neighbor <- NULL
   Post_Neighbor <- NULL
-  Mut_len <- NULL
+  simple_repeat_list <- NULL
+  V1 <- NULL
+  V2 <- NULL
+  V3 <- NULL
 
   # load somatic mutation list
   df_mutation <- read.csv(mutation_file,
@@ -95,7 +102,7 @@ fun_load_mutation <- function(mutation_file,
       if (length((simple_repeat_now %>%
                   filter(V1 == df_mutation$Chr[k] &
                          V2 <= df_mutation$Pos[k] &
-                         V3 >= df_mutation$Pos[k]))$X1)) {
+                         V3 >= df_mutation$Pos[k]))$V1)) {
         df_mutation$SimpleRepeat_TRF[k] <- "Y"
       }
     }
