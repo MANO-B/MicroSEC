@@ -1,6 +1,9 @@
 .Rproj.user
 .Rproj.user/
+MicroSEC.Rcheck
+MicroSEC.Rcheck/
 .Rbuildignore
+.gitignore
 .Rhistory
 .RData
 .DS_Store

@@ -5,7 +5,6 @@
 #' @param mutation_file Path of the mutation information file.
 #' @param sample_name Sample name.
 #' @return df_mutation
-#' @importFrom openxlsx read.xlsx
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
@@ -18,8 +17,8 @@
 #' @importFrom stringr str_detect
 #' @examples
 #' fun_load_mutation(
-#'   system.file("extdata", "test_mutation.tsv", package = "MicroSEC"),
-#'   "H15-11943-1-T_TDv3",
+#'   system.file("extdata", "mutation_list.tsv", package = "MicroSEC"),
+#'   "sample",
 #'   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 #' )
 #' @export
@@ -43,11 +42,11 @@ fun_load_mutation <- function(mutation_file,
   Mut_len <- NULL
 
   # load somatic mutation list
-  df_mutation <- utils::read.csv(mutation_file,
-                                 stringsAsFactors = FALSE,
-                                 header = TRUE,
-                                 check.names = F,
-                                 sep = "\t")
+  df_mutation <- read.csv(mutation_file,
+                          stringsAsFactors = FALSE,
+                          header = TRUE,
+                          check.names = F,
+                          sep = "\t")
   df_mutation <- df_mutation[complete.cases(df_mutation$Sample),] %>%
     filter(Sample == sample_name)
   df_mutation <- df_mutation[order(df_mutation$Chr, df_mutation$Pos),]
@@ -77,26 +76,26 @@ fun_load_mutation <- function(mutation_file,
   
   if ("simple_repeat_list" %in% ls() &
       !df_mutation$SimpleRepeat_TRF[1] %in% c("Y", "N")) {
-    simple_repeat_info <- data.frame(readr::read_tsv(
-      progress = F,
-      col_names = FALSE,
-      show_col_types = F,
-      simple_repeat_list))[,1:3]
+    simple_repeat_info <- read.csv(simple_repeat_list,
+                                   stringsAsFactors = FALSE,
+                                   header = FALSE,
+                                   check.names = FALSE,
+                                   sep = "\t")[,1:3]
     simple_repeat_info <- simple_repeat_info %>%
-      filter(X1 %in% chromosomes)
+      filter(V1 %in% chromosomes)
     chr_now <- chromosomes[1]
     simple_repeat_now <- simple_repeat_info %>%
-      filter(X1 == chr_now)
+      filter(V1 == chr_now)
     for (k in seq_len(length(df_mutation$SimpleRepeat_TRF))) {
       if (df_mutation$Chr[k] != chr_now) {
         chr_now <- df_mutation$Chr[k]
         simple_repeat_now <- simple_repeat_info %>%
-          filter(X1 == chr_now)
+          filter(V1 == chr_now)
       }
       if (length((simple_repeat_now %>%
-                  filter(X1 == df_mutation$Chr[k] &
-                         X2 <= df_mutation$Pos[k] &
-                         X3 >= df_mutation$Pos[k]))$X1)) {
+                  filter(V1 == df_mutation$Chr[k] &
+                         V2 <= df_mutation$Pos[k] &
+                         V3 >= df_mutation$Pos[k]))$X1)) {
         df_mutation$SimpleRepeat_TRF[k] <- "Y"
       }
     }

@@ -19,8 +19,8 @@ This function attempts to load the mutation information file.
 }
 \examples{
 fun_load_mutation(
-  system.file("extdata", "test_mutation.tsv", package = "MicroSEC"),
-  "H15-11943-1-T_TDv3",
+  system.file("extdata", "mutation_list.tsv", package = "MicroSEC"),
+  "sample",
   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 )
 }
