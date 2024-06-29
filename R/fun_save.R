@@ -8,7 +8,6 @@
 #' fun_save(msec = msec_analyzed,
 #'          output = "./MicroSEC_test.tsv.gz"
 #' )
-#' }
 #' @export
 fun_save <- function(msec, output) {
   # save the results

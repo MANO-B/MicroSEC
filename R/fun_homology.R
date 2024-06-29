@@ -26,7 +26,6 @@
 #'    chr_no = 24,
 #'    progress_bar = "Y"
 #' )
-#' }
 #' @export
 fun_homology <- function(msec,
                          df_distant,
