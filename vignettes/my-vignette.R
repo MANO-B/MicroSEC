@@ -16,3 +16,73 @@ progress_bar <- "N"
 ## ----packages-----------------------------------------------------------------
 library(MicroSEC)
 
+## ----analysis-----------------------------------------------------------------
+# initialize
+msec <- NULL
+homology_search <- NULL
+mut_depth <- NULL
+
+# test data
+sample_name <- "sample"
+read_length <- 150
+adapter_1 <- "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+adapter_2 <- "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
+organism <- "hg38"
+
+# load mutation information
+df_mutation <- fun_load_mutation(
+   system.file("extdata", "mutation_list.tsv", package = "MicroSEC"),
+   "sample",
+   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
+df_bam <- fun_load_bam(
+   system.file("extdata", "sample.bam", package = "MicroSEC"))
+
+# load genomic sequence
+ref_genome <- fun_load_genome(organism)
+chr_no <- fun_load_chr_no(organism)
+
+# analysis
+result <- fun_read_check(df_mutation = df_mutation,
+                         df_bam = df_bam,
+                         ref_genome = ref_genome,
+                         sample_name = sample_name,
+                         read_length = read_length,
+                         adapter_1 = adapter_1,
+                         adapter_2 = adapter_2,
+                         short_homology_search_length = 4,
+                         progress_bar = progress_bar)
+msec <- result[[1]]
+homology_search <- result[[2]]
+mut_depth <- result[[3]]
+
+# search homologous sequences
+msec = fun_homology(msec,
+                    homology_search,
+                    min_homology_search = 40,
+                    ref_genome,
+                    chr_no,
+                    progress_bar = progress_bar)
+
+# statistical analysis
+msec <- fun_summary(msec)
+msec <- fun_analysis(msec,
+                    mut_depth,
+                    short_homology_search_length = 4,
+                    min_homology_search = 40,
+                    threshold_p = 10 ^ (-6),
+                    threshold_hairpin_ratio = 0.50,
+                    threshold_short_length = 0.75,
+                    threshold_distant_homology = 0.15,
+                    threshold_soft_clip_ratio = 0.50,
+                    threshold_low_quality_rate = 0.1,
+                    homopolymer_length = 15)
+
+# save the results as a tsv.gz file.
+fun_save(msec, "~/MicroSEC_test.tsv.gz")
+
+## -----------------------------------------------------------------------------
+msec
+
+## -----------------------------------------------------------------------------
+sessionInfo()
+
