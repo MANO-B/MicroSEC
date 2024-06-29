@@ -13,3 +13,4 @@ vignettes/*.pdf
 .Renviron
 docs/
 MicroSEC_test.tsv.gz
+.github/workflows/
