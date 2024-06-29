@@ -21,7 +21,8 @@
 #' fun_load_mutation(
 #'   system.file("extdata", "mutation_list.tsv", package = "MicroSEC"),
 #'   "sample",
-#'   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#'   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
+#'   24
 #' )
 #' @export
 fun_load_mutation <- function(mutation_file,

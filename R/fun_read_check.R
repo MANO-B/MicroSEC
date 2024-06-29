@@ -36,16 +36,15 @@
 #' @importFrom Biostrings subseq
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
-#' \donttest{
-#' fun_read_check(df_mutation = df_mutation,
-#' df_bam = df_bam,
-#' ref_genome = ref_genome,
-#' sample_name = sample_name,
-#' read_length = read_length,
-#' adapter_1 = adapter_1,
-#' adapter_2 = adapter_2,
+#' fun_read_check(df_mutation = exampleMutation,
+#' df_bam = exampleBam,
+#' ref_genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
+#' sample_name = "sample",
+#' read_length = 150,
+#' adapter_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
+#' adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
 #' short_homology_search_length = 4,
-#' progress_bar = progress_bar)
+#' progress_bar = "Y")
 #' }
 #' @export
 fun_read_check <- function(df_mutation,

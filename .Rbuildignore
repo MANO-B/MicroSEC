@@ -6,3 +6,4 @@
 ^\.RData$
 ^\.Rhistory$
 MicroSEC.R
+MicroSEC_test.tsv.gz

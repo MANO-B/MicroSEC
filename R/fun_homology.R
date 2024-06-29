@@ -19,7 +19,6 @@
 #' @importFrom BiocGenerics paste
 #' @importFrom GenomeInfoDb seqnames
 #' @examples
-#' \donttest{
 #' fun_homology(msec = msec_read_checked,
 #'              df_distant = homology_searched,
 #'              min_homology_search = 40,
