@@ -1,6 +1,11 @@
 .Rproj.user
+.Rproj.user/
 .Rbuildignore
 .Rhistory
 .RData
 .DS_Store
 .Ruserdata
+vignettes/*.html
+vignettes/*.pdf
+.Renviron
+docs/
