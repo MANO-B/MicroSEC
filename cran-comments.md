@@ -10,13 +10,9 @@ This is a resubmission. In this version I have:
 - fun_save_gz
 
 ## Test environments
-* macOS 14.5, R 4.2.3
-* ubuntu 18.04, R 3.6.3
-* Windows 10, R 4.0.3
-Environments with the following packages already installed:
-- BSgenome.Hsapiens.UCSC.hg38  
-- BSgenome.Hsapiens.UCSC.hg19  
-- BSgenome.Mmusculus.UCSC.mm10  
+* macOS-arm64 14.5, R 4.2.3
+
+
 
 ## R CMD check results
 Duration: 4m 9.5s
