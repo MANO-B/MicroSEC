@@ -14,8 +14,3 @@ fun_save(msec, output)
 \description{
 This function attempts to save the filtering results.
 }
-\examples{
-\donttest{
-fun_save(msec_analyzed, "./test_data.tsv")
-}
-}

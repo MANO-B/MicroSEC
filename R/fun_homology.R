@@ -20,12 +20,12 @@
 #' @importFrom GenomeInfoDb seqnames
 #' @examples
 #' fun_homology(msec = msec_read_checked,
-#'              df_distant = homology_searched,
-#'              min_homology_search = 40,
-#'              ref_genome = BSgenome.Hsapiens.UCSC.hg38::
-#'                             BSgenome.Hsapiens.UCSC.hg38,
-#'              chr_no = 24,
-#'              progress_bar = "Y")
+#'    df_distant = homology_searched,
+#'    min_homology_search = 40,
+#'    ref_genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
+#'    chr_no = 24,
+#'    progress_bar = "Y"
+#' )
 #' }
 #' @export
 fun_homology <- function(msec,
