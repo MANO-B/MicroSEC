@@ -63,14 +63,11 @@
 # load necessary packages
 library(MicroSEC)
 library(dplyr)
-library(openxlsx)
 library(readr)
 library(stringr)
 library(Rsamtools)
 library(BiocGenerics)
-library(lubridate)
 library(Biostrings)
-library(gtools)
 
 # set arguments
 args <- commandArgs(trailingOnly = T)
