@@ -11,9 +11,8 @@ This is a resubmission. In this version I have:
   
 ## Test environments  
 Local environments  
-* macOS-arm64 14.5, R 4.2.3  
-* windows11 on Parallels Desktop on macOS-arm64 14.5, R 4.4.1  
-  
+* macOS-arm64 14.5, R 4.2.3
+
 R-hub environments  
 * gcc13 R-devel (2024-06-28 r86850), Fedora Linux 38 (Container Image)  
 * linux R-4.2.3, ubuntu-latest on GitHub  
