@@ -79,7 +79,7 @@ msec <- fun_analysis(msec,
                     homopolymer_length = 15)
 
 # save the results as a tsv.gz file.
-fun_save(msec, "~/MicroSEC_test.tsv.gz")
+#fun_save(msec, "~/MicroSEC_test.tsv.gz")
 
 ## -----------------------------------------------------------------------------
 msec
