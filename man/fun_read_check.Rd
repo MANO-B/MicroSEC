@@ -4,16 +4,22 @@
 \alias{fun_read_check}
 \title{Read check function.}
 \usage{
-fun_read_check(short_homology_search_length)
+fun_read_check(
+  df_mutation,
+  df_bam,
+  ref_genome,
+  sample_name,
+  read_length,
+  adapter_1,
+  adapter_2,
+  short_homology_search_length,
+  progress_bar
+)
 }
 \arguments{
-\item{short_homology_search_length}{Small sequence for homology search.}
-
 \item{df_mutation}{Mutation information.}
 
 \item{df_bam}{Data from the BAM file.}
-
-\item{df_mut_call}{Read ID list.}
 
 \item{ref_genome}{Reference genome for the data.}
 
@@ -25,6 +31,8 @@ fun_read_check(short_homology_search_length)
 
 \item{adapter_2}{The Read 2 adapter sequence of the library.}
 
+\item{short_homology_search_length}{Small sequence for homology search.}
+
 \item{progress_bar}{"Y": You can see the progress visually.}
 }
 \value{
@@ -35,6 +43,14 @@ This function attempts to check the mutation profile in each read.
 }
 \examples{
 \donttest{
-fun_read_check(short_homology_search_length = 4)
+fun_read_check(df_mutation = df_mutation,
+df_bam = df_bam,
+ref_genome = ref_genome,
+sample_name = sample_name,
+read_length = read_length,
+adapter_1 = adapter_1,
+adapter_2 = adapter_2,
+short_homology_search_length = 4,
+progress_bar = progress_bar)
 }
 }

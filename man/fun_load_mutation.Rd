@@ -4,7 +4,7 @@
 \alias{fun_load_mutation}
 \title{Mutation data file loader}
 \usage{
-fun_load_mutation(mutation_file, sample_name)
+fun_load_mutation(mutation_file, sample_name, ref_genome)
 }
 \arguments{
 \item{mutation_file}{Path of the mutation information file.}
@@ -19,7 +19,8 @@ This function attempts to load the mutation information file.
 }
 \examples{
 fun_load_mutation(
-  system.file("extdata", "test_mutation.xlsx", package = "MicroSEC"),
- "H15-11943-1-T_TDv3"
+  system.file("extdata", "test_mutation.tsv", package = "MicroSEC"),
+  "H15-11943-1-T_TDv3",
+  BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 )
 }

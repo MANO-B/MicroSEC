@@ -33,6 +33,7 @@
 #' @importFrom Biostrings start
 #' @importFrom Biostrings end
 #' @importFrom Biostrings nchar
+#' @importFrom Biostrings subseq
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
 #' \donttest{

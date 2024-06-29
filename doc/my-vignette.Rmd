@@ -99,7 +99,7 @@ Results are saved in a tsv file.
 github url: https://github.com/MANO-B/MicroSEC  
   
 ## Setting
-```{r}
+```{r setting}
 wd <- "~"
 knitr::opts_chunk$set(collapse = TRUE,
                       fig.width = 12,
@@ -121,7 +121,7 @@ library(MicroSEC)
 ```
 
 ## Analysis
-```{r}
+```{r analysis}
 # initialize
 msec <- NULL
 homology_search <- NULL
