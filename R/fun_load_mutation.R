@@ -16,6 +16,7 @@
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_detect
 #' @importFrom stats complete.cases
+#' @importFrom utils read.csv
 #' @examples
 #' fun_load_mutation(
 #'   system.file("extdata", "mutation_list.tsv", package = "MicroSEC"),
@@ -25,7 +26,8 @@
 #' @export
 fun_load_mutation <- function(mutation_file,
                              sample_name,
-                             ref_genome) {
+                             ref_genome,
+                             chr_no) {
   Sample <- NULL
   Mut_type <- NULL
   Chr <- NULL
@@ -47,7 +49,14 @@ fun_load_mutation <- function(mutation_file,
   V1 <- NULL
   V2 <- NULL
   V3 <- NULL
-
+  
+  if (ref_genome@user_seqnames[[1]] == "chr1") {
+    chromosomes <- paste0("chr", c(seq_len(chr_no - 2),"X", "Y"))
+  }
+  if (ref_genome@user_seqnames[[1]] == "1") {
+    chromosomes <- paste0("", c(seq_len(chr_no - 2),"X", "Y"))
+  }
+  
   # load somatic mutation list
   df_mutation <- read.csv(mutation_file,
                           stringsAsFactors = FALSE,

@@ -133,7 +133,10 @@ for (sample in seq_len(dim(sample_info)[1])) {
   }
   
   # load mutation information
-  df_mutation <- fun_load_mutation(mutation_file, sample_name, ref_genome)
+  df_mutation <- fun_load_mutation(mutation_file,
+                                   sample_name,
+                                   ref_genome,
+                                   chr_no)
   
   if (tools::file_ext(bam_file) == "bam") {
     bam_file_bai <- paste0(bam_file, ".bai")
