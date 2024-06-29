@@ -16,5 +16,6 @@ msec
 This function summarizes the filtering results.
 }
 \examples{
+data(msec_homology_searched)
 fun_summary(msec_homology_searched)
 }

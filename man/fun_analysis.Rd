@@ -50,6 +50,8 @@ msec
 This function analyzes the filtering results.
 }
 \examples{
+data(msec_summarized)
+data(mut_depth_checked)
 fun_analysis(msec = msec_summarized,
              mut_depth = mut_depth_checked,
              short_homology_search_length = 4,

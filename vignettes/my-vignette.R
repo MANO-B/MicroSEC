@@ -33,7 +33,8 @@ organism <- "hg38"
 df_mutation <- fun_load_mutation(
    system.file("extdata", "mutation_list.tsv", package = "MicroSEC"),
    "sample",
-   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
+   BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
+   24)
 df_bam <- fun_load_bam(
    system.file("extdata", "sample.bam", package = "MicroSEC"))
 

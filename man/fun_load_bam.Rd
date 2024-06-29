@@ -17,6 +17,6 @@ This function attempts to load the BAM file.
 }
 \examples{
 fun_load_bam(
-  system.file("extdata", "test.bam", package = "MicroSEC")
+  system.file("extdata", "sample.bam", package = "MicroSEC")
 )
 }

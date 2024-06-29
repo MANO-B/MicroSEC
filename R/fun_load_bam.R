@@ -9,7 +9,7 @@
 #' @importFrom Biostrings DNAStringSet
 #' @examples
 #' fun_load_bam(
-#'   system.file("extdata", "test.bam", package = "MicroSEC")
+#'   system.file("extdata", "sample.bam", package = "MicroSEC")
 #' )
 #' @export
 fun_load_bam <- function(bam_file) {

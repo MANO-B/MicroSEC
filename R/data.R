@@ -235,7 +235,7 @@
 #' }
 "msec_analyzed"
 
-#' An example sequence infromation file.
+#' An example sequence information file.
 #'
 #' A dataset containing the information of reads for homology search.
 #'
@@ -252,7 +252,7 @@
 #' }
 "homology_searched"
 
-#' An example sequence infromation file.
+#' An example sequence information file.
 #'
 #' A dataset containing the information of reads for homology search.
 #'
