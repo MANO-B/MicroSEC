@@ -19,11 +19,11 @@ LazyData: true
 Depends: R (>= 3.4.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Imports: tidyr, openxlsx, data.table, R.utils, stringr, magrittr,
-        dplyr, gtools, Biostrings, GenomicAlignments, Rsamtools,
+Imports: tidyr, R.utils, stringr, magrittr, dplyr, 
+        gtools, Biostrings, GenomicAlignments, Rsamtools,
         GenomeInfoDb, BiocGenerics
 Suggests: BSgenome.Hsapiens.UCSC.hg38, BSgenome.Hsapiens.UCSC.hg19,
-        BSgenome.Mmusculus.UCSC.mm10, knitr, rmarkdown
+        BSgenome.Mmusculus.UCSC.mm10
 VignetteBuilder: knitr
 URL: https://github.com/MANO-B/MicroSEC/
 BugReports: https://github.com/MANO-B/MicroSEC/issues

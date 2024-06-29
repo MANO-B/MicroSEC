@@ -39,22 +39,6 @@
 #' }
 "exampleBAM"
 
-#' An example mutated read ID file.
-#'
-#' A dataset containing the information of mutated read.
-#'
-#' @format A list with 7 factors, each contains 8 variables:
-#' \describe{
-#'   \item{Chr}{altered chromosome}
-#'   \item{Pos}{altered position}
-#'   \item{Ref}{reference base}
-#'   \item{Alt}{altered base}
-#'   \item{Mut_ID}{mutated read ID}
-#'   \item{Mut}{mutation detail}
-#'   ...
-#' }
-"exampleMutCall"
-
 #' An example mutation file.
 #'
 #' A dataset containing the information of eight mutations processed by the
