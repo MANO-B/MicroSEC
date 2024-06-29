@@ -2,6 +2,7 @@
 This is a resubmission. In this version I have:  
 * Version changed: 1.1.3 -> 2.0.0  
 * Many functions were removed and the structure was simplified.  
+* Bugs fixed.
 - fun_convert  
 - fun_hairpin_trimming  
 - fun_insert_length  
