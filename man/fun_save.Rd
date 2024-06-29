@@ -15,7 +15,7 @@ fun_save(msec, output)
 This function attempts to save the filtering results.
 }
 \examples{
-\donttest{
+\dontrun{
 data(msec_analyzed)
 fun_save(msec = msec_analyzed,
          output = "./MicroSEC_test.tsv.gz"

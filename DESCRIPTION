@@ -21,8 +21,13 @@ RoxygenNote: 7.3.1
 LazyData: true
 Imports: stringr, dplyr, gtools, Biostrings, Rsamtools,
         GenomeInfoDb, BiocGenerics
-Suggests: BSgenome.Hsapiens.UCSC.hg38, knitr,
-        BSgenome.Hsapiens.UCSC.hg19, BSgenome.Mmusculus.UCSC.mm10
+Suggests: 
+    BSgenome.Hsapiens.UCSC.hg38,
+    knitr,
+    BSgenome.Hsapiens.UCSC.hg19,
+    BSgenome.Mmusculus.UCSC.mm10,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 URL: https://github.com/MANO-B/MicroSEC/
 BugReports: https://github.com/MANO-B/MicroSEC/issues
+Config/testthat/edition: 3

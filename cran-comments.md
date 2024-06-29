@@ -19,15 +19,14 @@ Environments with the following packages already installed:
 - BSgenome.Mmusculus.UCSC.mm10  
 
 ## R CMD check results
-Duration: 3m 0.7s
-0 errors ✓ | 0 warnings ✓ | 0 notes ✓
-R CMD check succeeded  
+Duration: 4m 9.5s
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+R CMD check succeeded
 
-Examples with CPU or elapsed time > 5s
+Examples with CPU (user + system) or elapsed time > 5s
                 user system elapsed
-fun_homology   66.401  2.349  68.770
-fun_read_check 20.256  0.792  21.049
-fun_convert     6.587  0.703   7.306
-  
+fun_homology   76.889  0.611  77.783
+fun_read_check 15.179  0.461  15.847
+ 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.
