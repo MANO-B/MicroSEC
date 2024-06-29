@@ -3,7 +3,7 @@
 \docType{data}
 \name{mut_depth_checked}
 \alias{mut_depth_checked}
-\title{An example sequence infromation file.}
+\title{An example sequence information file.}
 \format{
 Three lists with 201 factors, each contains 29 variables:
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/fun_zero.R
 \name{fun_zero}
 \alias{fun_zero}
-\title{Devide function without 0/0 errors}
+\title{Divide function without 0/0 errors}
 \usage{
 fun_zero(a, b)
 }
@@ -10,8 +10,8 @@ fun_zero(a, b)
 \item{a, b}{Integers}
 }
 \value{
-a devided by b
+a divided by b
 }
 \description{
-This function attempts to devide without 0/0 errors.
+This function attempts to divide without 0/0 errors.
 }
