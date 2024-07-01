@@ -203,10 +203,10 @@ The program does not use any of the functions specific to the above version pack
 See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
-# Stable version from CRAN (recommended)
+# Stable version from CRAN (not recommended now)
 install.packages("MicroSEC")
 
-# Developmental stable version from github (not recommended)
+# Developmental stable version from github (recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 ```
 - How to use in command line
