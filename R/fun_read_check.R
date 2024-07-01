@@ -46,6 +46,7 @@
 #' adapter_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
 #' adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
 #' short_homology_search_length = 4,
+#' min_homology_search = 40,
 #' progress_bar = "Y"
 #' )
 #' @export
@@ -57,6 +58,7 @@ fun_read_check <- function(df_mutation,
                            adapter_1,
                            adapter_2,
                            short_homology_search_length,
+                           min_homology_search,
                            progress_bar) {
   Chr <- NULL
   Pos <- NULL
@@ -239,74 +241,76 @@ fun_read_check <- function(df_mutation,
             cigar_genome_pos[,dim(cigar_genome_pos)[2]] -
             df_mutation[i, "Pos"] -
             (1 - indel_status) * alt
-
-          mutated_seq <- (mut_pos > 0)
-          mut_read_id <- cigar_qname_all[mutated_seq]
-          mut_read_strand <- cigar_strand_all[mutated_seq]
-          mut_position_cigar <- mut_pos[mutated_seq]
-          mut_qual <- cigar_qual_all[mutated_seq]
-          mut_seq <- cigar_seq_all[mutated_seq]
-          mut_isize <- cigar_isize_all[mutated_seq]
-          mut_cigar <- cigar_type_all[mutated_seq,]
-          mut_qname <- cigar_qname_all[mutated_seq]
-          mut_pre_supporting_length = pre_supporting_length[mutated_seq]
-          mut_post_supporting_length = post_supporting_length[mutated_seq]
-          mut_short_supporting_length =
-            ifelse(mut_pre_supporting_length < mut_post_supporting_length,
-                   mut_pre_supporting_length,
-                   mut_post_supporting_length)
           
-          covering_seq <- (pre_supporting_length >= 0 &
-                             post_supporting_length >= 0)
-          pre_supporting_length <- pre_supporting_length[covering_seq]
-          post_supporting_length <- post_supporting_length[covering_seq]
-          short_supporting_length =
-            ifelse(pre_supporting_length < post_supporting_length,
-                   pre_supporting_length,
-                   post_supporting_length)
-
-          mut_call <- 1
-          soft_clipped_read <- sum(rowSums(mut_cigar == "S") > 0)
-
-          for (depth in seq_len(length(pre_supporting_length))) {
-            mut_depth_pre_tmp[pre_supporting_length[depth] + 2] <-
-              mut_depth_pre_tmp[pre_supporting_length[depth] + 2] + 1
-            mut_depth_post_tmp[post_supporting_length[depth] + 2] <-
-              mut_depth_post_tmp[post_supporting_length[depth] + 2] + 1
-            mut_depth_short_tmp[short_supporting_length[depth] + 2] <-
-              mut_depth_short_tmp[short_supporting_length[depth] + 2] + 1
+          mutated_seq <- (mut_pos > 0) & lapply(cigar_qual_all, mean)>=53
+          if (sum(mutated_seq) > 0) {
+            mut_read_id <- cigar_qname_all[mutated_seq]
+            mut_read_strand <- cigar_strand_all[mutated_seq]
+            mut_position_cigar <- mut_pos[mutated_seq]
+            mut_qual <- cigar_qual_all[mutated_seq]
+            mut_seq <- cigar_seq_all[mutated_seq]
+            mut_isize <- cigar_isize_all[mutated_seq]
+            mut_cigar <- cigar_type_all[mutated_seq,]
+            mut_qname <- cigar_qname_all[mutated_seq]
+            mut_pre_supporting_length = pre_supporting_length[mutated_seq]
+            mut_post_supporting_length = post_supporting_length[mutated_seq]
+            mut_short_supporting_length =
+              ifelse(mut_pre_supporting_length < mut_post_supporting_length,
+                     mut_pre_supporting_length,
+                     mut_post_supporting_length)
+            
+            covering_seq <- (pre_supporting_length >= 0 &
+                               post_supporting_length >= 0)
+            pre_supporting_length <- pre_supporting_length[covering_seq]
+            post_supporting_length <- post_supporting_length[covering_seq]
+            short_supporting_length =
+              ifelse(pre_supporting_length < post_supporting_length,
+                     pre_supporting_length,
+                     post_supporting_length)
+  
+            mut_call <- 1
+            soft_clipped_read <- sum(rowSums(mut_cigar == "S") > 0)
+  
+            for (depth in seq_len(length(pre_supporting_length))) {
+              mut_depth_pre_tmp[pre_supporting_length[depth] + 2] <-
+                mut_depth_pre_tmp[pre_supporting_length[depth] + 2] + 1
+              mut_depth_post_tmp[post_supporting_length[depth] + 2] <-
+                mut_depth_post_tmp[post_supporting_length[depth] + 2] + 1
+              mut_depth_short_tmp[short_supporting_length[depth] + 2] <-
+                mut_depth_short_tmp[short_supporting_length[depth] + 2] + 1
+            }
+            
+            pre_support_length <- max(mut_pre_supporting_length)
+            post_support_length <- max(mut_post_supporting_length)
+            short_support_length <- max(mut_short_supporting_length)
+            pre_minimum_length <- min(mut_pre_supporting_length)
+            post_minimum_length <- min(mut_post_supporting_length)
+  
+            post_farthest <- max(ifelse(
+              mut_read_strand == "f" & mut_isize < 1000 & mut_isize > 0,
+                ifelse(mut_post_supporting_length > mut_isize - mut_pre_supporting_length - alt_length,
+                       mut_post_supporting_length, mut_isize - mut_pre_supporting_length - alt_length),
+                       mut_post_supporting_length))
+            pre_farthest <- max(ifelse(
+              mut_read_strand == "r" & mut_isize > -1000 & mut_isize < 0,
+                ifelse(mut_pre_supporting_length > - mut_isize - mut_post_supporting_length - alt_length,
+                       mut_pre_supporting_length, - mut_isize - mut_post_supporting_length - alt_length),
+                       mut_pre_supporting_length))
+  
+            # read quality check
+            low_quality_base <- sum(unlist(lapply(mut_qual,
+                                      function(x){sum(x<51)/length(x)})))
+            df_qual_pre <- lapply(mut_qual,
+                                  function(x){x[max(1, mut_position_cigar - 10):
+                                                max(1, mut_position_cigar - 1)]})
+            df_qual_post <- lapply(mut_qual,
+                                   function(x){x[min(length(x), mut_position_cigar + 1):
+                                                   min(length(x), mut_position_cigar + 10)]})
+            pre_mutation_quality_score <- sum(unlist(df_qual_pre) < 51)
+            pre_mutation_quality_num <- length(unlist(df_qual_pre))
+            post_mutation_quality_score <- sum(unlist(df_qual_post) < 51)
+            post_mutation_quality_num <- length(unlist(df_qual_post))
           }
-          
-          pre_support_length <- max(mut_pre_supporting_length)
-          post_support_length <- max(mut_post_supporting_length)
-          short_support_length <- max(mut_short_supporting_length)
-          pre_minimum_length <- min(mut_pre_supporting_length)
-          post_minimum_length <- min(mut_post_supporting_length)
-
-          post_farthest <- max(ifelse(
-            mut_read_strand == "f" & mut_isize < 1000 & mut_isize > 0,
-              ifelse(mut_post_supporting_length > mut_isize - mut_pre_supporting_length - alt_length,
-                     mut_post_supporting_length, mut_isize - mut_pre_supporting_length - alt_length),
-                     mut_post_supporting_length))
-          pre_farthest <- max(ifelse(
-            mut_read_strand == "r" & mut_isize > -1000 & mut_isize < 0,
-              ifelse(mut_pre_supporting_length > - mut_isize - mut_post_supporting_length - alt_length,
-                     mut_pre_supporting_length, - mut_isize - mut_post_supporting_length - alt_length),
-                     mut_pre_supporting_length))
-
-          # read quality check
-          low_quality_base <- sum(unlist(lapply(mut_qual,
-                                    function(x){sum(x<51)/length(x)})))
-          df_qual_pre <- lapply(mut_qual,
-                                function(x){x[max(1, mut_position_cigar - 10):
-                                              max(1, mut_position_cigar - 1)]})
-          df_qual_post <- lapply(mut_qual,
-                                 function(x){x[min(length(x), mut_position_cigar + 1):
-                                                 min(length(x), mut_position_cigar + 10)]})
-          pre_mutation_quality_score <- sum(unlist(df_qual_pre) < 51)
-          pre_mutation_quality_num <- length(unlist(df_qual_pre))
-          post_mutation_quality_score <- sum(unlist(df_qual_post) < 51)
-          post_mutation_quality_num <- length(unlist(df_qual_post))
         }
       }
       # if mutation supporting reads exist
@@ -389,11 +393,11 @@ fun_read_check <- function(df_mutation,
         if (indel_status == 1) {
           pre_homology_search_seq <-
             subseq(mut_seq,
-                   1,ifelse(nchar(mut_seq) < 40, nchar(mut_seq),
+                   1,ifelse(nchar(mut_seq) < min_homology_search, nchar(mut_seq),
                              ifelse(mut_position_cigar +
                                       short_homology_search_length +
                                       post_rep_short +
-                                      alt_length - 1 < 40, 40,
+                                      alt_length - 1 < min_homology_search, min_homology_search,
                               ifelse(mut_position_cigar +
                                       short_homology_search_length +
                                       post_rep_short +
@@ -405,7 +409,7 @@ fun_read_check <- function(df_mutation,
                                        alt_length - 1))))
           post_homology_search_seq <-
             subseq(mut_seq,
-                    ifelse(nchar(mut_seq) < 40, 1,
+                    ifelse(nchar(mut_seq) < min_homology_search, 1,
                     ifelse(mut_position_cigar -
                              short_homology_search_length -
                              pre_rep_short < 1, 1,
@@ -419,11 +423,11 @@ fun_read_check <- function(df_mutation,
         } else if (indel_flag == 1) {
           pre_homology_search_seq <-
             subseq(mut_seq,
-                   1,ifelse(nchar(mut_seq) < 40, nchar(mut_seq),
+                   1,ifelse(nchar(mut_seq) < min_homology_search, nchar(mut_seq),
                             ifelse(mut_position_cigar +
                                      short_homology_search_length +
                                      post_rep_short +
-                                     alt_length < 40, 40,
+                                     alt_length < min_homology_search, min_homology_search,
                                    ifelse(mut_position_cigar +
                                             short_homology_search_length +
                                             post_rep_short +
@@ -435,7 +439,7 @@ fun_read_check <- function(df_mutation,
                                             alt_length))))
           post_homology_search_seq <-
             subseq(mut_seq,
-                   ifelse(nchar(mut_seq) < 40, 1,
+                   ifelse(nchar(mut_seq) < min_homology_search, 1,
                           ifelse(mut_position_cigar -
                                    short_homology_search_length -
                                    pre_rep_short < 1, 1,
@@ -449,11 +453,11 @@ fun_read_check <- function(df_mutation,
         } else {
          pre_homology_search_seq <-
             subseq(mut_seq,
-                   1,ifelse(nchar(mut_seq) < 40, nchar(mut_seq),
+                   1,ifelse(nchar(mut_seq) < min_homology_search, nchar(mut_seq),
                             ifelse(mut_position_cigar +
                                      short_homology_search_length +
                                      post_rep_short +
-                                     alt_length < 40, 40,
+                                     alt_length < min_homology_search, min_homology_search,
                                    ifelse(mut_position_cigar +
                                             short_homology_search_length +
                                             post_rep_short +
@@ -465,7 +469,7 @@ fun_read_check <- function(df_mutation,
                                             alt_length - 1))))
           post_homology_search_seq <-
             subseq(mut_seq,
-                   ifelse(nchar(mut_seq) < 40, 1,
+                   ifelse(nchar(mut_seq) < min_homology_search, 1,
                      ifelse(mut_position_cigar -
                        short_homology_search_length < 1, 1,
                      ifelse(nchar(mut_seq) -

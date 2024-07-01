@@ -156,6 +156,7 @@ result <- fun_read_check(df_mutation = df_mutation,
                          adapter_1 = adapter_1,
                          adapter_2 = adapter_2,
                          short_homology_search_length = 4,
+                         min_homology_search = 40,
                          progress_bar = progress_bar)
 msec <- result[[1]]
 homology_search <- result[[2]]

@@ -309,6 +309,7 @@ for (sample in seq_len(dim(sample_info)[1])) {
                            adapter_1 = adapter_1,
                            adapter_2 = adapter_2,
                            short_homology_search_length = 4,
+                           min_homology_search = 40,
                            progress_bar = progress_bar)
   msec <- rbind(msec, result[[1]])
   homology_search <- rbind(homology_search, result[[2]])
