@@ -62,7 +62,7 @@ fun_read_check <- function(df_mutation,
                            progress_bar) {
   Chr <- NULL
   Pos <- NULL
-  options(show.error.messages = TRUE, warn = -1)
+  #options(show.error.messages = TRUE, warn = -1)
 
   df_chr <- df_bam$rname
   if (!is.character(df_chr)) {
@@ -233,6 +233,7 @@ fun_read_check <- function(df_mutation,
                                 (alt - 1))))) ==
                    df_mutation[i, "Alt"])
         mut_pos <- indel_pos + snv_pos
+        print(sum(mut_pos))
         if (sum(mut_pos) > 0){
           pre_supporting_length <- df_mutation[i, "Pos"] -
             cigar_genome_pos[,1] +
@@ -243,6 +244,7 @@ fun_read_check <- function(df_mutation,
             (1 - indel_status) * alt
           
           mutated_seq <- (mut_pos > 0) & lapply(cigar_qual_all, mean)>=53
+          print(sum(mutated_seq))
           if (sum(mutated_seq) > 0) {
             mut_read_id <- cigar_qname_all[mutated_seq]
             mut_read_strand <- cigar_strand_all[mutated_seq]
