@@ -30,4 +30,3 @@ Suggests:
 VignetteBuilder: knitr
 URL: https://github.com/MANO-B/MicroSEC/
 BugReports: https://github.com/MANO-B/MicroSEC/issues
-Config/testthat/edition: 3
