@@ -187,6 +187,7 @@ fun_read_check <- function(df_mutation,
         cigar_genome_pos <- matrix(cigar_pos_all,
                                  nrow=dim(cigar_num_all)[1],
                                  ncol=dim(cigar_num_all)[2] + 1)
+        
         for (k in seq_len(dim(cigar_type_all)[2])) {
           cigar_read_pos[,(k+1):(dim(cigar_type_all)[2] + 1)] =
             cigar_read_pos[,(k+1):(dim(cigar_type_all)[2] + 1)] +

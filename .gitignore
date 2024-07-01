@@ -14,3 +14,4 @@ vignettes/*.pdf
 docs/
 MicroSEC_test.tsv.gz
 .github/
+sample.tsv.gz
