@@ -62,7 +62,6 @@ fun_read_check <- function(df_mutation,
                            progress_bar) {
   Chr <- NULL
   Pos <- NULL
-  #options(show.error.messages = TRUE, warn = -1)
 
   df_chr <- df_bam$rname
   if (!is.character(df_chr)) {
