@@ -233,7 +233,7 @@ fun_read_check <- function(df_mutation,
                                 (alt - 1))))) ==
                    df_mutation[i, "Alt"])
         mut_pos <- indel_pos + snv_pos
-        if (sum(mut_pos) > 0){
+        if (sum(mut_pos, na.rm = T) > 0){
           pre_supporting_length <- df_mutation[i, "Pos"] -
             cigar_genome_pos[,1] +
             indel_status
@@ -243,7 +243,7 @@ fun_read_check <- function(df_mutation,
             (1 - indel_status) * alt
           
           mutated_seq <- (mut_pos > 0) & lapply(cigar_qual_all, mean)>=53
-          if (sum(mutated_seq) > 0) {
+          if (sum(mutated_seq, na.rm = T) > 0) {
             mut_read_id <- cigar_qname_all[mutated_seq]
             mut_read_strand <- cigar_strand_all[mutated_seq]
             mut_position_cigar <- mut_pos[mutated_seq]
@@ -261,7 +261,7 @@ fun_read_check <- function(df_mutation,
             
             covering_seq <- (pre_supporting_length >= 0 &
                                post_supporting_length >= 0)
-            if (sum(covering_seq) > 0) {
+            if (sum(covering_seq, na.rm = T) > 0) {
               pre_supporting_length <- pre_supporting_length[covering_seq]
               post_supporting_length <- post_supporting_length[covering_seq]
               short_supporting_length =
@@ -270,7 +270,7 @@ fun_read_check <- function(df_mutation,
                        post_supporting_length)
     
               mut_call <- 1
-              soft_clipped_read <- sum(rowSums(mut_cigar == "S") > 0)
+              soft_clipped_read <- sum(rowSums(mut_cigar == "S") > 0, na.rm = T)
     
               for (depth in seq_len(length(pre_supporting_length))) {
                 mut_depth_pre_tmp[pre_supporting_length[depth] + 2] <-
@@ -300,16 +300,16 @@ fun_read_check <- function(df_mutation,
     
               # read quality check
               low_quality_base <- sum(unlist(lapply(mut_qual,
-                                        function(x){sum(x<51)/length(x)})))
+                                        function(x){sum(x<51)/length(x)})),na.rm = T)
               df_qual_pre <- lapply(mut_qual,
                                     function(x){x[max(1, mut_position_cigar - 10):
                                                   max(1, mut_position_cigar - 1)]})
               df_qual_post <- lapply(mut_qual,
                                      function(x){x[min(length(x), mut_position_cigar + 1):
                                                      min(length(x), mut_position_cigar + 10)]})
-              pre_mutation_quality_score <- sum(unlist(df_qual_pre) < 51)
+              pre_mutation_quality_score <- sum(unlist(df_qual_pre) < 51, na.rm = T)
               pre_mutation_quality_num <- length(unlist(df_qual_pre))
-              post_mutation_quality_score <- sum(unlist(df_qual_post) < 51)
+              post_mutation_quality_score <- sum(unlist(df_qual_post) < 51, na.rm = T)
               post_mutation_quality_num <- length(unlist(df_qual_post))
             }
           }
