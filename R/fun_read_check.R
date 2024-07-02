@@ -10,6 +10,7 @@
 #' @param adapter_1 The Read 1 adapter sequence of the library.
 #' @param adapter_2 The Read 2 adapter sequence of the library.　
 #' @param short_homology_search_length Small sequence for homology search.
+#' @param min_homology_search Minimum length to define "homologous".
 #' @param progress_bar "Y": You can see the progress visually.
 #' @return list(msec, homology_search, mut_depth)
 #' @importFrom dplyr %>%
