@@ -1,7 +1,21 @@
 ![MicroSEC logo](MicroSEC_logo.png)
 
+# Docker and Apptainer
+MicroSEC docker file can be downloadable via Docker-hub.  
+https://hub.docker.com/r/ikegamitky/microsec/tags  
+
+Apptainer cantainer can be built via Docker-hub.
+```
+apptainer pull docker://ikegamitky/microsec:v2.0.0
+```
+  
+Apptainer container can be built with a definition file (takes 2 hours).  
+```
+wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.def
+```
+  
 # NEW
-MicroSEC.R has been improved to dramatically reduce memory usage.  
+MicroSEC has been improved to dramatically reduce memory usage.  
 The speed of analysis is also improved by deleting parts of the BAM file that are not relevant to the mutations prior to analysis by MicroSEC.  
 Samtools is now mandatory.  
 Please download and use the new version of MicroSEC.R.  
@@ -55,7 +69,6 @@ SL_1010-N6-B  1-snv         chr1 108130741   C    T   N                         
     - SimpleRepeat_TRF: Whether the mutation locates at a simple repeat sequence or not (Y or N).  
     - Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
     - Sample, Chr, Pos, Ref, and Alt should be set exactly.  
-    - Gene, HGVS.c, HGVS.p, Total_QV>=20, %Alt, SimpleRepeat_TRF, and Transition can be set to any values.  
     - If you do not know Mut_type, SimpleRepeat_TRF, or Neighborhood_sequence, enter "-".
 ### File 2: BAM file (required)  
 This file should contain at least these contents (always included in standard BAM files):  
@@ -463,6 +476,7 @@ for (sample in seq_len(dim(sample_info)[1])) {
                            adapter_1 = adapter_1,
                            adapter_2 = adapter_2,
                            short_homology_search_length = 4,
+                           min_homology_search = 40,
                            progress_bar = progress_bar)
   msec <- rbind(msec, result[[1]])
   homology_search <- rbind(homology_search, result[[2]])
@@ -493,7 +507,7 @@ msec = fun_analysis(msec,
                     homopolymer_length = 15)
 
 # save the results
-fun_save(msec, paste0(wd, "/", sample_info[1,1], ".tsv"), wd)
+fun_save(msec, paste0(wd, "/", sample_info[1,1], ".tsv"))
 ```
 
 - Output files  

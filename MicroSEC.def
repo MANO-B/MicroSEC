@@ -1,0 +1,30 @@
+BootStrap: docker
+From: rocker/r-base:4.2.3
+
+%post
+    cd /tmp
+    #export http_proxy=...
+    #echo 'Acquire::http::Proxy "http://xxxx.xx.xx:xxxx";' >> /etc/apt/apt.conf
+    apt-get -y update
+    apt-get install -y build-essential curl cmake perl libncurses-dev libbz2-dev liblzma-dev tar wget bzip2 gcc zlib1g-dev make libxml2-dev libcurl4-openssl-dev postgresql libpq-dev libmariadb-dev-compat libmariadb-dev libfontconfig1-dev libnode-dev libssl-dev libharfbuzz-dev libfribidi-dev libfreetype-dev libpng-dev libtiff5-dev libjpeg-dev libclang-dev gdebi-core cargo libudunits2-dev libmagick++-dev texlive texlive-lang-japanese evince xdvik-ja libpoppler-cpp-dev xorg libx11-dev libglu1-mesa-dev gdal-bin libgdal-dev --fix-missing
+    wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.R
+    wget https://github.com/samtools/samtools/releases/download/1.12/samtools-1.12.tar.bz2
+    tar xvjf samtools-1.12.tar.bz2  --no-same-owner
+    cd samtools-1.12/
+    ./configure
+    make
+    make install
+    cd ..
+    rm samtools-1.12.tar.bz2
+    R --no-echo -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.5-3.tar.gz", repos=NULL, type="source")'
+    R --no-echo -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/MatrixModels/MatrixModels_0.5-1.tar.gz", repos=NULL, type="source")'
+    R --no-echo -e 'install.packages(c("knitr", "askpass", "credentials", "rmarkdown", "httr", "gh", "WikipediR", "roxygen2", "usethis", "pkgdown", "rcmdcheck", "rversions", "urlchecker", "quantreg", "gert", "rmarkdown", "zip", "credentials", "spelling","mnormt", "rentrez", "XML", "numDeriv", "jsonlite", "RCurl", "ggplot2", "tidyverse", "RColorBrewer", "survival", "WriteXLS", "readr"), dependencies = TRUE, repos="https://cloud.r-project.org/")'
+    R --no-echo -e 'install.packages(c("tidyr", "openxlsx", "data.table", "R.utils", "stringr", "magrittr", "dplyr", "gtools", "devtools", "BiocManager", "V8", "juicyjuice"), dependencies = TRUE, repos="https://cloud.r-project.org/")'
+    R --no-echo -e 'install.packages("devtools", dependencies = TRUE, repos="https://cloud.r-project.org/")'
+    R --no-echo -e 'BiocManager::install(c("BiocVersion", "Rhtslib", "ComplexHeatmap", "BiocStyle", "Rsamtools", "GenomeInfoDb", "GenomicRanges", "Biostrings", "GenomicAlignments", "SummarizedExperiment", "rtracklayer"), update=FALSE)'
+    R --no-echo -e 'BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update=FALSE)'
+    R --no-echo -e 'devtools::install_github("MANO-B/MicroSEC", upgrade="never")'
+
+%environment
+export PATH=/usr/local/bin:$PATH
+export LC_ALL=C.UTF-8

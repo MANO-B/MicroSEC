@@ -140,7 +140,6 @@ df_mutation <- fun_load_mutation(
    "sample",
    BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
    24)
-df_mutation <- 
 df_bam <- fun_load_bam(
    system.file("extdata", "sample.bam", package = "MicroSEC"))
 
