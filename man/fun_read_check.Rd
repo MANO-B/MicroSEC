@@ -13,6 +13,7 @@ fun_read_check(
   adapter_1,
   adapter_2,
   short_homology_search_length,
+  min_homology_search,
   progress_bar
 )
 }
@@ -52,6 +53,7 @@ read_length = 150,
 adapter_1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
 adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
 short_homology_search_length = 4,
+min_homology_search = 40,
 progress_bar = "Y"
 )
 }

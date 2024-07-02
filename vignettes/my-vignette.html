@@ -12,7 +12,7 @@
 
 <meta name="author" content="Masachika Ikegami" />
 
-<meta name="date" content="2024-06-29" />
+<meta name="date" content="2024-07-02" />
 
 <title>MicroSEC: Sequence artifact filtering pipeline for FFPE samples</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">MicroSEC: Sequence artifact filtering
 pipeline for FFPE samples</h1>
 <h4 class="author">Masachika Ikegami</h4>
-<h4 class="date">2024-06-29</h4>
+<h4 class="date">2024-07-02</h4>
 
 
 
@@ -481,382 +481,251 @@ Results are saved in a tsv file.</p>
 <span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>df_bam <span class="ot">&lt;-</span> <span class="fu">fun_load_bam</span>(</span>
 <span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>   <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;sample.bam&quot;</span>, <span class="at">package =</span> <span class="st">&quot;MicroSEC&quot;</span>))</span>
 <span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co"># load genomic sequence</span></span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>ref_genome <span class="ot">&lt;-</span> <span class="fu">fun_load_genome</span>(organism)</span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>chr_no <span class="ot">&lt;-</span> <span class="fu">fun_load_chr_no</span>(organism)</span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a></span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co"># analysis</span></span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">fun_read_check</span>(<span class="at">df_mutation =</span> df_mutation,</span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>                         <span class="at">df_bam =</span> df_bam,</span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>                         <span class="at">ref_genome =</span> ref_genome,</span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>                         <span class="at">sample_name =</span> sample_name,</span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>                         <span class="at">read_length =</span> read_length,</span>
-<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>                         <span class="at">adapter_1 =</span> adapter_1,</span>
-<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>                         <span class="at">adapter_2 =</span> adapter_2,</span>
-<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>                         <span class="at">short_homology_search_length =</span> <span class="dv">4</span>,</span>
-<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>                         <span class="at">progress_bar =</span> progress_bar)</span>
-<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>msec <span class="ot">&lt;-</span> result[[<span class="dv">1</span>]]</span>
-<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>homology_search <span class="ot">&lt;-</span> result[[<span class="dv">2</span>]]</span>
-<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>mut_depth <span class="ot">&lt;-</span> result[[<span class="dv">3</span>]]</span>
-<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a></span>
-<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a><span class="co"># search homologous sequences</span></span>
-<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>msec <span class="ot">=</span> <span class="fu">fun_homology</span>(msec,</span>
-<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>                    homology_search,</span>
-<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>                    <span class="at">min_homology_search =</span> <span class="dv">40</span>,</span>
-<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>                    ref_genome,</span>
-<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a>                    chr_no,</span>
-<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a>                    <span class="at">progress_bar =</span> progress_bar)</span>
-<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a></span>
-<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co"># statistical analysis</span></span>
-<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a>msec <span class="ot">&lt;-</span> <span class="fu">fun_summary</span>(msec)</span>
-<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a>msec <span class="ot">&lt;-</span> <span class="fu">fun_analysis</span>(msec,</span>
-<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a>                    mut_depth,</span>
-<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a>                    <span class="at">short_homology_search_length =</span> <span class="dv">4</span>,</span>
-<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a>                    <span class="at">min_homology_search =</span> <span class="dv">40</span>,</span>
-<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a>                    <span class="at">threshold_p =</span> <span class="dv">10</span> <span class="sc">^</span> (<span class="sc">-</span><span class="dv">6</span>),</span>
-<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a>                    <span class="at">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
-<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a>                    <span class="at">threshold_short_length =</span> <span class="fl">0.75</span>,</span>
-<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a>                    <span class="at">threshold_distant_homology =</span> <span class="fl">0.15</span>,</span>
-<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a>                    <span class="at">threshold_soft_clip_ratio =</span> <span class="fl">0.50</span>,</span>
-<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a>                    <span class="at">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
-<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a>                    <span class="at">homopolymer_length =</span> <span class="dv">15</span>)</span>
-<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a></span>
-<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a><span class="co"># save the results as a tsv.gz file.</span></span>
-<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a><span class="co">#fun_save(msec, &quot;~/MicroSEC_test.tsv.gz&quot;)</span></span></code></pre></div>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co"># another example data</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co"># data(exampleMutation)</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co"># data(exampleBam)</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co"># df_mutation &lt;- exampleMutation</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co"># df_bam &lt;- exampleBam</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co"># load genomic sequence</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>ref_genome <span class="ot">&lt;-</span> <span class="fu">fun_load_genome</span>(organism)</span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>chr_no <span class="ot">&lt;-</span> <span class="fu">fun_load_chr_no</span>(organism)</span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co"># analysis</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">fun_read_check</span>(<span class="at">df_mutation =</span> df_mutation,</span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>                         <span class="at">df_bam =</span> df_bam,</span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>                         <span class="at">ref_genome =</span> ref_genome,</span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>                         <span class="at">sample_name =</span> sample_name,</span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>                         <span class="at">read_length =</span> read_length,</span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>                         <span class="at">adapter_1 =</span> adapter_1,</span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a>                         <span class="at">adapter_2 =</span> adapter_2,</span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>                         <span class="at">short_homology_search_length =</span> <span class="dv">4</span>,</span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>                         <span class="at">min_homology_search =</span> <span class="dv">40</span>,</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>                         <span class="at">progress_bar =</span> progress_bar)</span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>msec <span class="ot">&lt;-</span> result[[<span class="dv">1</span>]]</span>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>homology_search <span class="ot">&lt;-</span> result[[<span class="dv">2</span>]]</span>
+<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a>mut_depth <span class="ot">&lt;-</span> result[[<span class="dv">3</span>]]</span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co"># search homologous sequences</span></span>
+<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a>msec <span class="ot">=</span> <span class="fu">fun_homology</span>(msec,</span>
+<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a>                    homology_search,</span>
+<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a>                    <span class="at">min_homology_search =</span> <span class="dv">40</span>,</span>
+<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a>                    ref_genome,</span>
+<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a>                    chr_no,</span>
+<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a>                    <span class="at">progress_bar =</span> progress_bar)</span>
+<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a></span>
+<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a><span class="co"># statistical analysis</span></span>
+<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a>msec <span class="ot">&lt;-</span> <span class="fu">fun_summary</span>(msec)</span>
+<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a>msec <span class="ot">&lt;-</span> <span class="fu">fun_analysis</span>(msec,</span>
+<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a>                    mut_depth,</span>
+<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a>                    <span class="at">short_homology_search_length =</span> <span class="dv">4</span>,</span>
+<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a>                    <span class="at">min_homology_search =</span> <span class="dv">40</span>,</span>
+<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a>                    <span class="at">threshold_p =</span> <span class="dv">10</span> <span class="sc">^</span> (<span class="sc">-</span><span class="dv">6</span>),</span>
+<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a>                    <span class="at">threshold_hairpin_ratio =</span> <span class="fl">0.50</span>,</span>
+<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a>                    <span class="at">threshold_short_length =</span> <span class="fl">0.75</span>,</span>
+<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a>                    <span class="at">threshold_distant_homology =</span> <span class="fl">0.15</span>,</span>
+<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a>                    <span class="at">threshold_soft_clip_ratio =</span> <span class="fl">0.50</span>,</span>
+<span id="cb4-66"><a href="#cb4-66" tabindex="-1"></a>                    <span class="at">threshold_low_quality_rate =</span> <span class="fl">0.1</span>,</span>
+<span id="cb4-67"><a href="#cb4-67" tabindex="-1"></a>                    <span class="at">homopolymer_length =</span> <span class="dv">15</span>)</span>
+<span id="cb4-68"><a href="#cb4-68" tabindex="-1"></a></span>
+<span id="cb4-69"><a href="#cb4-69" tabindex="-1"></a><span class="co"># save the results as a tsv.gz file.</span></span>
+<span id="cb4-70"><a href="#cb4-70" tabindex="-1"></a><span class="co">#fun_save(msec, &quot;~/MicroSEC_test.tsv.gz&quot;)</span></span></code></pre></div>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>msec</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt;    Sample Mut_type   Chr       Pos Ref Alt SimpleRepeat_TRF</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; 1  sample    1-snv chr10  61902249   C   T                N</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; 2  sample    1-snv chr11   2133646   C   A                N</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; 3  sample    1-snv chr11  32434897   T   C                N</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; 4  sample    1-snv chr11  67434027   G   T                N</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; 5  sample    1-snv chr13  48379751   A   G                N</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 6  sample    1-snv chr14  81108357   T   C                N</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; 7  sample    1-snv chr15  98891503   C   T                N</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 8  sample    1-snv chr16  72795046   G   A                N</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 9  sample    1-snv chr16  89280195   T   C                N</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; 10 sample    1-snv chr17   7848244   C   T                N</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 11 sample    1-snv chr17  60600638   C   G                N</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 12 sample    1-snv chr17  80754194   C   T                N</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 13 sample    1-snv chr19   2215680   T   A                N</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; 14 sample    1-snv chr19  10141146   T   A                N</span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; 15 sample    1-snv chr19  14097617   T   G                N</span></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; 16 sample    1-snv chr19  33253988   C   G                N</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; 17 sample    1-snv chr19  42272269   C   A                N</span></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; 18 sample    1-snv  chr2  15940723   A   G                N</span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; 19 sample    1-snv  chr2  29920553   G   A                N</span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; 20 sample    1-snv  chr3  49373258   T   C                N</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; 21 sample    1-snv  chr3 138188399   A   C                Y</span></span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; 22 sample    1-snv  chr3 187729575   A   C                N</span></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 23 sample    1-snv  chr4  55125251   C   T                N</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; 24 sample    1-snv  chr5 132591946   T   A                N</span></span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; 25 sample    1-snv  chr5 173800333   G   A                N</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; 26 sample    1-snv  chr6  37170774   C   A                N</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; 27 sample    1-snv  chr9  36840696   C   T                N</span></span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; 28 sample    1-snv  chr9 135167477   C   A                N</span></span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; 29 sample    2-snv  chrX  15801377  CA  TG                N</span></span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt;                         Neighborhood_sequence read_length total_read</span></span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#&gt; 1   GCAAACCAAGAATTTTGTCCTTTGGCGACTTTTTCTTTGTA         150         36</span></span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt; 2   ATGCCACGGCTGCGACGGCTAACACGGCTTGCGGGCCTGCC         150         18</span></span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co">#&gt; 3   GGCACTGCTCCTCGTGCGGCCCCGCGCCGCCCCAGCTCGGC         150         41</span></span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a><span class="co">#&gt; 4   AATCCCAGCCAGCGGATTGGTGGTGGCCCAGGGGATGCTGC         150         29</span></span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#&gt; 5   GTGGGCAGATCAGGAGGTCAGGGCATCAAGATCATCCTGGC         150         15</span></span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co">#&gt; 6   AATTCATTCTCTCTCTCTCTCTCTCTCTCTCCCTCTAGTTA         150         33</span></span>
-<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a><span class="co">#&gt; 7   AACACCTACAGGTTTGAGGGTTGGCGCTGTGTGGACCGTGA         150         14</span></span>
-<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a><span class="co">#&gt; 8   GTGGAGCTGCTGATGCTCCTACCAGTGCTCAAATGACGGAA         150         22</span></span>
-<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co">#&gt; 9   CGTCCGCCCAGGGCACCGGCCCCACCTGGCCGAGGTGAGAC         150         23</span></span>
-<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a><span class="co">#&gt; 10  CCAGGCCCCCTGAGTAAAGCTCCCCAGCCTGTGCCGCCCGG         150         17</span></span>
-<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a><span class="co">#&gt; 11  AGCGGTGGCAGCCCGAGAGGGTCGCGACCCTCTCCCGGACG         150         12</span></span>
-<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a><span class="co">#&gt; 12  CGCCCTGCGCTGGTGAGTGGTCCCTGCTGTGCCCCTGGGAC         150         47</span></span>
-<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a><span class="co">#&gt; 13  CCGAGCTGCTCCCTCACGTGAGTGGCCCAGGCGAGCCTCAC         150         16</span></span>
-<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co">#&gt; 14  TGTTTCCAGGGCTACGGGCAAGGTTGGGAGGATCTTCAAAG         150         42</span></span>
-<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a><span class="co">#&gt; 15  AGGGGCCAGGTACTCAGGGGGGCCGCACAAGGTCCAAGTGC         150         40</span></span>
-<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a><span class="co">#&gt; 16  ATGGGGATCGTGTTTGTGCAGACACCATACAGCAGTGACAT         150         22</span></span>
-<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a><span class="co">#&gt; 17  CCACCCACCTCCACTCGTTCATCCTCCACTGACACAGCCAG         150         20</span></span>
-<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a><span class="co">#&gt; 18  CCGCGCAGAATCGCCTCCGGGTCCCCTGCAGTCGGCGGGAG         150         16</span></span>
-<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a><span class="co">#&gt; 19  GCTCCCGGGGCTGCAGCGGCAGCCCCGCAGCTGGGGAGCCC         150         10</span></span>
-<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co">#&gt; 20  GGAGGCTGAGATAGGAGAATCGCTTGAACTCAGGAGGCGGA         150         56</span></span>
-<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a><span class="co">#&gt; 21  TTTTTTTTTTTTTTAAAAAACGTTTTTTTAAAGAAAAAGAC         150         13</span></span>
-<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a><span class="co">#&gt; 22  CAGGTTTGAGGCCCTCAGCCCCACTGTAGTGCATATCACTT         150         18</span></span>
-<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a><span class="co">#&gt; 23  AGAGGCGGCCCGGGTCTCCATGCAGAGCCACAGGGCGACGG         150         18</span></span>
-<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a><span class="co">#&gt; 24  AATTAACCTCACTGTTGGGAAATTTTCCCAACAAAAAACAG         150         26</span></span>
-<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a><span class="co">#&gt; 25  GTTTCATTGGTGCTTAAGGGACTGCTTTCTCCCCTGAAACG         150         48</span></span>
-<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a><span class="co">#&gt; 26  GTGCTTCCCCCTTTCCTAGGAAAGGAGAAGGAGCCCCTGGA         150         16</span></span>
-<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a><span class="co">#&gt; 27  GTCCCCTTTCCACCAGTCTCTTCCACTTCTGTCCTTTCCTC         150         41</span></span>
-<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a><span class="co">#&gt; 28  GTTTTTGGCCCAGCAGATGGATTGACGTGAATCTGTGACCA         150         38</span></span>
-<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a><span class="co">#&gt; 29 TAGCCGGGATTACAGGCACGTGCCGCCACACCCAGTTAATTT         150          7</span></span>
-<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a><span class="co">#&gt;    soft_clipped_read flag_hairpin pre_support_length post_support_length</span></span>
-<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a><span class="co">#&gt; 1                 36            0                139                   6</span></span>
-<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a><span class="co">#&gt; 2                 18            0                112                   8</span></span>
-<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a><span class="co">#&gt; 3                 20           41                140                  95</span></span>
-<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a><span class="co">#&gt; 4                 27            0                141                   8</span></span>
-<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a><span class="co">#&gt; 5                  2            0                149                 108</span></span>
-<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a><span class="co">#&gt; 6                 21            0                146                 149</span></span>
-<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a><span class="co">#&gt; 7                 14            0                124                   6</span></span>
-<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a><span class="co">#&gt; 8                 20            0                143                   6</span></span>
-<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a><span class="co">#&gt; 9                 21            0                  5                 112</span></span>
-<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a><span class="co">#&gt; 10                16            0                118                 149</span></span>
-<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a><span class="co">#&gt; 11                 9            7                132                 149</span></span>
-<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a><span class="co">#&gt; 12                42            0                147                   6</span></span>
-<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a><span class="co">#&gt; 13                16            4                  6                 119</span></span>
-<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a><span class="co">#&gt; 14                40            0                  5                 144</span></span>
-<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a><span class="co">#&gt; 15                37            0                149                   7</span></span>
-<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a><span class="co">#&gt; 16                22            0                  5                 121</span></span>
-<span id="cb5-79"><a href="#cb5-79" tabindex="-1"></a><span class="co">#&gt; 17                18            0                145                   7</span></span>
-<span id="cb5-80"><a href="#cb5-80" tabindex="-1"></a><span class="co">#&gt; 18                16            0                  6                 129</span></span>
-<span id="cb5-81"><a href="#cb5-81" tabindex="-1"></a><span class="co">#&gt; 19                 4            9                143                   6</span></span>
-<span id="cb5-82"><a href="#cb5-82" tabindex="-1"></a><span class="co">#&gt; 20                21            0                113                 146</span></span>
-<span id="cb5-83"><a href="#cb5-83" tabindex="-1"></a><span class="co">#&gt; 21                 8           10                140                  17</span></span>
-<span id="cb5-84"><a href="#cb5-84" tabindex="-1"></a><span class="co">#&gt; 22                16            0                  9                 146</span></span>
-<span id="cb5-85"><a href="#cb5-85" tabindex="-1"></a><span class="co">#&gt; 23                18            0                129                   7</span></span>
-<span id="cb5-86"><a href="#cb5-86" tabindex="-1"></a><span class="co">#&gt; 24                 7           23                148                 147</span></span>
-<span id="cb5-87"><a href="#cb5-87" tabindex="-1"></a><span class="co">#&gt; 25                46            0                142                   7</span></span>
-<span id="cb5-88"><a href="#cb5-88" tabindex="-1"></a><span class="co">#&gt; 26                12            0                146                 149</span></span>
-<span id="cb5-89"><a href="#cb5-89" tabindex="-1"></a><span class="co">#&gt; 27                37            0                  5                 128</span></span>
-<span id="cb5-90"><a href="#cb5-90" tabindex="-1"></a><span class="co">#&gt; 28                34            0                147                   8</span></span>
-<span id="cb5-91"><a href="#cb5-91" tabindex="-1"></a><span class="co">#&gt; 29                 3            0                125                  76</span></span>
-<span id="cb5-92"><a href="#cb5-92" tabindex="-1"></a><span class="co">#&gt;    short_support_length pre_farthest post_farthest</span></span>
-<span id="cb5-93"><a href="#cb5-93" tabindex="-1"></a><span class="co">#&gt; 1                     6          290             6</span></span>
-<span id="cb5-94"><a href="#cb5-94" tabindex="-1"></a><span class="co">#&gt; 2                     8          296             8</span></span>
-<span id="cb5-95"><a href="#cb5-95" tabindex="-1"></a><span class="co">#&gt; 3                    10          219            95</span></span>
-<span id="cb5-96"><a href="#cb5-96" tabindex="-1"></a><span class="co">#&gt; 4                     8          175             8</span></span>
-<span id="cb5-97"><a href="#cb5-97" tabindex="-1"></a><span class="co">#&gt; 5                    43          270           323</span></span>
-<span id="cb5-98"><a href="#cb5-98" tabindex="-1"></a><span class="co">#&gt; 6                    14          146           150</span></span>
-<span id="cb5-99"><a href="#cb5-99" tabindex="-1"></a><span class="co">#&gt; 7                     6          232             6</span></span>
-<span id="cb5-100"><a href="#cb5-100" tabindex="-1"></a><span class="co">#&gt; 8                     6          275             6</span></span>
-<span id="cb5-101"><a href="#cb5-101" tabindex="-1"></a><span class="co">#&gt; 9                     5            5           268</span></span>
-<span id="cb5-102"><a href="#cb5-102" tabindex="-1"></a><span class="co">#&gt; 10                    5          218           149</span></span>
-<span id="cb5-103"><a href="#cb5-103" tabindex="-1"></a><span class="co">#&gt; 11                   13          193           200</span></span>
-<span id="cb5-104"><a href="#cb5-104" tabindex="-1"></a><span class="co">#&gt; 12                    6          284             6</span></span>
-<span id="cb5-105"><a href="#cb5-105" tabindex="-1"></a><span class="co">#&gt; 13                    6            6           352</span></span>
-<span id="cb5-106"><a href="#cb5-106" tabindex="-1"></a><span class="co">#&gt; 14                    5            5           399</span></span>
-<span id="cb5-107"><a href="#cb5-107" tabindex="-1"></a><span class="co">#&gt; 15                    7          209             7</span></span>
-<span id="cb5-108"><a href="#cb5-108" tabindex="-1"></a><span class="co">#&gt; 16                    5            5           240</span></span>
-<span id="cb5-109"><a href="#cb5-109" tabindex="-1"></a><span class="co">#&gt; 17                    7          145             7</span></span>
-<span id="cb5-110"><a href="#cb5-110" tabindex="-1"></a><span class="co">#&gt; 18                    6            6           343</span></span>
-<span id="cb5-111"><a href="#cb5-111" tabindex="-1"></a><span class="co">#&gt; 19                    6          237             6</span></span>
-<span id="cb5-112"><a href="#cb5-112" tabindex="-1"></a><span class="co">#&gt; 20                   65          113           348</span></span>
-<span id="cb5-113"><a href="#cb5-113" tabindex="-1"></a><span class="co">#&gt; 21                   17          221            17</span></span>
-<span id="cb5-114"><a href="#cb5-114" tabindex="-1"></a><span class="co">#&gt; 22                    9            9           187</span></span>
-<span id="cb5-115"><a href="#cb5-115" tabindex="-1"></a><span class="co">#&gt; 23                    7          207             7</span></span>
-<span id="cb5-116"><a href="#cb5-116" tabindex="-1"></a><span class="co">#&gt; 24                   38          242           389</span></span>
-<span id="cb5-117"><a href="#cb5-117" tabindex="-1"></a><span class="co">#&gt; 25                    7          354             7</span></span>
-<span id="cb5-118"><a href="#cb5-118" tabindex="-1"></a><span class="co">#&gt; 26                   12          146           325</span></span>
-<span id="cb5-119"><a href="#cb5-119" tabindex="-1"></a><span class="co">#&gt; 27                    5            5           251</span></span>
-<span id="cb5-120"><a href="#cb5-120" tabindex="-1"></a><span class="co">#&gt; 28                    8          341             8</span></span>
-<span id="cb5-121"><a href="#cb5-121" tabindex="-1"></a><span class="co">#&gt; 29                   76          396            76</span></span>
-<span id="cb5-122"><a href="#cb5-122" tabindex="-1"></a><span class="co">#&gt;    low_quality_base_rate_under_q18 low_quality_pre low_quality_post</span></span>
-<span id="cb5-123"><a href="#cb5-123" tabindex="-1"></a><span class="co">#&gt; 1                      0.005555556     0.000000000      0.000000000</span></span>
-<span id="cb5-124"><a href="#cb5-124" tabindex="-1"></a><span class="co">#&gt; 2                      0.004444444     0.011111111      0.000000000</span></span>
-<span id="cb5-125"><a href="#cb5-125" tabindex="-1"></a><span class="co">#&gt; 3                      0.029876048              NA      0.019512195</span></span>
-<span id="cb5-126"><a href="#cb5-126" tabindex="-1"></a><span class="co">#&gt; 4                      0.016091954     0.006896552      0.027586207</span></span>
-<span id="cb5-127"><a href="#cb5-127" tabindex="-1"></a><span class="co">#&gt; 5                      0.002222222     0.006666667      0.006666667</span></span>
-<span id="cb5-128"><a href="#cb5-128" tabindex="-1"></a><span class="co">#&gt; 6                      0.060285537              NA      0.093939394</span></span>
-<span id="cb5-129"><a href="#cb5-129" tabindex="-1"></a><span class="co">#&gt; 7                      0.002857143     0.014285714      0.000000000</span></span>
-<span id="cb5-130"><a href="#cb5-130" tabindex="-1"></a><span class="co">#&gt; 8                      0.001212121     0.009090909      0.000000000</span></span>
-<span id="cb5-131"><a href="#cb5-131" tabindex="-1"></a><span class="co">#&gt; 9                      0.010276680              NA      0.013043478</span></span>
-<span id="cb5-132"><a href="#cb5-132" tabindex="-1"></a><span class="co">#&gt; 10                     0.010980392     0.000000000      0.023529412</span></span>
-<span id="cb5-133"><a href="#cb5-133" tabindex="-1"></a><span class="co">#&gt; 11                     0.008333333     0.008333333      0.016666667</span></span>
-<span id="cb5-134"><a href="#cb5-134" tabindex="-1"></a><span class="co">#&gt; 12                     0.004680851     0.000000000      0.025531915</span></span>
-<span id="cb5-135"><a href="#cb5-135" tabindex="-1"></a><span class="co">#&gt; 13                     0.002500000     0.000000000      0.000000000</span></span>
-<span id="cb5-136"><a href="#cb5-136" tabindex="-1"></a><span class="co">#&gt; 14                     0.003492063     0.000000000      0.000000000</span></span>
-<span id="cb5-137"><a href="#cb5-137" tabindex="-1"></a><span class="co">#&gt; 15                     0.047833333     0.020000000      0.070000000</span></span>
-<span id="cb5-138"><a href="#cb5-138" tabindex="-1"></a><span class="co">#&gt; 16                     0.012727273     0.027272727      0.009090909</span></span>
-<span id="cb5-139"><a href="#cb5-139" tabindex="-1"></a><span class="co">#&gt; 17                     0.000000000     0.000000000      0.000000000</span></span>
-<span id="cb5-140"><a href="#cb5-140" tabindex="-1"></a><span class="co">#&gt; 18                     0.007500000     0.000000000      0.000000000</span></span>
-<span id="cb5-141"><a href="#cb5-141" tabindex="-1"></a><span class="co">#&gt; 19                     0.007333333     0.010000000      0.000000000</span></span>
-<span id="cb5-142"><a href="#cb5-142" tabindex="-1"></a><span class="co">#&gt; 20                     0.005595238              NA      0.010714286</span></span>
-<span id="cb5-143"><a href="#cb5-143" tabindex="-1"></a><span class="co">#&gt; 21                     0.080512821     0.007692308      0.061538462</span></span>
-<span id="cb5-144"><a href="#cb5-144" tabindex="-1"></a><span class="co">#&gt; 22                     0.006666667     0.000000000      0.000000000</span></span>
-<span id="cb5-145"><a href="#cb5-145" tabindex="-1"></a><span class="co">#&gt; 23                     0.003703704     0.000000000      0.000000000</span></span>
-<span id="cb5-146"><a href="#cb5-146" tabindex="-1"></a><span class="co">#&gt; 24                     0.011282051     0.011538462      0.023076923</span></span>
-<span id="cb5-147"><a href="#cb5-147" tabindex="-1"></a><span class="co">#&gt; 25                     0.004166667     0.000000000      0.012500000</span></span>
-<span id="cb5-148"><a href="#cb5-148" tabindex="-1"></a><span class="co">#&gt; 26                     0.022916667     0.043750000      0.031250000</span></span>
-<span id="cb5-149"><a href="#cb5-149" tabindex="-1"></a><span class="co">#&gt; 27                     0.001626016              NA      0.000000000</span></span>
-<span id="cb5-150"><a href="#cb5-150" tabindex="-1"></a><span class="co">#&gt; 28                     0.003333333     0.000000000      0.000000000</span></span>
-<span id="cb5-151"><a href="#cb5-151" tabindex="-1"></a><span class="co">#&gt; 29                     0.000952381     0.014285714      0.000000000</span></span>
-<span id="cb5-152"><a href="#cb5-152" tabindex="-1"></a><span class="co">#&gt;    distant_homology_rate soft_clipped_rate prob_filter_1 prob_filter_3_pre</span></span>
-<span id="cb5-153"><a href="#cb5-153" tabindex="-1"></a><span class="co">#&gt; 1             0.00000000         1.0000000  0.000000e+00      1.447220e-17</span></span>
-<span id="cb5-154"><a href="#cb5-154" tabindex="-1"></a><span class="co">#&gt; 2             0.00000000         1.0000000  0.000000e+00      5.215869e-13</span></span>
-<span id="cb5-155"><a href="#cb5-155" tabindex="-1"></a><span class="co">#&gt; 3             0.14634146         0.4878049  1.452418e-28      2.175919e-05</span></span>
-<span id="cb5-156"><a href="#cb5-156" tabindex="-1"></a><span class="co">#&gt; 4             0.00000000         0.9310345  8.138627e-36      6.709824e-15</span></span>
-<span id="cb5-157"><a href="#cb5-157" tabindex="-1"></a><span class="co">#&gt; 5             1.00000000         0.1333333  1.120506e-03      6.242215e-02</span></span>
-<span id="cb5-158"><a href="#cb5-158" tabindex="-1"></a><span class="co">#&gt; 6             0.18181818         0.6363636  1.491835e-12      9.332240e-01</span></span>
-<span id="cb5-159"><a href="#cb5-159" tabindex="-1"></a><span class="co">#&gt; 7             0.00000000         1.0000000  0.000000e+00      1.283918e-13</span></span>
-<span id="cb5-160"><a href="#cb5-160" tabindex="-1"></a><span class="co">#&gt; 8             0.00000000         0.9090909  0.000000e+00      2.843298e-12</span></span>
-<span id="cb5-161"><a href="#cb5-161" tabindex="-1"></a><span class="co">#&gt; 9             0.00000000         0.9130435  7.683366e-16      1.331326e-22</span></span>
-<span id="cb5-162"><a href="#cb5-162" tabindex="-1"></a><span class="co">#&gt; 10            0.00000000         0.9411765  4.124146e-14      5.605822e-01</span></span>
-<span id="cb5-163"><a href="#cb5-163" tabindex="-1"></a><span class="co">#&gt; 11            0.00000000         0.7500000  5.520275e-09      4.082244e-01</span></span>
-<span id="cb5-164"><a href="#cb5-164" tabindex="-1"></a><span class="co">#&gt; 12            0.00000000         0.8936170  1.118458e-36      2.157252e-17</span></span>
-<span id="cb5-165"><a href="#cb5-165" tabindex="-1"></a><span class="co">#&gt; 13            0.43750000         1.0000000  0.000000e+00      0.000000e+00</span></span>
-<span id="cb5-166"><a href="#cb5-166" tabindex="-1"></a><span class="co">#&gt; 14            0.00000000         0.9523810  0.000000e+00      0.000000e+00</span></span>
-<span id="cb5-167"><a href="#cb5-167" tabindex="-1"></a><span class="co">#&gt; 15            0.00000000         0.9250000  9.777314e-28      2.133547e-06</span></span>
-<span id="cb5-168"><a href="#cb5-168" tabindex="-1"></a><span class="co">#&gt; 16            0.00000000         1.0000000  0.000000e+00      0.000000e+00</span></span>
-<span id="cb5-169"><a href="#cb5-169" tabindex="-1"></a><span class="co">#&gt; 17            0.10000000         0.9000000  1.070439e-16      1.041692e-15</span></span>
-<span id="cb5-170"><a href="#cb5-170" tabindex="-1"></a><span class="co">#&gt; 18            0.00000000         1.0000000  0.000000e+00      0.000000e+00</span></span>
-<span id="cb5-171"><a href="#cb5-171" tabindex="-1"></a><span class="co">#&gt; 19            0.00000000         0.4000000  1.249347e-12      9.210095e-06</span></span>
-<span id="cb5-172"><a href="#cb5-172" tabindex="-1"></a><span class="co">#&gt; 20            0.53571429         0.3750000  6.547665e-02      1.331917e-01</span></span>
-<span id="cb5-173"><a href="#cb5-173" tabindex="-1"></a><span class="co">#&gt; 21            0.00000000         0.6153846  4.056353e-10      5.020636e-03</span></span>
-<span id="cb5-174"><a href="#cb5-174" tabindex="-1"></a><span class="co">#&gt; 22            0.00000000         0.8888889  3.829312e-13      1.593246e-15</span></span>
-<span id="cb5-175"><a href="#cb5-175" tabindex="-1"></a><span class="co">#&gt; 23            0.05555556         1.0000000  2.141869e-12      2.876436e-08</span></span>
-<span id="cb5-176"><a href="#cb5-176" tabindex="-1"></a><span class="co">#&gt; 24            0.00000000         0.2692308  1.922571e-06      7.001093e-01</span></span>
-<span id="cb5-177"><a href="#cb5-177" tabindex="-1"></a><span class="co">#&gt; 25            0.00000000         0.9583333  5.856441e-68      2.570577e-21</span></span>
-<span id="cb5-178"><a href="#cb5-178" tabindex="-1"></a><span class="co">#&gt; 26            0.00000000         0.7500000  6.202404e-12      1.000000e+00</span></span>
-<span id="cb5-179"><a href="#cb5-179" tabindex="-1"></a><span class="co">#&gt; 27            0.51219512         0.9024390  0.000000e+00      0.000000e+00</span></span>
-<span id="cb5-180"><a href="#cb5-180" tabindex="-1"></a><span class="co">#&gt; 28            0.00000000         0.8947368  1.203688e-23      9.787865e-20</span></span>
-<span id="cb5-181"><a href="#cb5-181" tabindex="-1"></a><span class="co">#&gt; 29            1.00000000         0.4285714  1.129158e-01      2.180325e-03</span></span>
-<span id="cb5-182"><a href="#cb5-182" tabindex="-1"></a><span class="co">#&gt;    prob_filter_3_post filter_1_mutation_intra_hairpin_loop</span></span>
-<span id="cb5-183"><a href="#cb5-183" tabindex="-1"></a><span class="co">#&gt; 1        0.000000e+00                                 TRUE</span></span>
-<span id="cb5-184"><a href="#cb5-184" tabindex="-1"></a><span class="co">#&gt; 2        0.000000e+00                                 TRUE</span></span>
-<span id="cb5-185"><a href="#cb5-185" tabindex="-1"></a><span class="co">#&gt; 3        5.922127e-05                                 TRUE</span></span>
-<span id="cb5-186"><a href="#cb5-186" tabindex="-1"></a><span class="co">#&gt; 4        1.657536e-46                                 TRUE</span></span>
-<span id="cb5-187"><a href="#cb5-187" tabindex="-1"></a><span class="co">#&gt; 5        1.576031e-01                                FALSE</span></span>
-<span id="cb5-188"><a href="#cb5-188" tabindex="-1"></a><span class="co">#&gt; 6        9.332240e-01                                 TRUE</span></span>
-<span id="cb5-189"><a href="#cb5-189" tabindex="-1"></a><span class="co">#&gt; 7        0.000000e+00                                 TRUE</span></span>
-<span id="cb5-190"><a href="#cb5-190" tabindex="-1"></a><span class="co">#&gt; 8        0.000000e+00                                 TRUE</span></span>
-<span id="cb5-191"><a href="#cb5-191" tabindex="-1"></a><span class="co">#&gt; 9        4.034735e-06                                 TRUE</span></span>
-<span id="cb5-192"><a href="#cb5-192" tabindex="-1"></a><span class="co">#&gt; 10       1.803949e-01                                 TRUE</span></span>
-<span id="cb5-193"><a href="#cb5-193" tabindex="-1"></a><span class="co">#&gt; 11       1.352333e-01                                 TRUE</span></span>
-<span id="cb5-194"><a href="#cb5-194" tabindex="-1"></a><span class="co">#&gt; 12       5.172301e-42                                 TRUE</span></span>
-<span id="cb5-195"><a href="#cb5-195" tabindex="-1"></a><span class="co">#&gt; 13       2.401722e-09                                 TRUE</span></span>
-<span id="cb5-196"><a href="#cb5-196" tabindex="-1"></a><span class="co">#&gt; 14       3.439487e-25                                 TRUE</span></span>
-<span id="cb5-197"><a href="#cb5-197" tabindex="-1"></a><span class="co">#&gt; 15       3.044148e-33                                 TRUE</span></span>
-<span id="cb5-198"><a href="#cb5-198" tabindex="-1"></a><span class="co">#&gt; 16       5.577230e-09                                 TRUE</span></span>
-<span id="cb5-199"><a href="#cb5-199" tabindex="-1"></a><span class="co">#&gt; 17       1.470255e-18                                 TRUE</span></span>
-<span id="cb5-200"><a href="#cb5-200" tabindex="-1"></a><span class="co">#&gt; 18       8.062479e-07                                 TRUE</span></span>
-<span id="cb5-201"><a href="#cb5-201" tabindex="-1"></a><span class="co">#&gt; 19       5.954375e-13                                 TRUE</span></span>
-<span id="cb5-202"><a href="#cb5-202" tabindex="-1"></a><span class="co">#&gt; 20       1.628245e-02                                FALSE</span></span>
-<span id="cb5-203"><a href="#cb5-203" tabindex="-1"></a><span class="co">#&gt; 21       1.316166e-10                                 TRUE</span></span>
-<span id="cb5-204"><a href="#cb5-204" tabindex="-1"></a><span class="co">#&gt; 22       1.297271e-09                                 TRUE</span></span>
-<span id="cb5-205"><a href="#cb5-205" tabindex="-1"></a><span class="co">#&gt; 23       1.539820e-13                                 TRUE</span></span>
-<span id="cb5-206"><a href="#cb5-206" tabindex="-1"></a><span class="co">#&gt; 24       8.151988e-01                                FALSE</span></span>
-<span id="cb5-207"><a href="#cb5-207" tabindex="-1"></a><span class="co">#&gt; 25       1.214497e-81                                 TRUE</span></span>
-<span id="cb5-208"><a href="#cb5-208" tabindex="-1"></a><span class="co">#&gt; 26       7.189894e-01                                 TRUE</span></span>
-<span id="cb5-209"><a href="#cb5-209" tabindex="-1"></a><span class="co">#&gt; 27       1.483541e-14                                 TRUE</span></span>
-<span id="cb5-210"><a href="#cb5-210" tabindex="-1"></a><span class="co">#&gt; 28       1.550041e-27                                 TRUE</span></span>
-<span id="cb5-211"><a href="#cb5-211" tabindex="-1"></a><span class="co">#&gt; 29       4.420733e-03                                FALSE</span></span>
-<span id="cb5-212"><a href="#cb5-212" tabindex="-1"></a><span class="co">#&gt;    filter_2_hairpin_structure filter_3_microhomology_induced_mutation</span></span>
-<span id="cb5-213"><a href="#cb5-213" tabindex="-1"></a><span class="co">#&gt; 1                       FALSE                                    TRUE</span></span>
-<span id="cb5-214"><a href="#cb5-214" tabindex="-1"></a><span class="co">#&gt; 2                       FALSE                                    TRUE</span></span>
-<span id="cb5-215"><a href="#cb5-215" tabindex="-1"></a><span class="co">#&gt; 3                        TRUE                                   FALSE</span></span>
-<span id="cb5-216"><a href="#cb5-216" tabindex="-1"></a><span class="co">#&gt; 4                       FALSE                                    TRUE</span></span>
-<span id="cb5-217"><a href="#cb5-217" tabindex="-1"></a><span class="co">#&gt; 5                       FALSE                                   FALSE</span></span>
-<span id="cb5-218"><a href="#cb5-218" tabindex="-1"></a><span class="co">#&gt; 6                       FALSE                                   FALSE</span></span>
-<span id="cb5-219"><a href="#cb5-219" tabindex="-1"></a><span class="co">#&gt; 7                       FALSE                                    TRUE</span></span>
-<span id="cb5-220"><a href="#cb5-220" tabindex="-1"></a><span class="co">#&gt; 8                       FALSE                                    TRUE</span></span>
-<span id="cb5-221"><a href="#cb5-221" tabindex="-1"></a><span class="co">#&gt; 9                       FALSE                                    TRUE</span></span>
-<span id="cb5-222"><a href="#cb5-222" tabindex="-1"></a><span class="co">#&gt; 10                      FALSE                                   FALSE</span></span>
-<span id="cb5-223"><a href="#cb5-223" tabindex="-1"></a><span class="co">#&gt; 11                       TRUE                                   FALSE</span></span>
-<span id="cb5-224"><a href="#cb5-224" tabindex="-1"></a><span class="co">#&gt; 12                      FALSE                                    TRUE</span></span>
-<span id="cb5-225"><a href="#cb5-225" tabindex="-1"></a><span class="co">#&gt; 13                      FALSE                                    TRUE</span></span>
-<span id="cb5-226"><a href="#cb5-226" tabindex="-1"></a><span class="co">#&gt; 14                      FALSE                                    TRUE</span></span>
-<span id="cb5-227"><a href="#cb5-227" tabindex="-1"></a><span class="co">#&gt; 15                      FALSE                                    TRUE</span></span>
-<span id="cb5-228"><a href="#cb5-228" tabindex="-1"></a><span class="co">#&gt; 16                      FALSE                                    TRUE</span></span>
-<span id="cb5-229"><a href="#cb5-229" tabindex="-1"></a><span class="co">#&gt; 17                      FALSE                                    TRUE</span></span>
-<span id="cb5-230"><a href="#cb5-230" tabindex="-1"></a><span class="co">#&gt; 18                      FALSE                                    TRUE</span></span>
-<span id="cb5-231"><a href="#cb5-231" tabindex="-1"></a><span class="co">#&gt; 19                       TRUE                                    TRUE</span></span>
-<span id="cb5-232"><a href="#cb5-232" tabindex="-1"></a><span class="co">#&gt; 20                      FALSE                                   FALSE</span></span>
-<span id="cb5-233"><a href="#cb5-233" tabindex="-1"></a><span class="co">#&gt; 21                       TRUE                                    TRUE</span></span>
-<span id="cb5-234"><a href="#cb5-234" tabindex="-1"></a><span class="co">#&gt; 22                      FALSE                                    TRUE</span></span>
-<span id="cb5-235"><a href="#cb5-235" tabindex="-1"></a><span class="co">#&gt; 23                      FALSE                                    TRUE</span></span>
-<span id="cb5-236"><a href="#cb5-236" tabindex="-1"></a><span class="co">#&gt; 24                       TRUE                                   FALSE</span></span>
-<span id="cb5-237"><a href="#cb5-237" tabindex="-1"></a><span class="co">#&gt; 25                      FALSE                                    TRUE</span></span>
-<span id="cb5-238"><a href="#cb5-238" tabindex="-1"></a><span class="co">#&gt; 26                      FALSE                                   FALSE</span></span>
-<span id="cb5-239"><a href="#cb5-239" tabindex="-1"></a><span class="co">#&gt; 27                      FALSE                                    TRUE</span></span>
-<span id="cb5-240"><a href="#cb5-240" tabindex="-1"></a><span class="co">#&gt; 28                      FALSE                                    TRUE</span></span>
-<span id="cb5-241"><a href="#cb5-241" tabindex="-1"></a><span class="co">#&gt; 29                      FALSE                                   FALSE</span></span>
-<span id="cb5-242"><a href="#cb5-242" tabindex="-1"></a><span class="co">#&gt;    filter_4_highly_homologous_region filter_5_soft_clipped_reads</span></span>
-<span id="cb5-243"><a href="#cb5-243" tabindex="-1"></a><span class="co">#&gt; 1                              FALSE                        TRUE</span></span>
-<span id="cb5-244"><a href="#cb5-244" tabindex="-1"></a><span class="co">#&gt; 2                              FALSE                        TRUE</span></span>
-<span id="cb5-245"><a href="#cb5-245" tabindex="-1"></a><span class="co">#&gt; 3                              FALSE                       FALSE</span></span>
-<span id="cb5-246"><a href="#cb5-246" tabindex="-1"></a><span class="co">#&gt; 4                              FALSE                        TRUE</span></span>
-<span id="cb5-247"><a href="#cb5-247" tabindex="-1"></a><span class="co">#&gt; 5                               TRUE                       FALSE</span></span>
-<span id="cb5-248"><a href="#cb5-248" tabindex="-1"></a><span class="co">#&gt; 6                               TRUE                        TRUE</span></span>
-<span id="cb5-249"><a href="#cb5-249" tabindex="-1"></a><span class="co">#&gt; 7                              FALSE                        TRUE</span></span>
-<span id="cb5-250"><a href="#cb5-250" tabindex="-1"></a><span class="co">#&gt; 8                              FALSE                        TRUE</span></span>
-<span id="cb5-251"><a href="#cb5-251" tabindex="-1"></a><span class="co">#&gt; 9                              FALSE                        TRUE</span></span>
-<span id="cb5-252"><a href="#cb5-252" tabindex="-1"></a><span class="co">#&gt; 10                             FALSE                        TRUE</span></span>
-<span id="cb5-253"><a href="#cb5-253" tabindex="-1"></a><span class="co">#&gt; 11                             FALSE                        TRUE</span></span>
-<span id="cb5-254"><a href="#cb5-254" tabindex="-1"></a><span class="co">#&gt; 12                             FALSE                        TRUE</span></span>
-<span id="cb5-255"><a href="#cb5-255" tabindex="-1"></a><span class="co">#&gt; 13                              TRUE                        TRUE</span></span>
-<span id="cb5-256"><a href="#cb5-256" tabindex="-1"></a><span class="co">#&gt; 14                             FALSE                        TRUE</span></span>
-<span id="cb5-257"><a href="#cb5-257" tabindex="-1"></a><span class="co">#&gt; 15                             FALSE                        TRUE</span></span>
-<span id="cb5-258"><a href="#cb5-258" tabindex="-1"></a><span class="co">#&gt; 16                             FALSE                        TRUE</span></span>
-<span id="cb5-259"><a href="#cb5-259" tabindex="-1"></a><span class="co">#&gt; 17                             FALSE                        TRUE</span></span>
-<span id="cb5-260"><a href="#cb5-260" tabindex="-1"></a><span class="co">#&gt; 18                             FALSE                        TRUE</span></span>
-<span id="cb5-261"><a href="#cb5-261" tabindex="-1"></a><span class="co">#&gt; 19                             FALSE                       FALSE</span></span>
-<span id="cb5-262"><a href="#cb5-262" tabindex="-1"></a><span class="co">#&gt; 20                              TRUE                       FALSE</span></span>
-<span id="cb5-263"><a href="#cb5-263" tabindex="-1"></a><span class="co">#&gt; 21                             FALSE                        TRUE</span></span>
-<span id="cb5-264"><a href="#cb5-264" tabindex="-1"></a><span class="co">#&gt; 22                             FALSE                        TRUE</span></span>
-<span id="cb5-265"><a href="#cb5-265" tabindex="-1"></a><span class="co">#&gt; 23                             FALSE                        TRUE</span></span>
-<span id="cb5-266"><a href="#cb5-266" tabindex="-1"></a><span class="co">#&gt; 24                             FALSE                       FALSE</span></span>
-<span id="cb5-267"><a href="#cb5-267" tabindex="-1"></a><span class="co">#&gt; 25                             FALSE                        TRUE</span></span>
-<span id="cb5-268"><a href="#cb5-268" tabindex="-1"></a><span class="co">#&gt; 26                             FALSE                        TRUE</span></span>
-<span id="cb5-269"><a href="#cb5-269" tabindex="-1"></a><span class="co">#&gt; 27                              TRUE                        TRUE</span></span>
-<span id="cb5-270"><a href="#cb5-270" tabindex="-1"></a><span class="co">#&gt; 28                             FALSE                        TRUE</span></span>
-<span id="cb5-271"><a href="#cb5-271" tabindex="-1"></a><span class="co">#&gt; 29                              TRUE                       FALSE</span></span>
-<span id="cb5-272"><a href="#cb5-272" tabindex="-1"></a><span class="co">#&gt;    filter_6_simple_repeat filter_7_mutation_at_homopolymer filter_8_low_quality</span></span>
-<span id="cb5-273"><a href="#cb5-273" tabindex="-1"></a><span class="co">#&gt; 1                   FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-274"><a href="#cb5-274" tabindex="-1"></a><span class="co">#&gt; 2                   FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-275"><a href="#cb5-275" tabindex="-1"></a><span class="co">#&gt; 3                   FALSE                            FALSE                   NA</span></span>
-<span id="cb5-276"><a href="#cb5-276" tabindex="-1"></a><span class="co">#&gt; 4                   FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-277"><a href="#cb5-277" tabindex="-1"></a><span class="co">#&gt; 5                   FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-278"><a href="#cb5-278" tabindex="-1"></a><span class="co">#&gt; 6                   FALSE                            FALSE                   NA</span></span>
-<span id="cb5-279"><a href="#cb5-279" tabindex="-1"></a><span class="co">#&gt; 7                   FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-280"><a href="#cb5-280" tabindex="-1"></a><span class="co">#&gt; 8                   FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-281"><a href="#cb5-281" tabindex="-1"></a><span class="co">#&gt; 9                   FALSE                            FALSE                   NA</span></span>
-<span id="cb5-282"><a href="#cb5-282" tabindex="-1"></a><span class="co">#&gt; 10                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-283"><a href="#cb5-283" tabindex="-1"></a><span class="co">#&gt; 11                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-284"><a href="#cb5-284" tabindex="-1"></a><span class="co">#&gt; 12                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-285"><a href="#cb5-285" tabindex="-1"></a><span class="co">#&gt; 13                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-286"><a href="#cb5-286" tabindex="-1"></a><span class="co">#&gt; 14                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-287"><a href="#cb5-287" tabindex="-1"></a><span class="co">#&gt; 15                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-288"><a href="#cb5-288" tabindex="-1"></a><span class="co">#&gt; 16                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-289"><a href="#cb5-289" tabindex="-1"></a><span class="co">#&gt; 17                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-290"><a href="#cb5-290" tabindex="-1"></a><span class="co">#&gt; 18                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-291"><a href="#cb5-291" tabindex="-1"></a><span class="co">#&gt; 19                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-292"><a href="#cb5-292" tabindex="-1"></a><span class="co">#&gt; 20                  FALSE                            FALSE                   NA</span></span>
-<span id="cb5-293"><a href="#cb5-293" tabindex="-1"></a><span class="co">#&gt; 21                   TRUE                            FALSE                FALSE</span></span>
-<span id="cb5-294"><a href="#cb5-294" tabindex="-1"></a><span class="co">#&gt; 22                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-295"><a href="#cb5-295" tabindex="-1"></a><span class="co">#&gt; 23                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-296"><a href="#cb5-296" tabindex="-1"></a><span class="co">#&gt; 24                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-297"><a href="#cb5-297" tabindex="-1"></a><span class="co">#&gt; 25                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-298"><a href="#cb5-298" tabindex="-1"></a><span class="co">#&gt; 26                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-299"><a href="#cb5-299" tabindex="-1"></a><span class="co">#&gt; 27                  FALSE                            FALSE                   NA</span></span>
-<span id="cb5-300"><a href="#cb5-300" tabindex="-1"></a><span class="co">#&gt; 28                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-301"><a href="#cb5-301" tabindex="-1"></a><span class="co">#&gt; 29                  FALSE                            FALSE                FALSE</span></span>
-<span id="cb5-302"><a href="#cb5-302" tabindex="-1"></a><span class="co">#&gt;        msec_filter_123    msec_filter_1234     msec_filter_all comment</span></span>
-<span id="cb5-303"><a href="#cb5-303" tabindex="-1"></a><span class="co">#&gt; 1  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-304"><a href="#cb5-304" tabindex="-1"></a><span class="co">#&gt; 2  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-305"><a href="#cb5-305" tabindex="-1"></a><span class="co">#&gt; 3  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-306"><a href="#cb5-306" tabindex="-1"></a><span class="co">#&gt; 4  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-307"><a href="#cb5-307" tabindex="-1"></a><span class="co">#&gt; 5                      Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-308"><a href="#cb5-308" tabindex="-1"></a><span class="co">#&gt; 6  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-309"><a href="#cb5-309" tabindex="-1"></a><span class="co">#&gt; 7  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-310"><a href="#cb5-310" tabindex="-1"></a><span class="co">#&gt; 8  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-311"><a href="#cb5-311" tabindex="-1"></a><span class="co">#&gt; 9  Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-312"><a href="#cb5-312" tabindex="-1"></a><span class="co">#&gt; 10 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-313"><a href="#cb5-313" tabindex="-1"></a><span class="co">#&gt; 11 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-314"><a href="#cb5-314" tabindex="-1"></a><span class="co">#&gt; 12 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-315"><a href="#cb5-315" tabindex="-1"></a><span class="co">#&gt; 13 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-316"><a href="#cb5-316" tabindex="-1"></a><span class="co">#&gt; 14 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-317"><a href="#cb5-317" tabindex="-1"></a><span class="co">#&gt; 15 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-318"><a href="#cb5-318" tabindex="-1"></a><span class="co">#&gt; 16 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-319"><a href="#cb5-319" tabindex="-1"></a><span class="co">#&gt; 17 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-320"><a href="#cb5-320" tabindex="-1"></a><span class="co">#&gt; 18 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-321"><a href="#cb5-321" tabindex="-1"></a><span class="co">#&gt; 19 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-322"><a href="#cb5-322" tabindex="-1"></a><span class="co">#&gt; 20                     Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-323"><a href="#cb5-323" tabindex="-1"></a><span class="co">#&gt; 21 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-324"><a href="#cb5-324" tabindex="-1"></a><span class="co">#&gt; 22 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-325"><a href="#cb5-325" tabindex="-1"></a><span class="co">#&gt; 23 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-326"><a href="#cb5-326" tabindex="-1"></a><span class="co">#&gt; 24 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-327"><a href="#cb5-327" tabindex="-1"></a><span class="co">#&gt; 25 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-328"><a href="#cb5-328" tabindex="-1"></a><span class="co">#&gt; 26 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-329"><a href="#cb5-329" tabindex="-1"></a><span class="co">#&gt; 27 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-330"><a href="#cb5-330" tabindex="-1"></a><span class="co">#&gt; 28 Artifact suspicious Artifact suspicious Artifact suspicious        </span></span>
-<span id="cb5-331"><a href="#cb5-331" tabindex="-1"></a><span class="co">#&gt; 29                     Artifact suspicious Artifact suspicious</span></span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; 1  sample    2-snv chr11  17719997  CC  GG                N</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; 2  sample    2-snv chr11  17719997  CC  GG                N</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; 3  sample    2-snv chr11  69295601  CT  AA                N</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; 4  sample    2-snv chr11  69295601  CT  AA                N</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; 5  sample    2-snv chr15  98707826  TC  CG                N</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 6  sample    1-ins  chr2  47783391   C  CA                N</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; 7  sample    2-del  chr2  60920434 CAG   C                N</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 8  sample    1-snv  chr3  72446880   G   C                N</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 9  sample    2-snv  chr3 179198865 CAC AAG                N</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; 10 sample    2-del  chr3 181742887 TTA   T                Y</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 11 sample    1-snv  chr5 180618885   G   A                N</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 12 sample    2-snv  chr6  29725282  CC  GG                N</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 13 sample    2-snv  chr6  88143884  GA  TC                N</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; 14 sample    2-snv  chr7  64068966  CG  AA                N</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; 15 sample    2-snv  chr8  23681315  GC  CA                N</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt;                          Neighborhood_sequence read_length total_read</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; 1   CCCCGCGGCGGTGCACCCGGGGCCGGGCGCACGTGAGGACGA         150          9</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; 2   CCCCGCGGCGGTGCACCCGGGGCCGGGCGCACGTGAGGACGA         150          9</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; 3   CTTGTCTGTAGTCTGTCCCCAATGGGGACAGGGACTCGTTGC         150         28</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; 4   CTTGTCTGTAGTCTGTCCCCAATGGGGACAGGGACTCGTTGC         150         28</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; 5   CAACTACGCCCTGGTCATCTCGGAGATGACCAATCTCAAGGA         150         17</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; 6   GGATGCGGCCTGGAGCGAGGCATGGGCCTGGGCCCAGGCCCT         150         13</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 7    TGGTCTTGAACTCCTGACATCGTGATCCACCCACCTTGGCC         150         34</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; 8    CTCGCACACCAGGCGGTGGCCGCGGCGCCCCGGGAAGGGCC         150         16</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; 9  CAGGTGAACTGTGGGGCATCAAGTTGATGCCCCCAAGAATCCT         150         23</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; 10   GGGGGAAAGGACAGAGCAGTTTATATATATATATATATATA         150          6</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; 11   AGCCTGGCGAGCTCCACCATAGCGCGGAAGCGTCCGCGCTG         150         19</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; 12  ATGTGCAGCACGAGGGGCTGGGCCAGCCCCTCATCCTGAGAT         150          9</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; 13  CCTCGGCAGACGTGTCTGTGTCCACAGACATGGTTACCTTGG         150         23</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt; 14  GCCTGGACTCTGCTCAGCAGAATTTGTATAGGGATGTGATGT         150         11</span></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#&gt; 15  CCAGGGAGGCCCGGGAGAAGCACTCCTCTTTCAGGGCCGGCA         150         34</span></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt;    soft_clipped_read flag_hairpin pre_support_length post_support_length</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co">#&gt; 1                  3            8                143                  10</span></span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a><span class="co">#&gt; 2                  3            8                143                  10</span></span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#&gt; 3                 13           28                139                 140</span></span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co">#&gt; 4                 13           28                139                 140</span></span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a><span class="co">#&gt; 5                  7           17                139                 140</span></span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a><span class="co">#&gt; 6                 11           12                131                  20</span></span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co">#&gt; 7                 16            0                 65                 144</span></span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a><span class="co">#&gt; 8                 16            0                138                   5</span></span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a><span class="co">#&gt; 9                  7           23                139                 141</span></span>
+<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a><span class="co">#&gt; 10                 1            0                100                 111</span></span>
+<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a><span class="co">#&gt; 11                12            0                145                  19</span></span>
+<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co">#&gt; 12                 4            9                139                 140</span></span>
+<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a><span class="co">#&gt; 13                 8           21                144                  10</span></span>
+<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a><span class="co">#&gt; 14                 7            0                 47                 131</span></span>
+<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a><span class="co">#&gt; 15                34           32                135                   9</span></span>
+<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a><span class="co">#&gt;    short_support_length pre_farthest post_farthest</span></span>
+<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a><span class="co">#&gt; 1                    10          205            10</span></span>
+<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co">#&gt; 2                    10          205            10</span></span>
+<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a><span class="co">#&gt; 3                     9          242           282</span></span>
+<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a><span class="co">#&gt; 4                     9          242           282</span></span>
+<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a><span class="co">#&gt; 5                    10          338           187</span></span>
+<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a><span class="co">#&gt; 6                    20          211            20</span></span>
+<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a><span class="co">#&gt; 7                    65           65           258</span></span>
+<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a><span class="co">#&gt; 8                     5          190             5</span></span>
+<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a><span class="co">#&gt; 9                    10          268           383</span></span>
+<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a><span class="co">#&gt; 10                   72          114           111</span></span>
+<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a><span class="co">#&gt; 11                   19          158            19</span></span>
+<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a><span class="co">#&gt; 12                   10          205           155</span></span>
+<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a><span class="co">#&gt; 13                   10          393            10</span></span>
+<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a><span class="co">#&gt; 14                   47           47           243</span></span>
+<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a><span class="co">#&gt; 15                    9          301             9</span></span>
+<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a><span class="co">#&gt;    low_quality_base_rate_under_q18 low_quality_pre low_quality_post</span></span>
+<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a><span class="co">#&gt; 1                      0.015555556     0.011111111      0.000000000</span></span>
+<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a><span class="co">#&gt; 2                      0.015555556     0.011111111      0.000000000</span></span>
+<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a><span class="co">#&gt; 3                      0.006428571     0.010714286      0.003571429</span></span>
+<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a><span class="co">#&gt; 4                      0.006428571     0.010714286      0.003571429</span></span>
+<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a><span class="co">#&gt; 5                      0.009803922     0.005882353      0.005882353</span></span>
+<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a><span class="co">#&gt; 6                      0.010769231     0.015384615      0.000000000</span></span>
+<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a><span class="co">#&gt; 7                      0.003725490     0.000000000      0.000000000</span></span>
+<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a><span class="co">#&gt; 8                      0.009583333     0.018750000      0.012500000</span></span>
+<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a><span class="co">#&gt; 9                      0.005217391     0.000000000      0.004347826</span></span>
+<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a><span class="co">#&gt; 10                     0.091111111     0.000000000      0.166666667</span></span>
+<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a><span class="co">#&gt; 11                     0.009824561     0.021052632      0.000000000</span></span>
+<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a><span class="co">#&gt; 12                     0.004444444     0.000000000      0.000000000</span></span>
+<span id="cb5-79"><a href="#cb5-79" tabindex="-1"></a><span class="co">#&gt; 13                     0.021449275     0.004347826      0.000000000</span></span>
+<span id="cb5-80"><a href="#cb5-80" tabindex="-1"></a><span class="co">#&gt; 14                     0.020000000     0.009090909      0.027272727</span></span>
+<span id="cb5-81"><a href="#cb5-81" tabindex="-1"></a><span class="co">#&gt; 15                     0.006862745     0.000000000      0.011764706</span></span>
+<span id="cb5-82"><a href="#cb5-82" tabindex="-1"></a><span class="co">#&gt;    distant_homology_rate soft_clipped_rate prob_filter_1 prob_filter_3_pre</span></span>
+<span id="cb5-83"><a href="#cb5-83" tabindex="-1"></a><span class="co">#&gt; 1             0.00000000         0.3333333  3.302602e-05      1.074714e-03</span></span>
+<span id="cb5-84"><a href="#cb5-84" tabindex="-1"></a><span class="co">#&gt; 2             0.00000000         0.3333333  3.302602e-05      1.074714e-03</span></span>
+<span id="cb5-85"><a href="#cb5-85" tabindex="-1"></a><span class="co">#&gt; 3             0.00000000         0.4642857  4.910766e-31      5.677562e-02</span></span>
+<span id="cb5-86"><a href="#cb5-86" tabindex="-1"></a><span class="co">#&gt; 4             0.00000000         0.4642857  4.910766e-31      5.677562e-02</span></span>
+<span id="cb5-87"><a href="#cb5-87" tabindex="-1"></a><span class="co">#&gt; 5             0.00000000         0.4117647  3.030728e-21      4.291513e-01</span></span>
+<span id="cb5-88"><a href="#cb5-88" tabindex="-1"></a><span class="co">#&gt; 6             0.07692308         0.8461538  8.199676e-12      1.456375e-06</span></span>
+<span id="cb5-89"><a href="#cb5-89" tabindex="-1"></a><span class="co">#&gt; 7             1.00000000         0.4705882  3.176630e-02      3.635212e-04</span></span>
+<span id="cb5-90"><a href="#cb5-90" tabindex="-1"></a><span class="co">#&gt; 8             0.00000000         1.0000000  0.000000e+00      7.940718e-06</span></span>
+<span id="cb5-91"><a href="#cb5-91" tabindex="-1"></a><span class="co">#&gt; 9             0.00000000         0.3043478  5.641193e-18      1.000000e+00</span></span>
+<span id="cb5-92"><a href="#cb5-92" tabindex="-1"></a><span class="co">#&gt; 10            0.33333333         0.1666667  3.498859e-05      2.251996e-01</span></span>
+<span id="cb5-93"><a href="#cb5-93" tabindex="-1"></a><span class="co">#&gt; 11            0.00000000         0.6315789  1.427493e-08      1.554304e-12</span></span>
+<span id="cb5-94"><a href="#cb5-94" tabindex="-1"></a><span class="co">#&gt; 12            0.00000000         0.4444444  4.488892e-11      6.083886e-01</span></span>
+<span id="cb5-95"><a href="#cb5-95" tabindex="-1"></a><span class="co">#&gt; 13            0.00000000         0.3478261  4.402162e-19      7.036874e-10</span></span>
+<span id="cb5-96"><a href="#cb5-96" tabindex="-1"></a><span class="co">#&gt; 14            0.27272727         0.6363636  6.768789e-03      1.872979e-03</span></span>
+<span id="cb5-97"><a href="#cb5-97" tabindex="-1"></a><span class="co">#&gt; 15            0.23529412         1.0000000  0.000000e+00      8.762043e-13</span></span>
+<span id="cb5-98"><a href="#cb5-98" tabindex="-1"></a><span class="co">#&gt;    prob_filter_3_post filter_1_mutation_intra_hairpin_loop</span></span>
+<span id="cb5-99"><a href="#cb5-99" tabindex="-1"></a><span class="co">#&gt; 1        1.619986e-05                                FALSE</span></span>
+<span id="cb5-100"><a href="#cb5-100" tabindex="-1"></a><span class="co">#&gt; 2        1.619986e-05                                FALSE</span></span>
+<span id="cb5-101"><a href="#cb5-101" tabindex="-1"></a><span class="co">#&gt; 3        4.551353e-02                                 TRUE</span></span>
+<span id="cb5-102"><a href="#cb5-102" tabindex="-1"></a><span class="co">#&gt; 4        4.551353e-02                                 TRUE</span></span>
+<span id="cb5-103"><a href="#cb5-103" tabindex="-1"></a><span class="co">#&gt; 5        6.420932e-01                                 TRUE</span></span>
+<span id="cb5-104"><a href="#cb5-104" tabindex="-1"></a><span class="co">#&gt; 6        9.229929e-13                                 TRUE</span></span>
+<span id="cb5-105"><a href="#cb5-105" tabindex="-1"></a><span class="co">#&gt; 7        4.220222e-05                                FALSE</span></span>
+<span id="cb5-106"><a href="#cb5-106" tabindex="-1"></a><span class="co">#&gt; 8        0.000000e+00                                 TRUE</span></span>
+<span id="cb5-107"><a href="#cb5-107" tabindex="-1"></a><span class="co">#&gt; 9        3.165609e-01                                 TRUE</span></span>
+<span id="cb5-108"><a href="#cb5-108" tabindex="-1"></a><span class="co">#&gt; 10       7.960368e-06                                FALSE</span></span>
+<span id="cb5-109"><a href="#cb5-109" tabindex="-1"></a><span class="co">#&gt; 11       2.634886e-12                                 TRUE</span></span>
+<span id="cb5-110"><a href="#cb5-110" tabindex="-1"></a><span class="co">#&gt; 12       4.128627e-01                                 TRUE</span></span>
+<span id="cb5-111"><a href="#cb5-111" tabindex="-1"></a><span class="co">#&gt; 13       3.858510e-21                                 TRUE</span></span>
+<span id="cb5-112"><a href="#cb5-112" tabindex="-1"></a><span class="co">#&gt; 14       3.627971e-03                                FALSE</span></span>
+<span id="cb5-113"><a href="#cb5-113" tabindex="-1"></a><span class="co">#&gt; 15       0.000000e+00                                 TRUE</span></span>
+<span id="cb5-114"><a href="#cb5-114" tabindex="-1"></a><span class="co">#&gt;    filter_2_hairpin_structure filter_3_microhomology_induced_mutation</span></span>
+<span id="cb5-115"><a href="#cb5-115" tabindex="-1"></a><span class="co">#&gt; 1                        TRUE                                   FALSE</span></span>
+<span id="cb5-116"><a href="#cb5-116" tabindex="-1"></a><span class="co">#&gt; 2                        TRUE                                   FALSE</span></span>
+<span id="cb5-117"><a href="#cb5-117" tabindex="-1"></a><span class="co">#&gt; 3                        TRUE                                   FALSE</span></span>
+<span id="cb5-118"><a href="#cb5-118" tabindex="-1"></a><span class="co">#&gt; 4                        TRUE                                   FALSE</span></span>
+<span id="cb5-119"><a href="#cb5-119" tabindex="-1"></a><span class="co">#&gt; 5                        TRUE                                   FALSE</span></span>
+<span id="cb5-120"><a href="#cb5-120" tabindex="-1"></a><span class="co">#&gt; 6                        TRUE                                    TRUE</span></span>
+<span id="cb5-121"><a href="#cb5-121" tabindex="-1"></a><span class="co">#&gt; 7                       FALSE                                   FALSE</span></span>
+<span id="cb5-122"><a href="#cb5-122" tabindex="-1"></a><span class="co">#&gt; 8                       FALSE                                    TRUE</span></span>
+<span id="cb5-123"><a href="#cb5-123" tabindex="-1"></a><span class="co">#&gt; 9                        TRUE                                   FALSE</span></span>
+<span id="cb5-124"><a href="#cb5-124" tabindex="-1"></a><span class="co">#&gt; 10                      FALSE                                   FALSE</span></span>
+<span id="cb5-125"><a href="#cb5-125" tabindex="-1"></a><span class="co">#&gt; 11                      FALSE                                    TRUE</span></span>
+<span id="cb5-126"><a href="#cb5-126" tabindex="-1"></a><span class="co">#&gt; 12                       TRUE                                   FALSE</span></span>
+<span id="cb5-127"><a href="#cb5-127" tabindex="-1"></a><span class="co">#&gt; 13                       TRUE                                    TRUE</span></span>
+<span id="cb5-128"><a href="#cb5-128" tabindex="-1"></a><span class="co">#&gt; 14                      FALSE                                   FALSE</span></span>
+<span id="cb5-129"><a href="#cb5-129" tabindex="-1"></a><span class="co">#&gt; 15                       TRUE                                    TRUE</span></span>
+<span id="cb5-130"><a href="#cb5-130" tabindex="-1"></a><span class="co">#&gt;    filter_4_highly_homologous_region filter_5_soft_clipped_reads</span></span>
+<span id="cb5-131"><a href="#cb5-131" tabindex="-1"></a><span class="co">#&gt; 1                              FALSE                       FALSE</span></span>
+<span id="cb5-132"><a href="#cb5-132" tabindex="-1"></a><span class="co">#&gt; 2                              FALSE                       FALSE</span></span>
+<span id="cb5-133"><a href="#cb5-133" tabindex="-1"></a><span class="co">#&gt; 3                              FALSE                       FALSE</span></span>
+<span id="cb5-134"><a href="#cb5-134" tabindex="-1"></a><span class="co">#&gt; 4                              FALSE                       FALSE</span></span>
+<span id="cb5-135"><a href="#cb5-135" tabindex="-1"></a><span class="co">#&gt; 5                              FALSE                       FALSE</span></span>
+<span id="cb5-136"><a href="#cb5-136" tabindex="-1"></a><span class="co">#&gt; 6                              FALSE                        TRUE</span></span>
+<span id="cb5-137"><a href="#cb5-137" tabindex="-1"></a><span class="co">#&gt; 7                               TRUE                       FALSE</span></span>
+<span id="cb5-138"><a href="#cb5-138" tabindex="-1"></a><span class="co">#&gt; 8                              FALSE                        TRUE</span></span>
+<span id="cb5-139"><a href="#cb5-139" tabindex="-1"></a><span class="co">#&gt; 9                              FALSE                       FALSE</span></span>
+<span id="cb5-140"><a href="#cb5-140" tabindex="-1"></a><span class="co">#&gt; 10                             FALSE                       FALSE</span></span>
+<span id="cb5-141"><a href="#cb5-141" tabindex="-1"></a><span class="co">#&gt; 11                             FALSE                        TRUE</span></span>
+<span id="cb5-142"><a href="#cb5-142" tabindex="-1"></a><span class="co">#&gt; 12                             FALSE                       FALSE</span></span>
+<span id="cb5-143"><a href="#cb5-143" tabindex="-1"></a><span class="co">#&gt; 13                             FALSE                       FALSE</span></span>
+<span id="cb5-144"><a href="#cb5-144" tabindex="-1"></a><span class="co">#&gt; 14                              TRUE                        TRUE</span></span>
+<span id="cb5-145"><a href="#cb5-145" tabindex="-1"></a><span class="co">#&gt; 15                              TRUE                        TRUE</span></span>
+<span id="cb5-146"><a href="#cb5-146" tabindex="-1"></a><span class="co">#&gt;    filter_6_simple_repeat filter_7_mutation_at_homopolymer filter_8_low_quality</span></span>
+<span id="cb5-147"><a href="#cb5-147" tabindex="-1"></a><span class="co">#&gt; 1                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-148"><a href="#cb5-148" tabindex="-1"></a><span class="co">#&gt; 2                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-149"><a href="#cb5-149" tabindex="-1"></a><span class="co">#&gt; 3                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-150"><a href="#cb5-150" tabindex="-1"></a><span class="co">#&gt; 4                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-151"><a href="#cb5-151" tabindex="-1"></a><span class="co">#&gt; 5                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-152"><a href="#cb5-152" tabindex="-1"></a><span class="co">#&gt; 6                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-153"><a href="#cb5-153" tabindex="-1"></a><span class="co">#&gt; 7                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-154"><a href="#cb5-154" tabindex="-1"></a><span class="co">#&gt; 8                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-155"><a href="#cb5-155" tabindex="-1"></a><span class="co">#&gt; 9                   FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-156"><a href="#cb5-156" tabindex="-1"></a><span class="co">#&gt; 10                   TRUE                            FALSE                 TRUE</span></span>
+<span id="cb5-157"><a href="#cb5-157" tabindex="-1"></a><span class="co">#&gt; 11                  FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-158"><a href="#cb5-158" tabindex="-1"></a><span class="co">#&gt; 12                  FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-159"><a href="#cb5-159" tabindex="-1"></a><span class="co">#&gt; 13                  FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-160"><a href="#cb5-160" tabindex="-1"></a><span class="co">#&gt; 14                  FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-161"><a href="#cb5-161" tabindex="-1"></a><span class="co">#&gt; 15                  FALSE                            FALSE                FALSE</span></span>
+<span id="cb5-162"><a href="#cb5-162" tabindex="-1"></a><span class="co">#&gt;        msec_filter_123    msec_filter_1234     msec_filter_all</span></span>
+<span id="cb5-163"><a href="#cb5-163" tabindex="-1"></a><span class="co">#&gt; 1  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-164"><a href="#cb5-164" tabindex="-1"></a><span class="co">#&gt; 2  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-165"><a href="#cb5-165" tabindex="-1"></a><span class="co">#&gt; 3  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-166"><a href="#cb5-166" tabindex="-1"></a><span class="co">#&gt; 4  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-167"><a href="#cb5-167" tabindex="-1"></a><span class="co">#&gt; 5  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-168"><a href="#cb5-168" tabindex="-1"></a><span class="co">#&gt; 6  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-169"><a href="#cb5-169" tabindex="-1"></a><span class="co">#&gt; 7                      Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-170"><a href="#cb5-170" tabindex="-1"></a><span class="co">#&gt; 8  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-171"><a href="#cb5-171" tabindex="-1"></a><span class="co">#&gt; 9  Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-172"><a href="#cb5-172" tabindex="-1"></a><span class="co">#&gt; 10                                         Artifact suspicious</span></span>
+<span id="cb5-173"><a href="#cb5-173" tabindex="-1"></a><span class="co">#&gt; 11 Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-174"><a href="#cb5-174" tabindex="-1"></a><span class="co">#&gt; 12 Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-175"><a href="#cb5-175" tabindex="-1"></a><span class="co">#&gt; 13 Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-176"><a href="#cb5-176" tabindex="-1"></a><span class="co">#&gt; 14                     Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-177"><a href="#cb5-177" tabindex="-1"></a><span class="co">#&gt; 15 Artifact suspicious Artifact suspicious Artifact suspicious</span></span>
+<span id="cb5-178"><a href="#cb5-178" tabindex="-1"></a><span class="co">#&gt;                                                                       comment</span></span>
+<span id="cb5-179"><a href="#cb5-179" tabindex="-1"></a><span class="co">#&gt; 1                                                                            </span></span>
+<span id="cb5-180"><a href="#cb5-180" tabindex="-1"></a><span class="co">#&gt; 2                                                                            </span></span>
+<span id="cb5-181"><a href="#cb5-181" tabindex="-1"></a><span class="co">#&gt; 3                                                                            </span></span>
+<span id="cb5-182"><a href="#cb5-182" tabindex="-1"></a><span class="co">#&gt; 4                                                                            </span></span>
+<span id="cb5-183"><a href="#cb5-183" tabindex="-1"></a><span class="co">#&gt; 5                                                                            </span></span>
+<span id="cb5-184"><a href="#cb5-184" tabindex="-1"></a><span class="co">#&gt; 6                                                                            </span></span>
+<span id="cb5-185"><a href="#cb5-185" tabindex="-1"></a><span class="co">#&gt; 7                                                                            </span></span>
+<span id="cb5-186"><a href="#cb5-186" tabindex="-1"></a><span class="co">#&gt; 8                                                                            </span></span>
+<span id="cb5-187"><a href="#cb5-187" tabindex="-1"></a><span class="co">#&gt; 9                                                                            </span></span>
+<span id="cb5-188"><a href="#cb5-188" tabindex="-1"></a><span class="co">#&gt; 10  too repetitive to analyze homology, filter 4: sequence is too repetitive,</span></span>
+<span id="cb5-189"><a href="#cb5-189" tabindex="-1"></a><span class="co">#&gt; 11                                                                           </span></span>
+<span id="cb5-190"><a href="#cb5-190" tabindex="-1"></a><span class="co">#&gt; 12                                                                           </span></span>
+<span id="cb5-191"><a href="#cb5-191" tabindex="-1"></a><span class="co">#&gt; 13                                                                           </span></span>
+<span id="cb5-192"><a href="#cb5-192" tabindex="-1"></a><span class="co">#&gt; 14                                                                           </span></span>
+<span id="cb5-193"><a href="#cb5-193" tabindex="-1"></a><span class="co">#&gt; 15</span></span></code></pre></div>
 </div>
 <div id="information-about-the-current-r-session" class="section level2">
 <h2>Information about the current R session</h2>

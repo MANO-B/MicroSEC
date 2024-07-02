@@ -38,6 +38,12 @@ df_mutation <- fun_load_mutation(
 df_bam <- fun_load_bam(
    system.file("extdata", "sample.bam", package = "MicroSEC"))
 
+# another example data
+# data(exampleMutation)
+# data(exampleBam)
+# df_mutation <- exampleMutation
+# df_bam <- exampleBam
+
 # load genomic sequence
 ref_genome <- fun_load_genome(organism)
 chr_no <- fun_load_chr_no(organism)
@@ -51,6 +57,7 @@ result <- fun_read_check(df_mutation = df_mutation,
                          adapter_1 = adapter_1,
                          adapter_2 = adapter_2,
                          short_homology_search_length = 4,
+                         min_homology_search = 40,
                          progress_bar = progress_bar)
 msec <- result[[1]]
 homology_search <- result[[2]]
