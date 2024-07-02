@@ -1,15 +1,8 @@
 ## Resubmission
 This is a resubmission. In this version I have:  
-* Version changed: 1.1.3 -> 2.0.0  
-* Many functions were removed and the structure was simplified.  
+* Version changed: 2.0.0 -> 2.0.1  
 * Bugs fixed.
-- fun_convert  
-- fun_hairpin_trimming  
-- fun_insert_length  
-- fun_load_id  
-- fun_load_mutation_gz  
-- fun_save_gz  
-  
+
 ## Test environments  
 Local environments  
 * macOS-arm64 14.5, R 4.2.3
