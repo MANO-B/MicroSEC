@@ -15,3 +15,4 @@ docs/
 MicroSEC_test.tsv.gz
 .github/
 sample.tsv.gz
+inst/.DS_Store
