@@ -23,10 +23,6 @@ Please download and use the new version of MicroSEC.R.
 ```
 wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.R
 ```
-An example of warnings;  
-```
-[W::finish_rg_pg] Tag PG:bwa-mem not found in @PG records. 
-```
 
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
@@ -86,6 +82,7 @@ samtools view -b sort.bam chr1:100-1000 > output_chr1.bam
 It is better to split the file by chromosome.  
 If the file size is still too large, split it further at a distance from the mutation.  
 Deleting regions where there are no mutations will lighten the process.  
+Please download and use MicroSEC.R script file.  
   
 ### File 3: sample information tsv file (required)  
 From seven to ten columns are necessary. Three optional columns can be omitted.  
@@ -151,8 +148,8 @@ Samtools is used for pre-processing to remove reads that are not related to muta
 
 ### R language
 
-This script files runs on `R` for Windows, Mac, or Linux, which requires the R version 3.4.0 or later.
-If you use version 3.5 or lower of R, you will have some difficulty installing the packages, but it is not impossible.  
+This script files runs on `R` for Windows, Mac, or Linux, which requires the R version 3.5.0 or later.
+If you use version 3.4 or lower of R, you will have some difficulty installing the packages, but it is not impossible.  
 
 ### Package dependencies
 
@@ -162,13 +159,13 @@ Users should install the following packages prior to use the scripts, from an `R
 if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
-install.packages(c('tidyr', 'openxlsx', 'data.table', 'R.utils', 'stringr', 'magrittr', 'dplyr', 'gtools', 'devtools'), dependencies = TRUE)
+install.packages(c('stringr', 'dplyr', 'gtools', 'devtools'), dependencies = TRUE)
 BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"), update=FALSE)
 
 # install necessary genomes
 BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update=FALSE)
-BiocManager::install("BSgenome.Hsapiens.UCSC.hg19", update=FALSE)
-BiocManager::install("BSgenome.Mmusculus.UCSC.mm10", update=FALSE)
+# BiocManager::install("BSgenome.Hsapiens.UCSC.hg19", update=FALSE)
+# BiocManager::install("BSgenome.Mmusculus.UCSC.mm10", update=FALSE)
 ```
 
 which will install in about 30 minutes on a recommended machine.
@@ -178,28 +175,14 @@ which will install in about 30 minutes on a recommended machine.
 All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2020. Users can check [CRAN snapshot](https://mran.microsoft.com/timemachine/) for details. The versions of software are, specifically:
 
 ```
-> packageVersion("tidyr")
-[1] '1.1.2'
-> packageVersion("openxlsx")
-[1] '4.2.2'
-> packageVersion("data.table")
-[1] '1.13.2'
-> packageVersion("R.utils")
-[1] '2.10.1'
 > packageVersion("stringr")
 [1] '1.4.0'
-> packageVersion("magrittr")
-[1] '1.5'
 > packageVersion("dplyr")
 [1] '1.0.2'
 > packageVersion("Biostrings")
 [1] '2.54.0'
 > packageVersion("BSgenome.Hsapiens.UCSC.hg38")
 [1] '1.4.1'
-> packageVersion("BSgenome.Hsapiens.UCSC.hg19")
-[1] '1.4.0'
-> packageVersion("BSgenome.Mmusculus.UCSC.mm10")
-[1] '1.4.0'
 > packageVersion("GenomicAlignments")
 [1] '1.22.1'
 > packageVersion("Rsamtools")
@@ -220,7 +203,7 @@ See also https://rdrr.io/cran/MicroSEC/
 # Stable version from CRAN (not recommended now)
 install.packages("MicroSEC")
 
-# Developmental stable version from github (recommended)
+# Developmental stable version (v2.0.1) from github (recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 ```
 - How to use in command line
