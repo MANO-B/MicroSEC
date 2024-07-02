@@ -34,6 +34,8 @@ fun_read_check(
 
 \item{short_homology_search_length}{Small sequence for homology search.}
 
+\item{min_homology_search}{Minimum length to define "homologous".}
+
 \item{progress_bar}{"Y": You can see the progress visually.}
 }
 \value{
