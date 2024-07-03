@@ -170,13 +170,13 @@ fun_read_check <- function(df_mutation,
           ncol = dim(cigar_num_all)[2]-1)
         cigar_num_all[is.na(cigar_num_all)] = 0
         cigar_type_all <-  as.matrix(str_split(df_bam_cigar,
-                                    "[:digit:]+",
-                                    simplify = T))[,-1]
+                                               "[:digit:]+",
+                                               simplify = T))[,-1]
         cigar_pos_all <- df_bam_pos
         cigar_seq_all <- df_bam_seq
         cigar_qname_all <- df_bam_qname
         cigar_isize_all <- df_bam_isize
-        cigar_qual_all <- list(sapply(as.character(df_bam_qual),
+        cigar_qual_all <- as.list(sapply(as.character(df_bam_qual),
                function(x) strtoi(charToRaw(x), 16L),
                simplify = TRUE))
         names(cigar_qual_all) <- NULL
