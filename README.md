@@ -204,7 +204,7 @@ See also https://rdrr.io/cran/MicroSEC/
 # Stable version from CRAN (not recommended now)
 install.packages("MicroSEC")
 
-# Developmental stable version (v2.0.2) from github (recommended)
+# Developmental stable version (v2.0.3) from github (recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 ```
 - How to use in command line

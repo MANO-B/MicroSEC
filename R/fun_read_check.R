@@ -178,7 +178,7 @@ fun_read_check <- function(df_mutation,
         cigar_isize_all <- df_bam_isize
         cigar_qual_all <- as.list(sapply(as.character(df_bam_qual),
                function(x) strtoi(charToRaw(x), 16L),
-               simplify = TRUE))
+               simplify = FALSE))
         names(cigar_qual_all) <- NULL
         cigar_strand_all <- gsub("\\-", "r",
                              gsub("\\+", "f", df_bam_strand))
