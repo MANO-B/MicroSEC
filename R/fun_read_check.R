@@ -219,7 +219,7 @@ fun_read_check <- function(df_mutation,
                             alt))) == df_mutation[i, "Alt"])
         snv_pos <- rowSums(cbind(as.matrix(cigar_type_all == Mut_type), FALSE) *
                    ((cigar_genome_pos - df_mutation[i, "Pos"]) <= 0) *
-                   cbind(((cigar_genome_pos[,-1] - df_mutation[i, "Pos"]) > 0),
+                   cbind(((as.matrix(cigar_genome_pos[,-1]) - df_mutation[i, "Pos"]) > 0),
                          FALSE) *
                    (cigar_read_pos -
                       cigar_genome_pos +
