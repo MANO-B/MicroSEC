@@ -162,7 +162,7 @@ Users should install the following packages prior to use the scripts, from an `R
 if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
-install.packages(c('stringr', 'dplyr', 'devtools'), dependencies = TRUE)
+install.packages(c('stringr', 'dplyr', 'remotes'), dependencies = TRUE)
 BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"), update=FALSE)
 
 # install necessary genomes
@@ -190,8 +190,8 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 [1] '1.22.1'
 > packageVersion("Rsamtools")
 [1] '2.0.3'
-> packageVersion("devtools")
-[1] '2.3.2'
+> packageVersion("remotes")
+[1] '2.5.0'
 > packageVersion("GenomeInfoDb")
 [1] '1.22.1'
 ```
@@ -205,7 +205,7 @@ See also https://rdrr.io/cran/MicroSEC/
 install.packages("MicroSEC")
 
 # Developmental stable version (v2.0.3) from github (recommended)
-devtools::install_github("MANO-B/MicroSEC", upgrade="never")
+remotes::install_github("MANO-B/MicroSEC")
 ```
 - How to use in command line
 ```
