@@ -25,7 +25,6 @@
 #' @importFrom BiocGenerics which.max
 #' @importFrom BiocGenerics rbind
 #' @importFrom BiocGenerics colnames
-#' @importFrom gtools asc
 #' @importFrom Biostrings matchPattern
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings reverseComplement
@@ -177,7 +176,10 @@ fun_read_check <- function(df_mutation,
         cigar_seq_all <- df_bam_seq
         cigar_qname_all <- df_bam_qname
         cigar_isize_all <- df_bam_isize
-        cigar_qual_all <- asc(as.character(df_bam_qual))
+        cigar_qual_all <- data.frame(
+        sapply(as.character(df_bam_qual),
+               function(x) strtoi(charToRaw(x), 16L),
+               simplify = TRUE))
         names(cigar_qual_all) <- NULL
         cigar_strand_all <- gsub("\\-", "r",
                              gsub("\\+", "f", df_bam_strand))
