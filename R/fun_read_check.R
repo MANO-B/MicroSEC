@@ -176,8 +176,7 @@ fun_read_check <- function(df_mutation,
         cigar_seq_all <- df_bam_seq
         cigar_qname_all <- df_bam_qname
         cigar_isize_all <- df_bam_isize
-        cigar_qual_all <- data.frame(
-        sapply(as.character(df_bam_qual),
+        cigar_qual_all <- list(sapply(as.character(df_bam_qual),
                function(x) strtoi(charToRaw(x), 16L),
                simplify = TRUE))
         names(cigar_qual_all) <- NULL
@@ -245,7 +244,8 @@ fun_read_check <- function(df_mutation,
             df_mutation[i, "Pos"] -
             (1 - indel_status) * alt
           
-          mutated_seq <- (mut_pos > 0) & lapply(cigar_qual_all, mean)>=53
+          mutated_seq <- (mut_pos > 0) &
+            lapply((cigar_qual_all), mean)>=53
           if (sum(mutated_seq, na.rm = T) > 0) {
             mut_read_id <- cigar_qname_all[mutated_seq]
             mut_read_strand <- cigar_strand_all[mutated_seq]

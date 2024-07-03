@@ -159,7 +159,7 @@ Users should install the following packages prior to use the scripts, from an `R
 if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
-install.packages(c('stringr', 'dplyr', 'gtools', 'devtools'), dependencies = TRUE)
+install.packages(c('stringr', 'dplyr', 'devtools'), dependencies = TRUE)
 BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"), update=FALSE)
 
 # install necessary genomes
@@ -187,8 +187,6 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 [1] '1.22.1'
 > packageVersion("Rsamtools")
 [1] '2.0.3'
-> packageVersion("gtools")
-[1] '3.8.2'
 > packageVersion("devtools")
 [1] '2.3.2'
 > packageVersion("GenomeInfoDb")
@@ -453,7 +451,6 @@ for (sample in seq_len(dim(sample_info)[1])) {
   # analysis
   result <- fun_read_check(df_mutation = exampleMutation,
                            df_bam = exampleBAM,
-                           df_mut_call = exampleMutCall,
                            ref_genome = ref_genome,
                            sample_name = sample_name,
                            read_length = read_length,
