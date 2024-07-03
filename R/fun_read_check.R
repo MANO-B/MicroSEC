@@ -253,7 +253,7 @@ fun_read_check <- function(df_mutation,
             mut_qual <- cigar_qual_all[mutated_seq]
             mut_seq <- cigar_seq_all[mutated_seq]
             mut_isize <- cigar_isize_all[mutated_seq]
-            mut_cigar <- cigar_type_all[mutated_seq,]
+            mut_cigar <- as.matrix(cigar_type_all[mutated_seq,])
             mut_qname <- cigar_qname_all[mutated_seq]
             mut_pre_supporting_length = pre_supporting_length[mutated_seq]
             mut_post_supporting_length = post_supporting_length[mutated_seq]
