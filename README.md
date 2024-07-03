@@ -6,7 +6,7 @@ https://hub.docker.com/r/ikegamitky/microsec/tags
 
 Apptainer cantainer can be built via Docker-hub.
 ```
-apptainer pull docker://ikegamitky/microsec:v2.0.0
+apptainer pull docker://ikegamitky/microsec:v2.0.2
 ```
   
 Apptainer container can be built with a definition file (takes 2 hours).  
@@ -201,7 +201,7 @@ See also https://rdrr.io/cran/MicroSEC/
 # Stable version from CRAN (not recommended now)
 install.packages("MicroSEC")
 
-# Developmental stable version (v2.0.1) from github (recommended)
+# Developmental stable version (v2.0.2) from github (recommended)
 devtools::install_github("MANO-B/MicroSEC", upgrade="never")
 ```
 - How to use in command line
