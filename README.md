@@ -12,7 +12,7 @@ Apptainer cantainer can be built via Docker-hub.
 apptainer pull docker://ikegamitky/microsec:v2.0.3
 ```
   
-Apptainer container can be built with a definition file (takes 2 hours).  
+Apptainer container can be built with a definition file (takes 30 min).  
 ```
 wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.def
 sudo apptainer build MicroSEC.sif MicroSEC.def
