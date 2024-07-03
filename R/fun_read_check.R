@@ -206,7 +206,7 @@ fun_read_check <- function(df_mutation,
                             (cigar_read_pos - indel_status) *
                             (cigar_genome_pos ==
                               (df_mutation[i, "Pos"] + indel_status)) *
-                            cbind(as.matrix(cigar_type_all == Mut_type), FALSE) *
+                            cbind((cigar_type_all == Mut_type), FALSE) *
                             cbind((cigar_num_all == indel_length), FALSE))
         indel_pos <- indel_pos *
           (as.character(
@@ -217,9 +217,9 @@ fun_read_check <- function(df_mutation,
                             alt == 0, 1, indel_pos +
                             (nchar(cigar_seq_all) > (indel_pos + alt)) *
                             alt))) == df_mutation[i, "Alt"])
-        snv_pos <- rowSums(cbind(as.matrix(cigar_type_all == Mut_type), FALSE) *
+        snv_pos <- rowSums(cbind((cigar_type_all == Mut_type), FALSE) *
                    ((cigar_genome_pos - df_mutation[i, "Pos"]) <= 0) *
-                   cbind(((as.matrix(cigar_genome_pos[,-1]) - df_mutation[i, "Pos"]) > 0),
+                   cbind((((cigar_genome_pos[,-1,drop=F]) - df_mutation[i, "Pos"]) > 0),
                          FALSE) *
                    (cigar_read_pos -
                       cigar_genome_pos +
