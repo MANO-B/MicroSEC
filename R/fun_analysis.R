@@ -18,6 +18,7 @@
 #' @return msec
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
+#' @importFrom dplyr case_when
 #' @importFrom dplyr select
 #' @importFrom BiocGenerics mapply
 #' @examples
@@ -119,6 +120,76 @@ fun_analysis <- function(msec,
     mut_depth_post <- mut_depth[[2]]
     mut_depth_short <- mut_depth[[3]]
     
+    msec <- msec %>% mutate(
+      short_support_length_adj = case_when(
+        is.na(short_support_length_adj) ~ 0,
+        short_support_length_adj > 99 ~ 99,
+        short_support_length_adj < 0 ~ 0,
+        TRUE ~ short_support_length_adj
+      ),
+      shortest_support_length_adj = case_when(
+        is.na(shortest_support_length_adj) ~ 0,
+        shortest_support_length_adj > 99 ~ 99,
+        shortest_support_length_adj < 0 ~ 0,
+        TRUE ~ shortest_support_length_adj
+      ),
+      pre_support_length_adj = case_when(
+        is.na(pre_support_length_adj) ~ 0,
+        pre_support_length_adj > 199 ~ 199,
+        pre_support_length_adj < 0 ~ 0,
+        TRUE ~ pre_support_length_adj
+      ),
+      pre_minimum_length_adj = case_when(
+        is.na(pre_minimum_length_adj) ~ 0,
+        pre_minimum_length_adj > 199 ~ 199,
+        pre_minimum_length_adj < 0 ~ 0,
+        TRUE ~ pre_minimum_length_adj
+      ),
+      post_support_length_adj = case_when(
+        is.na(post_support_length_adj) ~ 0,
+        post_support_length_adj > 199 ~ 199,
+        post_support_length_adj < 0 ~ 0,
+        TRUE ~ post_support_length_adj
+      ),
+      post_minimum_length_adj = case_when(
+        is.na(post_minimum_length_adj) ~ 0,
+        post_minimum_length_adj > 199 ~ 199,
+        post_minimum_length_adj < 0 ~ 0,
+        TRUE ~ post_minimum_length_adj
+      ),
+      half_length = case_when(
+        is.na(half_length) ~ 0,
+        half_length > 99 ~ 99,
+        half_length < 0 ~ 0,
+        TRUE ~ half_length
+      ),
+      minimum_length = case_when(
+        is.na(minimum_length) ~ 0,
+        minimum_length > 30 ~ 30,
+        minimum_length < 0 ~ 0,
+        TRUE ~ minimum_length
+      ),
+      minimum_length_1 = case_when(
+        is.na(minimum_length_1) ~ 0,
+        minimum_length_1 > 30 ~ 30,
+        minimum_length_1 < 0 ~ 0,
+        TRUE ~ minimum_length_1
+      ),
+      minimum_length_2 = case_when(
+        is.na(minimum_length_2) ~ 0,
+        minimum_length_2 > 30 ~ 30,
+        minimum_length_2 < 0 ~ 0,
+        TRUE ~ minimum_length_2
+      ),
+      altered_length = case_when(
+        is.na(altered_length) ~ 0,
+        altered_length > 30 ~ 30,
+        altered_length < 0 ~ 0,
+        TRUE ~ altered_length
+      )
+    )
+        
+    
     
     msec <- msec %>% mutate(
       short_short_support =
@@ -153,7 +224,7 @@ fun_analysis <- function(msec,
           return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
-        msec$shortest_support_length_adj + 2
+        msec$shortest_support_length_adj + 1
       )
     msec$pre_support_length_adj_sum <-
       mapply(
@@ -168,7 +239,7 @@ fun_analysis <- function(msec,
           return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
-        msec$pre_minimum_length_adj + 2
+        msec$pre_minimum_length_adj + 1
       )
     msec$post_support_length_adj_sum <-
       mapply(
@@ -183,7 +254,7 @@ fun_analysis <- function(msec,
           return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$post_minimum_length_adj + 2
+        msec$post_minimum_length_adj + 1
       )
     msec$half_length_adj_sum <-
       mapply(
@@ -198,7 +269,7 @@ fun_analysis <- function(msec,
           return(mut_depth_short[x, y])
         },
         1:dim(msec)[1],
-        msec$minimum_length + 2
+        msec$minimum_length + 1
       )
     msec$total_length_pre_adj_sum <-
       mapply(
@@ -215,7 +286,7 @@ fun_analysis <- function(msec,
           return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
-        msec$minimum_length_1 + 2
+        msec$minimum_length_1 + 1
       )
     msec$total_length_post_adj_sum <-
       mapply(
@@ -232,7 +303,7 @@ fun_analysis <- function(msec,
           return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$minimum_length_1 + 2
+        msec$minimum_length_1 + 1
       )
     msec <- msec %>% mutate(
       short_short_support_sum =
@@ -258,11 +329,14 @@ fun_analysis <- function(msec,
     )
     msec <- msec %>% mutate(
       prob_filter_1 = ifelse((prob_filter_1 > 1),
-                             1, prob_filter_1),
+                             1, ifelse((prob_filter_1 < 0),
+                                       0, prob_filter_1)),
       prob_filter_3_pre = ifelse((prob_filter_3_pre > 1),
-                                 1, prob_filter_3_pre),
+                                 1, ifelse((prob_filter_3_pre < 0),
+                                           0, prob_filter_3_pre)),
       prob_filter_3_post = ifelse((prob_filter_3_post > 1),
-                                  1, prob_filter_3_post)
+                                  1, ifelse((prob_filter_3_post < 0),
+                                            0, prob_filter_3_post))
     )
     msec <- msec %>% mutate(
       filter_1_mutation_intra_hairpin_loop =
