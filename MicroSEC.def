@@ -26,5 +26,9 @@ From: rocker/r-base:4.2.3
     R --no-echo -e 'install.packages(c("R.utils", "BiocManager", "bitops"), dependencies = FALSE, repos="https://cloud.r-project.org/")'
     R --no-echo -e 'BiocManager::install(c("zlibbioc", "RCurl", "BH", "S4Vectors", "BiocGenerics", "IRanges", "XVector", "GenomeInfoDb", "GenomeInfoDbData", "BiocParallel"), update=FALSE)'
     R --no-echo -e 'BiocManager::install(c("Rhtslib", "BiocStyle", "Rsamtools", "GenomicRanges", "Biostrings", "GenomicAlignments"), update=FALSE)'
-    R --no-echo -e 'BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update=FALSE)'
+    R --no-echo -e 'options(timeout = 3000); BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update=FALSE)'
     R --no-echo -e 'remotes::install_github("MANO-B/MicroSEC")'
+
+%environment
+export PATH=/usr/local/bin:$PATH
+export LC_ALL=C.UTF-8

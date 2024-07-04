@@ -4,12 +4,12 @@
 MicroSEC docker file can be downloadable via Docker-hub.  
 https://hub.docker.com/r/ikegamitky/microsec/tags
 ```
-docker pull ikegamitky/microsec:v2.0.3
+docker pull ikegamitky/microsec:v2.0.4
 ```
 
 Apptainer cantainer can be built via Docker-hub.
 ```
-apptainer pull docker://ikegamitky/microsec:v2.0.3
+apptainer pull docker://ikegamitky/microsec:v2.0.4
 ```
   
 Apptainer container can be built with a definition file (takes 30 min).  
@@ -17,6 +17,7 @@ Apptainer container can be built with a definition file (takes 30 min).
 wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.def
 sudo apptainer build MicroSEC.sif MicroSEC.def
 ```
+
   
 # NEW
 MicroSEC has been improved to dramatically reduce memory usage.  
@@ -204,7 +205,7 @@ See also https://rdrr.io/cran/MicroSEC/
 # Stable version from CRAN (not recommended now)
 install.packages("MicroSEC")
 
-# Developmental stable version (v2.0.3) from github (recommended)
+# Developmental stable version (v2.0.4) from github (recommended)
 remotes::install_github("MANO-B/MicroSEC")
 ```
 - How to use in command line

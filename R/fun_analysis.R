@@ -296,14 +296,14 @@ fun_analysis <- function(msec,
         1:dim(msec)[1],
         msec$read_length -
           msec$altered_length + 2 -
-          msec$minimum_length_2
+          msec$minimum_length_1
       ) -
       mapply(
         function(x, y) {
           return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$minimum_length_1 + 1
+        msec$minimum_length_2 + 1
       )
     msec <- msec %>% mutate(
       short_short_support_sum =
