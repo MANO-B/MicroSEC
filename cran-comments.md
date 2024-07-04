@@ -1,6 +1,6 @@
 ## Resubmission
 This is a resubmission. In this version I have:  
-* Version changed: 2.0.0 -> 2.0.3  
+* Version changed: 2.0.0 -> 2.0.4  
 * Bugs fixed.
 
 ## Test environments  
