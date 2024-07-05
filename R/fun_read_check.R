@@ -276,12 +276,12 @@ fun_read_check <- function(df_mutation,
               soft_clipped_read <- sum(rowSums(mut_cigar == "S") > 0, na.rm = T)
     
               for (depth in seq_len(length(pre_supporting_length))) {
-                mut_depth_pre_tmp[pre_supporting_length[depth] + 2] <-
-                  mut_depth_pre_tmp[pre_supporting_length[depth] + 2] + 1
-                mut_depth_post_tmp[post_supporting_length[depth] + 2] <-
-                  mut_depth_post_tmp[post_supporting_length[depth] + 2] + 1
-                mut_depth_short_tmp[short_supporting_length[depth] + 2] <-
-                  mut_depth_short_tmp[short_supporting_length[depth] + 2] + 1
+                mut_depth_pre_tmp[min(201,pre_supporting_length[depth] + 2)] <-
+                  mut_depth_pre_tmp[min(201,pre_supporting_length[depth] + 2)] + 1
+                mut_depth_post_tmp[min(201,post_supporting_length[depth] + 2)] <-
+                  mut_depth_post_tmp[min(201,post_supporting_length[depth] + 2)] + 1
+                mut_depth_short_tmp[min(101,short_supporting_length[depth] + 2)] <-
+                  mut_depth_short_tmp[min(101,short_supporting_length[depth] + 2)] + 1
               }
               
               pre_support_length <- max(mut_pre_supporting_length)
