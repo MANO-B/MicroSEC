@@ -33,7 +33,7 @@ PIK3CA E545A (chr3:179218304A>C, NM_006218.4:c.1634A>C) pathogenic mutation migh
 be called as an artifact by MicroSEC, which may be a false positive error. 
 A PIK3CA pseudogene (LOC100422375) in chromosome 22 harbors a base substitution 
 which was identical with the mutation in PIK3CA c.1634A>C.  
-Please check the reads manuaaly with IGV.  
+Please check the reads manually with IGV.  
 
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
