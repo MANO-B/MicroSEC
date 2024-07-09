@@ -19,7 +19,7 @@ sudo apptainer build MicroSEC.sif MicroSEC.def
 ```
 
   
-# NEW
+# Analysis script file
 MicroSEC has been improved to dramatically reduce memory usage.  
 The speed of analysis is also improved by deleting parts of the BAM file that are not relevant to the mutations prior to analysis by MicroSEC.  
 Samtools is now mandatory.  
@@ -27,6 +27,13 @@ Please download and use the new version of MicroSEC.R.
 ```
 wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.R
 ```
+
+# Known limitation
+PIK3CA E545A (chr3:179218304A>C, NM_006218.4:c.1634A>C) pathogenic mutation might
+be called as an artifact by MicroSEC, which may be a false positive error. 
+A PIK3CA pseudogene (LOC100422375) in chromosome 22 harbors a base substitution 
+which was identical with the mutation in PIK3CA c.1634A>C.  
+Please check the reads manuaaly with IGV.  
 
 # MicroSEC pipeline for FFPE artifacts
 This pipeline is designed for filtering sequence errors found in formalin-fixed and 
