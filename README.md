@@ -1,5 +1,8 @@
 ![MicroSEC logo](MicroSEC_logo.png)
 
+# Version history
+2.1.0: Compatible with large indels in very short leads.
+
 # Docker and Apptainer
 MicroSEC docker file can be downloadable via Docker-hub.  
 https://hub.docker.com/r/ikegamitky/microsec/tags
@@ -9,7 +12,7 @@ docker pull ikegamitky/microsec:v2.0.5
 
 Apptainer cantainer can be built via Docker-hub.
 ```
-apptainer pull docker://ikegamitky/microsec:v2.0.5
+apptainer pull docker://ikegamitky/microsec:v2.1.0
 ```
   
 Apptainer container can be built with a definition file (takes 30 min).  
