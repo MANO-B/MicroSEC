@@ -44,85 +44,58 @@ fun_summary <- function(msec) {
   
   if (dim(msec)[1] > 0) {
     msec <- msec %>% mutate(
-      distant_homology_rate = fun_zero(distant_homology, total_read)
+      distant_homology_rate = fun_zero(distant_homology, total_read),
+      altered_length = ifelse(mut_type == "snv",
+                              alt_length,
+                              ifelse(mut_type == "ins",
+                                     indel_length,
+                                     0)),
+      altered_length2 = ifelse(mut_type == "del",
+                              indel_length + 1,
+                              alt_length),
+      altered_length3 = ifelse(mut_type == "snv",
+                               1,
+                               ifelse(mut_type == "ins",
+                                      1 + indel_length,
+                                      1 - indel_length))
     )
     msec <- msec %>% mutate(
       penalty_pre = ifelse(pre_support_length == 0, 0, penalty_pre),
       penalty_post = ifelse(pre_support_length == 0, 0, penalty_post)
     )
     msec <- msec %>% mutate(
-      pre_minimum_length_adj = ifelse(indel_status == 1,
-          (((pre_minimum_length - (indel_length + penalty_pre + 1)) +
-          abs(pre_minimum_length - (indel_length + penalty_pre + 1))) / 2) +
-            (indel_length + penalty_pre + 1),
-          (((pre_minimum_length - penalty_pre) +
+      pre_minimum_length_adj = (((pre_minimum_length - penalty_pre) +
               abs(pre_minimum_length - penalty_pre)) / 2) +
-            penalty_pre),
-      post_minimum_length_adj = ifelse(indel_status == 1,
-          (((post_minimum_length - (indel_length + penalty_post + 1)) +
-          abs(post_minimum_length - (indel_length + penalty_post + 1))) / 2) +
-            (indel_length + penalty_post + 1),
-          (((post_minimum_length - penalty_post) +
-              abs(post_minimum_length - penalty_post)) / 2) +
-            penalty_post),
-      pre_support_length_adj = ifelse(indel_status == 1,
-          (((pre_support_length -
-               (read_length - indel_length - penalty_post - 1)) -
-        abs(pre_support_length -
-              (read_length - indel_length - penalty_post - 1))) / 2) +
-            (read_length - indel_length - penalty_post - 1),
-        (((pre_support_length - (read_length - alt_length - penalty_post)) -
-            abs(pre_support_length -
-                  (read_length - alt_length - penalty_post))) / 2) +
-          (read_length - alt_length - penalty_post)),
-      post_support_length_adj = ifelse(indel_status == 1,
-          (((post_support_length -
-               (read_length - indel_length - penalty_pre - 1)) -
-              abs(post_support_length -
-                    (read_length - indel_length - penalty_pre - 1))) / 2) +
-            (read_length - indel_length - penalty_pre - 1),
-          (((post_support_length - (read_length - alt_length - penalty_pre)) -
-              abs(post_support_length -
-                    (read_length - alt_length - penalty_pre))) / 2) +
-            (read_length - alt_length - penalty_pre))
-    )
-    msec <- msec %>% mutate(
-      pre_minimum_length_adj =
-          (((pre_minimum_length_adj - pre_rep_status - 1) +
-              abs(pre_minimum_length_adj - pre_rep_status - 1)) / 2) +
-            pre_rep_status + 1,
+            penalty_pre,
       post_minimum_length_adj =
-          (((post_minimum_length_adj - post_rep_status - 1) +
-              abs(post_minimum_length_adj - post_rep_status - 1)) / 2) +
-            post_rep_status + 1,
-      pre_support_length_adj =
-       (((pre_support_length_adj - (read_length - post_rep_status - 1)) -
-       abs(pre_support_length_adj - (read_length - post_rep_status - 1))) / 2) +
-            (read_length - post_rep_status - 1),
+        (((post_minimum_length - penalty_post - altered_length2 + 1) +
+          abs(post_minimum_length - penalty_post - altered_length2 + 1)) / 2) +
+            penalty_post + altered_length2 - 1,
+      pre_support_length_adj = 
+        (((pre_support_length - (read_length - altered_length - penalty_post)) -
+            abs(pre_support_length -
+                  (read_length - altered_length - penalty_post))) / 2) +
+          (read_length - altered_length - penalty_post),
       post_support_length_adj =
-       (((post_support_length_adj - (read_length - pre_rep_status - 1)) -
-       abs(post_support_length_adj - (read_length - pre_rep_status - 1))) / 2) +
-            (read_length - pre_rep_status - 1)
+        (((post_support_length -
+        (read_length - altered_length + altered_length2 - penalty_pre - 1)) -
+            abs(post_support_length -
+    (read_length - altered_length + altered_length2 - penalty_pre - 1))) / 2) +
+          (read_length - altered_length + altered_length2 - penalty_pre - 1),
+      short_support_length_adj =
+        (short_support_length -
+             max(penalty_post + altered_length2 - 1, penalty_pre) +
+       abs(short_support_length -
+             max(penalty_post + altered_length2 - 1, penalty_pre))) / 2 +
+      max(penalty_post + altered_length2 - 1, penalty_pre)
     )
     msec <- msec %>% mutate(
       shortest_support_length_adj =
         (((pre_minimum_length_adj - post_minimum_length_adj) -
             abs(pre_minimum_length_adj - post_minimum_length_adj)) / 2) +
         post_minimum_length_adj,
-      minimum_length_1 =
-        (((pre_rep_status - (indel_length + penalty_pre + 1)) +
-            abs(pre_rep_status - (indel_length + penalty_pre + 1))) / 2) +
-        (indel_length + penalty_pre + 1),
-      minimum_length_2 =
-        (((post_rep_status - (indel_length + penalty_post + 1)) +
-            abs(post_rep_status - (indel_length + penalty_post + 1))) / 2) +
-        (indel_length + penalty_post + 1)
-    )
-    msec <- msec %>% mutate(
-      minimum_length_1 = ifelse(indel_status == 1,
-                                minimum_length_1, penalty_pre),
-      minimum_length_2 = ifelse(indel_status == 1,
-                                minimum_length_2, penalty_post)
+      minimum_length_1 = penalty_pre,
+      minimum_length_2 = penalty_post + altered_length2 - 1
     )
     msec <- msec %>% mutate(
       minimum_length =
@@ -130,31 +103,8 @@ fun_summary <- function(msec) {
             abs(minimum_length_1 -  minimum_length_2)) / 2) +
         minimum_length_2
     )
-    msec <- msec %>% mutate(
-      shortest_support_length_adj =
-        ((minimum_length - shortest_support_length_adj) +
-        abs(minimum_length - shortest_support_length_adj)) / 2 +
-        shortest_support_length_adj,
-      pre_minimum_length_adj =
-        ((minimum_length_1 - pre_minimum_length_adj) +
-           abs(minimum_length_1 - pre_minimum_length_adj)) / 2 +
-        pre_minimum_length_adj,
-      post_minimum_length_adj =
-        ((minimum_length_2 - post_minimum_length_adj) +
-           abs(minimum_length_2 - post_minimum_length_adj)) / 2 +
-        post_minimum_length_adj
-    )
-    msec <- msec %>% mutate(
-      short_support_length_adj =
-        (((short_support_length - minimum_length) +
-            abs(short_support_length - minimum_length)) / 2) +
-        minimum_length,
-      altered_length = ifelse(mut_type == "snv",
-                              alt_length,
-                              ifelse(mut_type == "ins",
-                                     indel_length,
-                                     0)),
-      half_length = as.integer((read_length - altered_length) / 2)
+   msec <- msec %>% mutate(
+      half_length = as.integer((read_length - altered_length3) / 2)
     )
     msec <- msec %>% mutate(
       short_support_length_total =

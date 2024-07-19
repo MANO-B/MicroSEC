@@ -112,6 +112,8 @@ fun_analysis <- function(msec,
     minimum_length <- NULL
     short_support_length_adj <- NULL
     altered_length <- NULL
+    altered_length2 <- NULL
+    altered_length3 <- NULL
     distant_homology <- NULL
     low_quality_pre <- NULL
     low_quality_post <- NULL
@@ -165,25 +167,25 @@ fun_analysis <- function(msec,
       ),
       minimum_length = case_when(
         is.na(minimum_length) ~ 0,
-        minimum_length > 30 ~ 30,
+        minimum_length > 33 ~ 33,
         minimum_length < 0 ~ 0,
         TRUE ~ minimum_length
       ),
       minimum_length_1 = case_when(
         is.na(minimum_length_1) ~ 0,
-        minimum_length_1 > 30 ~ 30,
+        minimum_length_1 > 33 ~ 33,
         minimum_length_1 < 0 ~ 0,
         TRUE ~ minimum_length_1
       ),
       minimum_length_2 = case_when(
         is.na(minimum_length_2) ~ 0,
-        minimum_length_2 > 30 ~ 30,
+        minimum_length_2 > 33 ~ 33,
         minimum_length_2 < 0 ~ 0,
         TRUE ~ minimum_length_2
       ),
       altered_length = case_when(
         is.na(altered_length) ~ 0,
-        altered_length > 30 ~ 30,
+        altered_length > 33 ~ 33,
         altered_length < 0 ~ 0,
         TRUE ~ altered_length
       )
@@ -277,9 +279,9 @@ fun_analysis <- function(msec,
           return(mut_depth_pre[x, y])
         },
         1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length + 2 -
-          msec$minimum_length_2
+        msec$read_length + 2 -
+          msec$altered_length -
+          msec$penalty_post
       ) -
       mapply(
         function(x, y) {
@@ -294,9 +296,10 @@ fun_analysis <- function(msec,
           return(mut_depth_post[x, y])
         },
         1:dim(msec)[1],
-        msec$read_length -
-          msec$altered_length + 2 -
-          msec$minimum_length_1
+        msec$read_length + 1 -
+          msec$altered_length +
+          msec$altered_length2 -
+          msec$penalty_pre
       ) -
       mapply(
         function(x, y) {
@@ -460,6 +463,7 @@ fun_analysis <- function(msec,
                           -shortest_support_length_adj,
                           -minimum_length_1, -minimum_length_2, -minimum_length,
                           -short_support_length_adj, -altered_length,
+                          -altered_length2, -altered_length3,
                           -distant_homology,
                           -short_support_length_total,
                           -pre_support_length_total,

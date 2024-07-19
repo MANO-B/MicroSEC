@@ -687,8 +687,8 @@ fun_read_check <- function(df_mutation,
           }
         }
         if (indel_status == 1) {
-          penalty_pre <- 5 * co_mut_pre
-          penalty_post <- 5 * co_mut_post
+          penalty_pre <- indel_length + 1 + pre_rep_status + 5 * co_mut_pre
+          penalty_post <- indel_length + 1 + post_rep_status + 5 * co_mut_post
         } else {
           penalty_pre <- max(0, 4 * alt_length - 5) + 5 * co_mut_pre
           penalty_post <- max(0, 4 * alt_length - 5) + 5 * co_mut_post
