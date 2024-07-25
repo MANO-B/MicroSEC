@@ -1,7 +1,5 @@
 Sample	Mut_type	Chr	Pos	Ref	Alt	SimpleRepeat_TRF	Neighborhood_sequence
 sample	2-snv	chr11	17719997	CC	GG	N	ccccgcggcggtgcacccggGGccgggcgcacgtgaggacga
-sample	2-snv	chr11	17719997	CC	GG	N	ccccgcggcggtgcacccggGGccgggcgcacgtgaggacga
-sample	2-snv	chr11	69295601	CT	AA	N	cttgtctgtagtctgtccccAAtggggacagggactcgttgc
 sample	2-snv	chr11	69295601	CT	AA	N	cttgtctgtagtctgtccccAAtggggacagggactcgttgc
 sample	2-snv	chr15	98707826	TC	CG	N	caactacgccctggtcatctCGgagatgaccaatctcaagga
 sample	1-ins	chr2	47783391	C	CA	N	ggatgcggcctggagcgaggcAtgggcctgggcccaggccct

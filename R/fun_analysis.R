@@ -124,7 +124,7 @@ fun_analysis <- function(msec,
     
     msec <- msec %>% mutate(
       short_support_length_adj = case_when(
-        is.na(short_support_length_adj) ~ 0,
+        is.na(short_support_length_adj) ~ 99,
         short_support_length_adj > 99 ~ 99,
         short_support_length_adj < 0 ~ 0,
         TRUE ~ short_support_length_adj
@@ -136,7 +136,7 @@ fun_analysis <- function(msec,
         TRUE ~ shortest_support_length_adj
       ),
       pre_support_length_adj = case_when(
-        is.na(pre_support_length_adj) ~ 0,
+        is.na(pre_support_length_adj) ~ 199,
         pre_support_length_adj > 199 ~ 199,
         pre_support_length_adj < 0 ~ 0,
         TRUE ~ pre_support_length_adj
@@ -148,7 +148,7 @@ fun_analysis <- function(msec,
         TRUE ~ pre_minimum_length_adj
       ),
       post_support_length_adj = case_when(
-        is.na(post_support_length_adj) ~ 0,
+        is.na(post_support_length_adj) ~ 199,
         post_support_length_adj > 199 ~ 199,
         post_support_length_adj < 0 ~ 0,
         TRUE ~ post_support_length_adj
@@ -160,7 +160,7 @@ fun_analysis <- function(msec,
         TRUE ~ post_minimum_length_adj
       ),
       half_length = case_when(
-        is.na(half_length) ~ 0,
+        is.na(half_length) ~ 99,
         half_length > 99 ~ 99,
         half_length < 0 ~ 0,
         TRUE ~ half_length
@@ -188,10 +188,38 @@ fun_analysis <- function(msec,
         altered_length > 33 ~ 33,
         altered_length < 0 ~ 0,
         TRUE ~ altered_length
+      ),
+      altered_length2 = case_when(
+        is.na(altered_length2) ~ 0,
+        altered_length2 > 33 ~ 33,
+        altered_length2 < 0 ~ 0,
+        TRUE ~ altered_length2
+      ), 
+      penalty_pre = case_when(
+        is.na(penalty_pre) ~ 0,
+        TRUE ~ penalty_pre
+      ), 
+      penalty_post = case_when(
+        is.na(penalty_post) ~ 0,
+        TRUE ~ penalty_post
       )
     )
-        
-    
+    msec <- msec %>% mutate(
+      penalty_pre = case_when(
+        penalty_pre > read_length - 1 - altered_length + altered_length2 - minimum_length_2 ~
+          read_length - 1 - altered_length + altered_length2 - minimum_length_2,
+        penalty_pre < read_length - altered_length + altered_length2 - 198 ~
+          read_length - altered_length + altered_length2 - 198,
+        TRUE ~ penalty_pre
+      ), 
+      penalty_post = case_when(
+        penalty_post > read_length - altered_length - minimum_length_1 ~
+          read_length - altered_length - minimum_length_1,
+        penalty_post < read_length - altered_length - 197 ~
+          read_length - altered_length - 197,
+        TRUE ~ penalty_post
+      )
+    )
     
     msec <- msec %>% mutate(
       short_short_support =
