@@ -84,10 +84,16 @@ fun_summary <- function(msec) {
           (read_length - altered_length + altered_length2 - penalty_pre - 1),
       short_support_length_adj =
         (short_support_length -
-             max(penalty_post + altered_length2 - 1, penalty_pre) +
+             (penalty_post + altered_length2 - 1) +
        abs(short_support_length -
-             max(penalty_post + altered_length2 - 1, penalty_pre))) / 2 +
-      max(penalty_post + altered_length2 - 1, penalty_pre)
+             (penalty_post + altered_length2 - 1))) / 2 +
+      (penalty_post + altered_length2 - 1)
+    )
+    msec <- msec %>% mutate(
+      short_support_length_adj =
+        (short_support_length_adj - penalty_pre +
+           abs(short_support_length_adj - penalty_pre)) / 2 +
+        penalty_pre
     )
     msec <- msec %>% mutate(
       shortest_support_length_adj =
