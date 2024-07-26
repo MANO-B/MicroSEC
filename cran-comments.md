@@ -1,7 +1,8 @@
 ## Test environments
 * local: aarch64-apple-darwin20 (macOS Sonoma 14.5), R version 4.3.2
-* r-hub: linux, macos, macos-arm64, windows on Github Actions
-
+* r-hub: linux, macos, macos-arm64, windows on Github Actions  
+  https://github.com/MANO-B/MicroSEC/actions/runs/10106932404  
+  
 ## R CMD check results
 Duration: 4m 1.9s  
 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
