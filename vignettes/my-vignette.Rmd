@@ -196,7 +196,7 @@ msec_analyzed <- fun_analysis(msec = msec_summarized,
 
 ## Results
 ```{r}
-msec
+msec_analyzed
 ```
 
 ## Information about the current R session
