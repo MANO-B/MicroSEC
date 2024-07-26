@@ -37,6 +37,8 @@ fun_summary <- function(msec) {
   mut_type <- NULL
   alt_length <- NULL
   altered_length <- NULL
+  altered_length2 <- NULL
+  altered_length3 <- NULL
   short_support_length_adj <- NULL
   half_length <- NULL
   soft_clipped_rate <- NULL
