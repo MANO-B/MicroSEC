@@ -164,22 +164,22 @@ result <- fun_read_check(df_mutation = df_mutation,
                          short_homology_search_length = 4,
                          min_homology_search = 40,
                          progress_bar = progress_bar)
-msec <- result[[1]]
-homology_search <- result[[2]]
-mut_depth <- result[[3]]
+msec_read_checked <- result[[1]]
+homology_searched <- result[[2]]
+mut_depth_checked <- result[[3]]
 
 # search homologous sequences
-msec = fun_homology(msec,
-                    homology_search,
+msec_homology_searched = fun_homology(msec = msec_read_checked,
+                    df_distant = homology_searched,
                     min_homology_search = 40,
-                    ref_genome,
-                    chr_no,
+                    ref_genome = ref_genome,
+                    chr_no = chr_no,
                     progress_bar = progress_bar)
 
 # statistical analysis
-msec <- fun_summary(msec)
-msec <- fun_analysis(msec,
-                    mut_depth,
+msec_summarized <- fun_summary(msec_homology_searched)
+msec_analyzed <- fun_analysis(msec = msec_summarized,
+                    mut_depth = mut_depth_checked,
                     short_homology_search_length = 4,
                     min_homology_search = 40,
                     threshold_p = 10 ^ (-6),
@@ -191,7 +191,7 @@ msec <- fun_analysis(msec,
                     homopolymer_length = 15)
 
 # save the results as a tsv.gz file.
-#fun_save(msec, "~/MicroSEC_test.tsv.gz")
+#fun_save(msec_analyzed, "~/MicroSEC_test.tsv.gz")
 ```
 
 ## Results
