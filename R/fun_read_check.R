@@ -47,7 +47,7 @@
 #' adapter_2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
 #' short_homology_search_length = 4,
 #' min_homology_search = 40,
-#' progress_bar = "Y"
+#' progress_bar = "N"
 #' )
 #' @export
 fun_read_check <- function(df_mutation,

@@ -29,7 +29,7 @@
 #'    min_homology_search = 40,
 #'    ref_genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
 #'    chr_no = 24,
-#'    progress_bar = "Y"
+#'    progress_bar = "N"
 #' )
 #' @export
 fun_homology <- function(msec,
