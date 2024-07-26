@@ -7,6 +7,7 @@
 Duration: 4m 1.9s  
 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 
+It also takes time to process test data because of the large genomic data.  
 ─  checking examples ... [100s/100s] OK (1m 40.1s)  
    Examples with CPU (user + system) or elapsed time > 5s  
                     user system elapsed  

@@ -36,6 +36,7 @@
 #' @importFrom Biostrings subseq
 #' @importFrom BiocGenerics as.data.frame
 #' @examples
+#' \dontrun{
 #' data(exampleMutation)
 #' data(exampleBam)
 #' fun_read_check(df_mutation = exampleMutation,
@@ -49,6 +50,7 @@
 #' min_homology_search = 40,
 #' progress_bar = "N"
 #' )
+#' }
 #' @export
 fun_read_check <- function(df_mutation,
                            df_bam,

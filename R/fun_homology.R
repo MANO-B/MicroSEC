@@ -22,6 +22,7 @@
 #' @importFrom BiocGenerics paste
 #' @importFrom GenomeInfoDb seqnames
 #' @examples
+#' \dontrun{
 #' data(msec_read_checked)
 #' data(homology_searched)
 #' fun_homology(msec = msec_read_checked,
@@ -31,6 +32,7 @@
 #'    chr_no = 24,
 #'    progress_bar = "N"
 #' )
+#' }
 #' @export
 fun_homology <- function(msec,
                          df_distant,
