@@ -188,8 +188,7 @@ BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update=FALSE)
 which will install in about 30 minutes on a recommended machine.
 
 ### Package Versions
-
-All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2020. Users can check [CRAN snapshot](https://mran.microsoft.com/timemachine/) for details. The versions of software are, specifically:
+The program does not use any of the functions specific to the following version of the packages, so there is no problem if you use the latest version of the package.  
 
 ```
 > packageVersion("stringr")
@@ -209,7 +208,6 @@ All packages are in their latest versions as they appear on `CRAN` on Oct. 31, 2
 > packageVersion("GenomeInfoDb")
 [1] '1.22.1'
 ```
-The program does not use any of the functions specific to the above version packages, so there is no problem if you use the latest version of the package.  
 
 ## Instructions for Use
 See also https://rdrr.io/cran/MicroSEC/

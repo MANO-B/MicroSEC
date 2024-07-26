@@ -1,5 +1,5 @@
 Package: MicroSEC
-Title: Sequence Error Filtering Pipeline for FFPE Samples
+Title: Sequence Error Filter for formalin-fixed and paraffin-embedded samples
 Version: 2.1.3
 Authors@R: 
     person(given = "Masachika",
@@ -7,12 +7,12 @@ Authors@R:
            role = c("aut", "cre"),
            email = "ikegamitky@gmail.com")
 Description: Clinical sequencing of tumor is usually performed on formalin-fixed
-    and paraffin-embedded (FFPE) samples and have many sequencing errors. We
-    found that the majority of these errors are detected in chimeric read
-    caused by single-strand DNA with microhomology. Our filtering pipeline
-    focuses on the uneven distribution of the artifacts in each read and removes
-    such errors in FFPE samples without over-eliminating the true mutations
-    detected in fresh frozen samples.
+    and paraffin-embedded samples and have many sequencing errors. We found that
+    the majority of these errors are detected in chimeric read caused by
+    single-strand DNA with micro-homology. Our filtering pipeline focuses on the
+    uneven distribution of the artifacts in each read and removes such errors in
+    formalin-fixed and paraffin-embedded samples without over-eliminating the
+    true mutations detected in fresh frozen samples.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en-US
