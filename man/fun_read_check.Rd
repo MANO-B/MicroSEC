@@ -45,6 +45,7 @@ list(msec, homology_search, mut_depth)
 This function attempts to check the mutation profile in each read.
 }
 \examples{
+\dontrun{
 data(exampleMutation)
 data(exampleBam)
 fun_read_check(df_mutation = exampleMutation,
@@ -58,4 +59,5 @@ short_homology_search_length = 4,
 min_homology_search = 40,
 progress_bar = "N"
 )
+}
 }

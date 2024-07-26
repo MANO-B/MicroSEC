@@ -33,6 +33,7 @@ msec
 This function attempts to search the homologous regions.
 }
 \examples{
+\dontrun{
 data(msec_read_checked)
 data(homology_searched)
 fun_homology(msec = msec_read_checked,
@@ -42,4 +43,5 @@ fun_homology(msec = msec_read_checked,
    chr_no = 24,
    progress_bar = "N"
 )
+}
 }
