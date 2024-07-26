@@ -195,12 +195,12 @@ msec_analyzed <- fun_analysis(msec = msec_summarized,
 ```
 
 ## Results
-```{r}
+```{r result}
 msec_analyzed
 ```
 
 ## Information about the current R session
-```{r}
+```{r sessioninfo}
 sessionInfo()
 ```
 

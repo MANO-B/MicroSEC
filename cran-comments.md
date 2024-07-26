@@ -13,6 +13,13 @@ Duration: 4m 1.9s
    fun_homology   78.915  0.644  79.687  
    fun_read_check 15.382  0.479  15.867  
 
+* New submission
+Package was archived on CRAN  
+CRAN repository db overrides:  
+  X-CRAN-Comment: Archived on 2022-03-31 as check problems were not  
+    corrected in time.  
+  Updated: version 1.1.3 to version 2.1.3.  
+
 ## revdepcheck results
 There are currently no downstream dependencies for this package.
 
