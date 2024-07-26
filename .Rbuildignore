@@ -4,10 +4,9 @@
 ^\.Rproj\.user$
 ^\.RData$
 ^\.Rhistory$
-MicroSEC.R
-MicroSEC_test.tsv.gz
-README.md
+^MicroSEC\.R$
 ^\.github
 ^CRAN-SUBMISSION$
-MicroSEC.def
+^MicroSEC\.def$
 ^LICENSE\.md$
+^\.gitignore$

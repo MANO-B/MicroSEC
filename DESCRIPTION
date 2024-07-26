@@ -1,6 +1,6 @@
 Package: MicroSEC
 Title: Sequence Error Filtering Pipeline for FFPE Samples
-Version: 2.1.2
+Version: 2.1.3
 Authors@R: 
     person(given = "Masachika",
            family = "Ikegami",
