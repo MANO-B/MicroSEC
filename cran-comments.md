@@ -1,5 +1,5 @@
 ## Test environments
-* local: aarch64-apple-darwin20 (64-bit), R version 4.3.2 (2023-10-31)
+* local: aarch64-apple-darwin20 (macOS Sonoma 14.5), R version 4.3.2
 * r-hub: linux, macos, macos-arm64, windows on Github Actions
 
 ## R CMD check results
