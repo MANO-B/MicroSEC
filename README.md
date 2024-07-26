@@ -1,6 +1,7 @@
 ![MicroSEC logo](MicroSEC_logo.png)
 
 # Version history
+2.1.1: Bug fixed.   
 2.1.0: Compatible with large indels in very short leads.  
 2.0.0: Processing time reduced to 30% due to changes in search algorithm.  
   
@@ -213,10 +214,10 @@ The program does not use any of the functions specific to the above version pack
 See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
-# Stable version from CRAN (not recommended now)
-install.packages("MicroSEC")
+# Stable version (v2.1.1) from github (recommended)
+remotes::install_github("MANO-B/MicroSEC", ref = 'v2.1.1')
 
-# Developmental stable version (v2.0.4) from github (recommended)
+# Developmental version from github
 remotes::install_github("MANO-B/MicroSEC")
 ```
 - How to use in command line
