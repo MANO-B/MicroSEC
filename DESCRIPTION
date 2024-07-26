@@ -1,5 +1,5 @@
 Package: MicroSEC
-Title: Sequence Error Filter for formalin-fixed and paraffin-embedded samples
+Title: Sequence Error Filter for Formalin-Fixed and Paraffin-Embedded Samples
 Version: 2.1.3
 Authors@R: 
     person(given = "Masachika",
