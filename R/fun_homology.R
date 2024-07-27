@@ -102,6 +102,7 @@ fun_homology <- function(msec,
       tmp_distant$Pos = 0
       tmp_distant$Ref = ""
       tmp_distant$Alt = ""
+      k = 0
       if (dim(df_distant[df_distant$number == 1, ])[1] == 1) {
         tmp_distant <- df_distant[df_distant$number == 1, ][1, ]
         if (tmp_distant$distant_homology > 0) {
