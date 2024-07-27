@@ -1,6 +1,7 @@
 ![MicroSEC logo](MicroSEC_logo.png)
 
 # Version history
+2.1.4: Bug fixed.  
 2.1.3: Example files renewed. Package in CRAN available.  
 2.1.1: Bug fixed.  
 2.1.0: Compatible with large indels in very short leads.  
@@ -10,12 +11,12 @@
 MicroSEC docker file can be downloadable via Docker-hub.  
 https://hub.docker.com/r/ikegamitky/microsec/tags
 ```
-docker pull ikegamitky/microsec:v2.1.3
+docker pull ikegamitky/microsec:v2.1.4
 ```
 
 Apptainer cantainer can be built via Docker-hub.
 ```
-apptainer pull docker://ikegamitky/microsec:v2.1.3
+apptainer pull docker://ikegamitky/microsec:v2.1.4
 ```
   
 Apptainer container can be built with a definition file (takes 30 min).  
@@ -213,14 +214,15 @@ The program does not use any of the functions specific to the following version 
 See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
-# Stable version (v2.1.3) from CRAN (recommended)
-install.packages('MicroSEC', dependencies = FALSE)
-
-# Stable version (v2.1.3) from github (recommended)
+# Stable version (v2.1.4) from github (recommended)
 remotes::install_github("MANO-B/MicroSEC", ref = 'v2.1.3')
 
 # Developmental version from github
 remotes::install_github("MANO-B/MicroSEC")
+
+# Stable version (v2.1.3) from CRAN (not recommended)
+install.packages('MicroSEC', dependencies = FALSE)
+
 ```
 - How to use in command line
 ```
