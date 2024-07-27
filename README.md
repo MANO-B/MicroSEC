@@ -215,7 +215,7 @@ See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
 # Stable version (v2.1.4) from github (recommended)
-remotes::install_github("MANO-B/MicroSEC", ref = 'v2.1.3')
+remotes::install_github("MANO-B/MicroSEC", ref = 'v2.1.4')
 
 # Developmental version from github
 remotes::install_github("MANO-B/MicroSEC")
