@@ -6,6 +6,7 @@
 #' @param sample_name Sample name.
 #' @param ref_genome Reference genome for the data.
 #' @param chr_no Reference genome chromosome number (human=24, mouse=22).
+#' @param simple_repeat_list Optional, set simple repeat bed file path.
 #' @return df_mutation
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
@@ -30,7 +31,8 @@
 fun_load_mutation <- function(mutation_file,
                              sample_name,
                              ref_genome,
-                             chr_no) {
+                             chr_no,
+                             simple_repeat_list = "") {
   Sample <- NULL
   Mut_type <- NULL
   Chr <- NULL
@@ -48,7 +50,6 @@ fun_load_mutation <- function(mutation_file,
   Neighbor_end_2 <- NULL
   Pre_Neighbor <- NULL
   Post_Neighbor <- NULL
-  simple_repeat_list <- NULL
   V1 <- NULL
   V2 <- NULL
   V3 <- NULL
@@ -93,7 +94,7 @@ fun_load_mutation <- function(mutation_file,
     df_mutation$SimpleRepeat_TRF <- "-"
   }
   
-  if ("simple_repeat_list" %in% ls() &
+  if (file.exists(simple_repeat_list) &
       !df_mutation$SimpleRepeat_TRF[1] %in% c("Y", "N")) {
     simple_repeat_info <- read.csv(simple_repeat_list,
                                    stringsAsFactors = FALSE,

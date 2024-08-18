@@ -67,6 +67,7 @@ The MicroSEC filter utilizes a statistical analysis, and the results for mutatio
 Two files are necessary for the analysis: mutation information file, BAM file.  
 A mutation supporting read ID information file is desirable but not necessary.  
 Prepare a sample information tsv file.  
+
 ### File 1: mutation information tsv file (required)  
 This tsv file should contain at least these contents (any number of other columns are allowed):  
 ```
@@ -85,6 +86,18 @@ SL_1010-N6-B  1-snv         chr1 108130741   C    T   N                         
     - Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
     - Sample, Chr, Pos, Ref, and Alt should be set exactly.  
     - If you do not know Mut_type, SimpleRepeat_TRF, or Neighborhood_sequence, enter "-".
+```
+# Option for SimpleRepeat_TRF annotation
+# Bed file can be obtained from https://genome.ucsc.edu/cgi-bin/hgTables
+# Change a command as follows.
+fun_load_mutation <- function(mutation_file,
+                             sample_name,
+                             ref_genome,
+                             chr_no,
+                             simple_repeat_list = "bed file path")
+```
+
+
 ### File 2: BAM file (required)  
 This file should contain at least these contents (always included in standard BAM files):  
 - QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, ISIZE, and QUAL.  
@@ -177,7 +190,7 @@ Users should install the following packages prior to use the scripts, from an `R
 if (!requireNamespace("BiocManager", quietly = TRUE)){
     install.packages("BiocManager")
 }
-install.packages(c('stringr', 'dplyr', 'remotes'), dependencies = TRUE)
+install.packages(c('stringr', 'tidyverse', 'remotes'), dependencies = TRUE)
 BiocManager::install(c("Rsamtools", "Biostrings", "GenomicAlignments", "GenomeInfoDb"), update=FALSE)
 
 # install necessary genomes
