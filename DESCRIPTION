@@ -1,6 +1,6 @@
 Package: MicroSEC
 Title: Sequence Error Filter for Formalin-Fixed and Paraffin-Embedded Samples
-Version: 2.1.5
+Version: 2.1.6
 Maintainer: Masachika Ikegami <ikegamitky@gmail.com>
 Authors@R: 
     person(given = "Masachika",
