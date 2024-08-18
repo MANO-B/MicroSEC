@@ -86,18 +86,7 @@ SL_1010-N6-B  1-snv         chr1 108130741   C    T   N                         
     - Neighborhood_sequence: [5'-20 bases] + [Alt sequence] + [3'-20 bases].  
     - Sample, Chr, Pos, Ref, and Alt should be set exactly.  
     - If you do not know Mut_type, SimpleRepeat_TRF, or Neighborhood_sequence, enter "-".
-```
-# Option for SimpleRepeat_TRF annotation
-# Bed file can be obtained from https://genome.ucsc.edu/cgi-bin/hgTables
-# Change a command as follows.
-fun_load_mutation <- function(mutation_file,
-                             sample_name,
-                             ref_genome,
-                             chr_no,
-                             simple_repeat_list = "bed file path")
-```
-
-
+  
 ### File 2: BAM file (required)  
 This file should contain at least these contents (always included in standard BAM files):  
 - QNAME, FLAG, RNAME, POS, MAPQ, CIGAR, RNEXT, PNEXT, TLEN, SEQ, ISIZE, and QUAL.  
@@ -132,6 +121,7 @@ Reference fastq file is necessary when you using CRAM files.
   
 ### File 5: simple repeat region bed file (optional, but mandatory to detect simple repeat derived artifacts)  
 simpleRepeat.bed.gz file is necessary when you check simple repeat derived errors.  
+Bed file can be obtained from https://genome.ucsc.edu/cgi-bin/hgTables  
     
 ## Filtering detail
 This pipeline contains 8 filtering processes.  
@@ -269,6 +259,8 @@ sample_info <- read.csv(sample_list,
                        sep = "\t")
 
 # initialize
+reference_genome <- NULL
+simple_repeat_list <- ""
 msec <- NULL
 homology_search <- NULL
 mut_depth <- NULL
@@ -317,7 +309,11 @@ for (sample in seq_len(dim(sample_info)[1])) {
   }
   
   # load mutation information
-  df_mutation <- fun_load_mutation(mutation_file, sample_name, ref_genome)
+  df_mutation <- fun_load_mutation(mutation_file,
+                                   sample_name,
+                                   ref_genome,
+                                   24,
+                                   simple_repeat_list)
   
   if (tools::file_ext(bam_file) == "bam") {
     bam_file_bai <- paste0(bam_file, ".bai")

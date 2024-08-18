@@ -4,7 +4,13 @@
 \alias{fun_load_mutation}
 \title{Mutation data file loader}
 \usage{
-fun_load_mutation(mutation_file, sample_name, ref_genome, chr_no)
+fun_load_mutation(
+  mutation_file,
+  sample_name,
+  ref_genome,
+  chr_no,
+  simple_repeat_list = ""
+)
 }
 \arguments{
 \item{mutation_file}{Path of the mutation information file.}
@@ -14,6 +20,8 @@ fun_load_mutation(mutation_file, sample_name, ref_genome, chr_no)
 \item{ref_genome}{Reference genome for the data.}
 
 \item{chr_no}{Reference genome chromosome number (human=24, mouse=22).}
+
+\item{simple_repeat_list}{Optional, set simple repeat bed file path.}
 }
 \value{
 df_mutation
