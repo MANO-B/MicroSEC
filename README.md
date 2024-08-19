@@ -1,6 +1,7 @@
 ![MicroSEC logo](MicroSEC_logo.png)
 
 # Version history
+2.1.6: Bug with simple repeat annotation fixed.  
 2.1.5: Bug fixed.  
 2.1.3: Example files renewed. Package in CRAN available.  
 2.1.1: Bug fixed.  
