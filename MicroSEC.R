@@ -23,7 +23,7 @@
 # File 3: sample information tsv file  (mandatory, if multiple samples are processed in a batch)
 # Seven to ten columns are necessary (without column names).
 # Optional columns can be deleted if they are not applicable.
-# [sample name] [mutation information tsv file] [BAM file] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse] [panel name] [optional: reference genome fastq file] [optional: simple repeat region bed file]  
+# [sample name] [mutation information tsv file] [BAM file] [read length] [adapter sequence read 1] [optional: adapter sequence read 2] [sample type: Human or Mouse] [panel name] [optional: reference genome fasta file] [optional: simple repeat region bed file]  
 # PC9	./source/CCLE.tsv	./source/Cell_line/PC9.bam 127	AGATCGGAAGAGCACACGTCTGAACTCCAGTCA AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Human TOP
 # A375 ./source/CCLE.tsv.gz	./source/Cell_line/A375.bam	127	 AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT Hg38 TOP ./reference/hg38.fa ./reference/simpleRepeat.bed.gz
 #
