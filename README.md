@@ -218,6 +218,14 @@ The program does not use any of the functions specific to the following version 
 See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
+# Installing a package from github requires a github account.
+# 1. Sign in github.
+# 2. Access Settings - Developer Settings in the Dashboard.
+# 3. Generate a Personal access token (classic) without any checkboxes.
+# 4. Copy the generated token.
+# 5. Run following command in R console.
+Sys.setenv(GITHUB_PAT = "my_github_pat_here")
+
 # Stable version (v2.1.6) from github (recommended)
 remotes::install_github("MANO-B/MicroSEC", ref = 'v2.1.6')
 
