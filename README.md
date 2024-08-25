@@ -1,7 +1,7 @@
 ![MicroSEC logo](MicroSEC_logo.png)
 
 # Version history
-2.1.6: Bug with simple repeat annotation fixed.  
+2.1.6: Bug with simple repeat annotation fixed. Downloadable from CRAN.  
 2.1.5: Bug fixed.  
 2.1.3: Example files renewed. Package in CRAN available.  
 2.1.1: Bug fixed.  
@@ -232,9 +232,8 @@ remotes::install_github("MANO-B/MicroSEC", ref = 'v2.1.6')
 # Developmental version from github
 remotes::install_github("MANO-B/MicroSEC")
 
-# Stable version (v2.1.3) from CRAN (not recommended)
+# Stable version (v2.1.6) from CRAN (recommended)
 install.packages('MicroSEC', dependencies = FALSE)
-
 ```
 - How to use in command line
 ```
