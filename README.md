@@ -38,8 +38,8 @@ wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.R
 
 # Known limitation
 PIK3CA E545A (chr3:179218304A>C, NM_006218.4:c.1634A>C) pathogenic mutation might
-be called as an artifact by MicroSEC, which may be a [false positive error](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6296600/). 
-A PIK3CA pseudogene (LOC100422375) in chromosome 22 harbors [a base substitution](https://www.sciencedirect.com/science/article/pii/S1525157811002625) 
+be called as an artifact by MicroSEC, which may be a [false positive error](https://doi.org/10.1016/j.jgeb.2017.10.002). 
+A PIK3CA pseudogene (LOC100422375) in chromosome 22 harbors [a base substitution](https://doi.org/10.1016/j.jmoldx.2011.08.004) 
 which was identical with the mutation in PIK3CA c.1634A>C.  
 Please check the reads manually with IGV.  
 
