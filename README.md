@@ -218,7 +218,7 @@ The program does not use any of the functions specific to the following version 
 See also https://rdrr.io/cran/MicroSEC/
 - How to install
 ```
-# Stable version (v2.1.5) from github (recommended)
+# Stable version (v2.1.6) from github (recommended)
 remotes::install_github("MANO-B/MicroSEC", ref = 'v2.1.6')
 
 # Developmental version from github
