@@ -2,6 +2,7 @@
 
 # Version history
 2.1.6: Bug with simple repeat annotation fixed. Downloadable from CRAN.  
+<p><img src="https://cranlogs.r-pkg.org/badges/grand-total/MicroSEC" alt="" /></p>
 2.1.5: Bug fixed.  
 2.1.3: Example files renewed. Package in CRAN available.  
 2.1.1: Bug fixed.  
