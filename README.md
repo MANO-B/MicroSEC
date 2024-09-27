@@ -30,8 +30,10 @@ Run docker container or apptainer container.
 ```
 # mount host directory to container directory
 docker run -it --rm -v [host_dir]:[container_dir] ikegamitky/microsec:v2.1.6 bash
-
-
+# download script file
+wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.R
+# run the script
+Rscript MicroSEC.R [working/output directory] [sample information tsv file] [progress bar Y/N]
 ```
   
 # Analysis script file
