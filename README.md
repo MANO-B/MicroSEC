@@ -26,6 +26,13 @@ wget https://raw.githubusercontent.com/MANO-B/MicroSEC/main/MicroSEC.def
 sudo apptainer build MicroSEC.sif MicroSEC.def
 ```
 
+Run docker container or apptainer container.  
+```
+# mount host directory to container directory
+docker run -it --rm -v [host_dir]:[container_dir] ikegamitky/microsec:v2.1.6 bash
+
+
+```
   
 # Analysis script file
 MicroSEC has been improved to dramatically reduce memory usage.  
