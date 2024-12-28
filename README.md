@@ -9,7 +9,7 @@
 2.0.0: Processing time reduced to 30% due to changes in search algorithm.  
   
 # Docker and Apptainer
-MicroSEC docker file can be downloadable via Docker-hub.  
+MicroSEC docker file can be download via Docker-hub.  
 https://hub.docker.com/r/ikegamitky/microsec/tags
 ```
 docker pull ikegamitky/microsec:v2.1.6
